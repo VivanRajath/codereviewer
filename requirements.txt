@@ -4,3 +4,4 @@ python-dotenv
 httpx
 google-generativeai
 pylint
+gunicorn

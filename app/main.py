@@ -6,7 +6,7 @@ import logging
 from typing import Optional, List, Dict, Any
 
 from fastapi import FastAPI, Header, HTTPException, Request
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi.responses import JSONResponse, FileResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import httpx
@@ -890,4 +890,4 @@ async def auth_callback(code: str):
         # In a real app, we'd set a secure cookie or session
         return RedirectResponse(f"/dashboard#token={access_token}")
 
-from fastapi.responses import RedirectResponse
+
