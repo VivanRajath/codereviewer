@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - PR Analyzer</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="user-profile">
+                <img src="" alt="Avatar" class="avatar" id="userAvatar">
+                <div class="user-info">
+                    <div class="username" id="userName">INITIALIZING...</div>
+                    <div id="userLogin" style="font-size: 0.8rem; color: var(--text-dim);">@...</div>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/dashboard">› ACTIVITY_LOG</a></li>
+                <li><a href="/static/repositories.html">› REPOSITORIES</a></li>
+                <li><a href="/static/reports.html" class="active">› REPORTS</a></li>
+                <li><a href="/static/manual.html">› MANUAL_OVERRIDE</a></li>
+            </ul>
+            <div style="margin-top: auto;">
+                <button class="btn logout-btn" id="logoutBtn">LOGOUT</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <section id="reportsSection">
+                <div class="section-header">
+                    <h2>SYSTEM_REPORTS</h2>
+                    <button class="btn" onclick="fetchReports()">REFRESH</button>
+                </div>
+                <div id="reportsContainer" class="reports-container"></div>
+            </section>
+        </main>
+    </div>
+    <script src="/static/app.js"></script>
+</body>
+
+</html>

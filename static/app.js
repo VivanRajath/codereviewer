@@ -1,0 +1,1554 @@
+const GITHUB_API_BASE = 'https://api.github.com';
+
+// Helper to get token
+function getToken() {
+    return localStorage.getItem('gh_token');
+}
+
+// Helper for headers
+function getHeaders() {
+    const token = getToken();
+    return {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json'
+    };
+}
+
+// Login Logic
+if (document.getElementById('loginForm')) {
+    // Check for OAuth token in URL hash
+    const hash = window.location.hash;
+    if (hash && hash.includes('token=')) {
+        const token = hash.split('token=')[1];
+        if (token) {
+            // Verify token by fetching user
+            fetch(`${GITHUB_API_BASE}/user`, {
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            })
+                .then(res => {
+                    if (res.ok) return res.json();
+                    throw new Error('Invalid token');
+                })
+                .then(user => {
+                    localStorage.setItem('gh_token', token);
+                    localStorage.setItem('gh_user', JSON.stringify(user));
+                    window.location.href = '/dashboard';
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Authentication failed');
+                });
+        }
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const token = document.getElementById('token').value.trim();
+        const btn = document.getElementById('loginBtn');
+        const spinner = document.getElementById('loginSpinner');
+        const errorDiv = document.getElementById('loginError');
+        const btnText = btn.querySelector('.btn-text');
+
+        if (!token) return;
+
+        btn.disabled = true;
+        if (btnText) btnText.classList.add('hidden');
+        if (spinner) spinner.classList.remove('hidden');
+        if (errorDiv) errorDiv.classList.add('hidden');
+
+        try {
+            const res = await fetch(`${GITHUB_API_BASE}/user`, {
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+
+            if (res.ok) {
+                const user = await res.json();
+                localStorage.setItem('gh_token', token);
+                localStorage.setItem('gh_user', JSON.stringify(user));
+                window.location.href = '/dashboard';
+            } else {
+                throw new Error('Invalid token');
+            }
+        } catch (err) {
+            if (errorDiv) {
+                errorDiv.textContent = err.message || 'Failed to login';
+                errorDiv.classList.remove('hidden');
+            }
+            btn.disabled = false;
+            if (btnText) btnText.classList.remove('hidden');
+            if (spinner) spinner.classList.add('hidden');
+        }
+    });
+}
+
+// State
+let currentRepo = null;
+let currentPR = null;
+let currentAnalysis = null;
+let chatHistory = [];
+
+// Monaco editor state
+let monacoEditor = null;
+let monacoRawModel = null;
+let monacoWorkingModel = null;
+let currentEditorMode = 'working';
+let currentFileSha = null;
+let currentFilePath = null;
+
+// Create Monaco editor (called from inline script after Monaco is ready)
+window.createMonacoEditor = function () {
+    const el = document.getElementById('monacoEditor');
+    if (!el || !window.monaco) return;
+
+    monacoRawModel = monaco.editor.createModel('', 'plaintext');
+    monacoWorkingModel = monaco.editor.createModel('', 'plaintext');
+
+    monacoEditor = monaco.editor.create(el, {
+        model: monacoWorkingModel,
+        theme: 'vs-dark',
+        automaticLayout: true,
+        fontSize: 13,
+        minimap: { enabled: false },
+        fontFamily: "'JetBrains Mono', monospace"
+    });
+
+    // Default to reconstructed (working) mode
+    setEditorMode('working');
+};
+
+// Editor language helper
+function getLanguageFromFilename(filename) {
+    if (!filename) return 'plaintext';
+    if (filename.endsWith('.py')) return 'python';
+    if (filename.endsWith('.js')) return 'javascript';
+    if (filename.endsWith('.ts')) return 'typescript';
+    if (filename.endsWith('.json')) return 'json';
+    if (filename.endsWith('.css')) return 'css';
+    if (filename.endsWith('.html')) return 'html';
+    if (filename.endsWith('.md')) return 'markdown';
+    return 'plaintext';
+}
+
+function setEditorMode(mode) {
+    if (!monacoEditor || !monacoRawModel || !monacoWorkingModel) return;
+
+    currentEditorMode = mode;
+
+    if (mode === 'raw') {
+        monacoEditor.setModel(monacoRawModel);
+        monacoEditor.updateOptions({ readOnly: true });
+    } else {
+        monacoEditor.setModel(monacoWorkingModel);
+        monacoEditor.updateOptions({ readOnly: false });
+    }
+}
+
+// Open Editor with File
+window.openEditor = async function (url, filename, sha) {
+    if (!monacoEditor || !monacoWorkingModel) {
+        console.error("Monaco Editor not initialized");
+        return;
+    }
+
+    // Ensure we are in the correct tab
+    switchTab('files');
+
+    // Update UI
+    document.getElementById('editorFileName').textContent = filename;
+    currentFilePath = filename;
+    currentFileSha = sha;
+
+    // Highlight active file in list
+    document.querySelectorAll('.file-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.textContent.includes(filename)) {
+            item.classList.add('active');
+        }
+    });
+
+    // Show loading state
+    monacoWorkingModel.setValue('LOADING...');
+    monacoEditor.updateOptions({ readOnly: true });
+
+    // Reset Chat
+    const chatMessages = document.getElementById('chatMessages');
+    if (chatMessages) {
+        chatMessages.innerHTML = '<div style="color: var(--text-dim); text-align: center; margin-top: 1rem;">ANALYZING...</div>';
+    }
+
+    try {
+        let content = '';
+        if (url) {
+            const res = await fetch('/api/fetch-file', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    owner: currentRepo.owner,
+                    repo: currentRepo.name,
+                    path: filename,
+                    ref: currentPR ? currentPR.head.sha : 'main', // Use PR head SHA
+                    github_token: getToken()
+                })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                content = data.content;
+            } else {
+                throw new Error('Failed to fetch file content');
+            }
+        } else {
+            content = "// NO_CONTENT_URL_PROVIDED";
+        }
+
+        monacoWorkingModel.setValue(content);
+        monacoRawModel.setValue(content); // Update raw model too
+        monacoEditor.updateOptions({ readOnly: false });
+
+        // Set Language
+        const lang = getLanguageFromFilename(filename);
+        monaco.editor.setModelLanguage(monacoWorkingModel, lang);
+
+        // Trigger Analysis automatically
+        analyzeEditorCode();
+
+    } catch (err) {
+        console.error(err);
+        monacoWorkingModel.setValue('// FAILED_TO_LOAD_FILE');
+        monacoEditor.updateOptions({ readOnly: true });
+    }
+};
+
+// Toggle Chat Panel
+window.toggleChat = function () {
+    const splitView = document.getElementById('prSplitView');
+    if (splitView) {
+        splitView.classList.toggle('chat-collapsed');
+        // Resize editor
+        if (monacoEditor) {
+            setTimeout(() => monacoEditor.layout(), 300);
+        }
+    }
+};
+
+// Handle Chat Input
+window.handleChatInput = function (event) {
+    if (event.key === 'Enter') {
+        sendChatMessage();
+    }
+};
+
+// Send Chat Message
+window.sendChatMessage = async function () {
+    const input = document.getElementById('chatInput');
+    const messagesDiv = document.getElementById('chatMessages');
+    const message = input.value.trim();
+
+    if (!message) return;
+
+    // Add User Message
+    messagesDiv.innerHTML += `
+        <div class="chat-message user">
+            ${message}
+        </div>
+    `;
+    input.value = '';
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    // Add Loading Message
+    const loadingId = 'loading-' + Date.now();
+    messagesDiv.innerHTML += `
+        <div id="${loadingId}" class="chat-message ai">
+            ...
+        </div>
+    `;
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    try {
+        const code = monacoWorkingModel ? monacoWorkingModel.getValue() : '';
+
+        const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                message: message,
+                context: `Current File: ${currentFilePath}\nCode:\n${code}`,
+                history: chatHistory
+            })
+        });
+
+        const data = await res.json();
+
+        // Remove loading
+        const loadingEl = document.getElementById(loadingId);
+        if (loadingEl) loadingEl.remove();
+
+        // Add AI Response
+        messagesDiv.innerHTML += `
+            <div class="chat-message ai">
+                ${data.response}
+            </div>
+        `;
+
+        // Update History
+        chatHistory.push({ role: 'user', content: message });
+        chatHistory.push({ role: 'assistant', content: data.response });
+
+    } catch (err) {
+        console.error(err);
+        const loadingEl = document.getElementById(loadingId);
+        if (loadingEl) loadingEl.textContent = "ERROR: FAILED_TO_SEND_MESSAGE";
+    }
+
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+};
+
+// Helper function to extract analysis summary
+function getAnalysisSummary(analysis) {
+    if (!analysis) return 'NO_ANALYSIS_AVAILABLE';
+    if (typeof analysis === 'string') return analysis;
+    if (analysis.summary) return analysis.summary;
+    if (analysis.message) return analysis.message;
+    return 'ANALYSIS_COMPLETED';
+}
+
+// Fetch Activity Logs (Enhanced with commits and file changes)
+let activityDataCache = null;
+let lastFetchTime = 0;
+
+window.fetchActivityLogs = async function (force = false) {
+    const commitsGrid = document.getElementById('commitsGrid');
+    const fileChangesGrid = document.getElementById('fileChangesGrid');
+    const analysesGrid = document.getElementById('analysesGrid');
+
+    // Use cache if data was fetched less than 30 seconds ago and not forced
+    const now = Date.now();
+    if (!force && activityDataCache && (now - lastFetchTime) < 30000) {
+        renderActivityData(activityDataCache);
+        return;
+    }
+
+    if (commitsGrid) commitsGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-dim);">LOADING_COMMITS...</div>';
+    if (fileChangesGrid) fileChangesGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-dim);">LOADING_FILE_CHANGES...</div>';
+    if (analysesGrid) analysesGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-dim);">LOADING_ANALYSES...</div>';
+
+    try {
+        const res = await fetch('/api/activity-logs', {
+            headers: { 'github-token': getToken() }
+        });
+        const data = await res.json();
+
+        // Cache the data
+        activityDataCache = data;
+        lastFetchTime = now;
+
+        renderActivityData(data);
+
+    } catch (err) {
+        console.error('Failed to fetch activity logs', err);
+        if (commitsGrid) commitsGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--danger-color);">SYSTEM_ERROR: FAILED_TO_FETCH_COMMITS</div>';
+        if (fileChangesGrid) fileChangesGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--danger-color);">SYSTEM_ERROR: FAILED_TO_FETCH_FILE_CHANGES</div>';
+        if (analysesGrid) analysesGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--danger-color);">SYSTEM_ERROR: FAILED_TO_FETCH_ANALYSES</div>';
+    }
+};
+
+function renderActivityData(data) {
+    const commitsGrid = document.getElementById('commitsGrid');
+    const fileChangesGrid = document.getElementById('fileChangesGrid');
+    const analysesGrid = document.getElementById('analysesGrid');
+
+    // Display Commits
+    if (commitsGrid) {
+        if (!data.commits || data.commits.length === 0) {
+            commitsGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-dim);">NO_RECENT_COMMITS_FOUND.</div>';
+        } else {
+            commitsGrid.innerHTML = data.commits.map(commit => `
+                <div class="card" onclick="window.open('${commit.url}', '_blank')">
+                    <div class="card-title">
+                        <span style="font-family: monospace; color: var(--primary-color);">${commit.sha}</span>
+                        <span class="status-badge status-open">${commit.repo}</span>
+                    </div>
+                    <div style="font-size: 0.9rem; color: var(--text-color); margin-top: 0.5rem;">
+                        ${commit.message}
+                    </div>
+                    <div class="card-meta" style="margin-top: 0.5rem;">
+                        AUTHOR: ${commit.author} | ${new Date(commit.date).toLocaleString()}
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+
+    // Display File Changes
+    if (fileChangesGrid) {
+        if (!data.fileChanges || data.fileChanges.length === 0) {
+            fileChangesGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-dim);">NO_RECENT_FILE_CHANGES_FOUND.</div>';
+        } else {
+            fileChangesGrid.innerHTML = data.fileChanges.map(file => `
+                <div class="card">
+                    <div class="card-title">
+                        <span>${file.filename}</span>
+                        <span class="status-badge status-${file.status === 'added' ? 'open' : file.status === 'removed' ? 'closed' : 'open'}">${file.status}</span>
+                    </div>
+                    <div style="font-size: 0.9rem; color: var(--text-color); margin-top: 0.5rem;">
+                        PR #${file.pr_number}: ${file.pr_title}
+                    </div>
+                    <div class="card-meta" style="margin-top: 0.5rem;">
+                        REPO: ${file.repo} | 
+                        <span style="color: var(--primary-color);">+${file.additions}</span> / 
+                        <span style="color: var(--danger-color);">-${file.deletions}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+
+    // Display PR Analyses
+    if (analysesGrid) {
+        if (!data.analyses || data.analyses.length === 0) {
+            analysesGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-dim);">NO_RECENT_ANALYSES_FOUND.</div>';
+        } else {
+            analysesGrid.innerHTML = data.analyses.map(item => `
+                <div class="card" onclick='openAnalysisModal(${JSON.stringify(item).replace(/'/g, "&#39;")})'>
+                    <div class="card-title">
+                        <span>${item.repo} #${item.pr_number}</span>
+                        <span class="status-badge status-open">${item.action || 'ANALYZED'}</span>
+                    </div>
+                    <div class="card-meta">
+                        FILES: ${item.changed_files_count} | OWNER: ${item.owner}
+                    </div>
+                    <div style="font-size: 0.9rem; color: var(--text-color); overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; margin-top: 0.5rem;">
+                        ${getAnalysisSummary(item.analysis)}
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+}
+
+// Tab switching for activity dashboard
+window.switchActivityTab = function (tabName) {
+    // Update tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+
+    // Update tab content
+    document.querySelectorAll('#activitySection .tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    const activeTab = document.getElementById(`tab-${tabName}`);
+    if (activeTab) {
+        activeTab.classList.add('active');
+    }
+};
+
+// Keep old function for backward compatibility
+window.fetchAnalysis = window.fetchActivityLogs;
+
+// Save as Branch
+async function openSaveBranchModal() {
+    if (!currentPR) return;
+    const branchName = prompt("ENTER_NEW_BRANCH_NAME:");
+    if (!branchName) return;
+
+    try {
+        const res = await fetch('/api/save-branch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                owner: currentPR.owner,
+                repo: currentPR.repo,
+                base_branch: 'main',
+                new_branch_name: branchName,
+                github_token: getToken()
+            })
+        });
+        const data = await res.json();
+        if (data.ok) {
+            alert(`BRANCH ${branchName} CREATED.`);
+        } else {
+            alert('FAILED_TO_CREATE_BRANCH: ' + (data.error || 'UNKNOWN_ERROR'));
+        }
+    } catch (err) {
+        alert('NETWORK_ERROR');
+    }
+}
+
+// Modal (For Activity Feed)
+window.openAnalysisModal = function (item) {
+    document.getElementById('modalTitle').textContent = `ANALYSIS: ${item.repo} #${item.pr_number}`;
+    const contentDiv = document.getElementById('modalContent');
+    contentDiv.innerHTML = '';
+
+    const analysis = item.analysis;
+    if (typeof analysis === 'string') {
+        contentDiv.textContent = analysis;
+    } else {
+        const summary = document.createElement('div');
+        summary.innerHTML = `<strong style="color: var(--primary-color);">SUMMARY:</strong> ${analysis.summary || 'NO_SUMMARY.'} <br><br> <strong style="color: var(--secondary-color);">RECOMMENDATION:</strong> ${analysis.recommendation || 'NO_RECOMMENDATION.'}`;
+        summary.style.marginBottom = '1rem';
+        contentDiv.appendChild(summary);
+
+        if (analysis.issues) {
+            analysis.issues.forEach(issue => {
+                const el = document.createElement('div');
+                el.style.marginBottom = '0.5rem';
+                el.style.padding = '0.5rem';
+                el.style.background = 'rgba(255, 255, 255, 0.05)';
+                el.innerHTML = `<strong style="color: var(--primary-color);">${issue.category || 'ISSUE'}</strong>: ${issue.message || ''}`;
+                contentDiv.appendChild(el);
+            });
+        }
+    }
+
+    document.getElementById('analysisModal').classList.add('show');
+    document.getElementById('modalOverlay').classList.add('show');
+};
+
+window.closeModal = function () {
+    const modal = document.getElementById('analysisModal');
+    const overlay = document.getElementById('modalOverlay');
+    if (modal) modal.classList.remove('show');
+    if (overlay) overlay.classList.remove('show');
+};
+
+window.analyzeEditorCode = async function () {
+    const analysisDiv = document.getElementById('chatMessages');
+    if (!analysisDiv) return;
+
+    if (!monacoWorkingModel) {
+        // alert("EDITOR_NOT_READY"); // Silent fail or retry?
+        return;
+    }
+
+    const code = monacoWorkingModel.getValue();
+    // Use a loading bubble
+    analysisDiv.innerHTML = `
+        <div class="chat-message ai">
+            ANALYZING CODE...
+        </div>
+    `;
+
+    try {
+        const res = await fetch('/api/analyze-code', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                code: code,
+                filename: currentFilePath
+            })
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+            const analysis = data.analysis;
+            window.currentEditorIssues = analysis.issues || []; // Store for auto-fix
+
+            let html = '';
+            if (analysis.issues && analysis.issues.length > 0) {
+                const issuesHtml = analysis.issues.map((i, index) => {
+                    const message = i.message || (typeof i === 'string' ? i : 'Unknown Issue');
+                    return `
+                    <div style="margin-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">
+                        <div style="color: var(--warning-color); margin-bottom: 0.2rem;">> ${message}</div>
+                        <div style="text-align: right;">
+                            <button class="btn-sm" onclick="applyFix(${index})">APPLY FIX</button>
+                        </div>
+                    </div>
+                `}).join('');
+
+                html = `
+                    <div class="chat-message ai">
+                        <div style="font-weight: bold; margin-bottom: 0.5rem; color: var(--secondary-color);">ANALYSIS COMPLETE:</div>
+                        ${issuesHtml}
+                    </div>
+                `;
+            } else {
+                html = `
+                    <div class="chat-message ai" style="color: var(--success-color);">
+                        NO ISSUES DETECTED.
+                    </div>
+                `;
+            }
+            analysisDiv.innerHTML = html;
+        } else {
+            analysisDiv.innerHTML = `
+                <div class="chat-message ai" style="color: var(--danger-color);">
+                    ANALYSIS_FAILED: ${data.detail || "UNKNOWN_ERROR"}
+                </div>
+            `;
+        }
+    }
+    catch (e) {
+        console.error(e);
+        analysisDiv.innerHTML = `
+            <div class="chat-message ai" style="color: var(--danger-color);">
+                NETWORK_ERROR
+            </div>
+        `;
+    }
+};
+
+window.applyFix = async function (index) {
+    const issue = window.currentEditorIssues[index];
+    if (!issue) return;
+
+    const btn = document.querySelector(`button[onclick="applyFix(${index})"]`);
+    if (btn) {
+        btn.textContent = "APPLYING...";
+        btn.disabled = true;
+    }
+
+    try {
+        const code = monacoWorkingModel.getValue();
+        const res = await fetch('/api/generate-fix', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                code: code,
+                issue: issue
+            })
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+            monacoWorkingModel.setValue(data.fixed_code);
+            if (btn) btn.textContent = "APPLIED";
+            // Re-analyze to clear the issue
+            // analyzeEditorCode(); // Optional: might be too aggressive
+        } else {
+            alert("FAILED_TO_APPLY_FIX: " + (data.error || "UNKNOWN"));
+            if (btn) {
+                btn.textContent = "APPLY FIX";
+                btn.disabled = false;
+            }
+        }
+    } catch (e) {
+        console.error(e);
+        alert("NETWORK_ERROR");
+        if (btn) {
+            btn.textContent = "APPLY FIX";
+            btn.disabled = false;
+        }
+    }
+};
+
+// Auto-Fix File (analyzes if needed, then fixes)
+window.autoFixFile = async function () {
+    if (!monacoEditor || !monacoWorkingModel) {
+        alert("EDITOR_NOT_READY.");
+        return;
+    }
+    if (!currentRepo || !currentFilePath || !currentFileSha) {
+        alert("NO_FILE_SELECTED.");
+        return;
+    }
+
+    const btn = document.querySelector('button[onclick="autoFixFile()"]');
+    const originalText = btn ? btn.textContent : "AUTO-FIX";
+    if (btn) {
+        btn.textContent = "ANALYZING...";
+        btn.disabled = true;
+    }
+
+    const code = monacoWorkingModel.getValue();
+    const chatMessages = document.getElementById('chatMessages');
+
+    try {
+        // Step 1: Analyze code first (silently if no issues cached)
+        if (!window.currentEditorIssues || window.currentEditorIssues.length === 0) {
+            const analyzeRes = await fetch('/api/analyze-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    code: code,
+                    filename: currentFilePath
+                })
+            });
+            const analyzeData = await analyzeRes.json();
+
+            if (!analyzeData.ok || !analyzeData.analysis.issues || analyzeData.analysis.issues.length === 0) {
+                alert("NO_ISSUES_FOUND_TO_FIX.");
+                if (btn) {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }
+                return;
+            }
+
+            window.currentEditorIssues = analyzeData.analysis.issues;
+        }
+
+        //Step 2: Auto-fix
+        if (btn) btn.textContent = "FIXING...";
+
+        const branch = currentPR ? (currentPR.head.ref || currentPR.head_branch || 'main') : 'main';
+
+        const res = await fetch('/api/auto-fix', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                owner: currentRepo.owner,
+                repo: currentRepo.name,
+                branch: branch,
+                filename: currentFilePath,
+                code: code,
+                issues: window.currentEditorIssues,
+                github_token: getToken()
+            })
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+            // Show success in chat
+            if (chatMessages) {
+                const msg = document.createElement('div');
+                msg.className = 'chat-message ai';
+                msg.style.color = 'var(--primary-color)';
+                msg.innerHTML = `
+                    ✓ AUTO-FIX APPLIED AND PUSHED!
+                    <br><br>
+                    <strong>Fixed ${window.currentEditorIssues.length} issues</strong>
+                    <br>
+                    <code style="background: var(--surface-color); padding: 0.2rem 0.5rem;">${data.new_sha ? data.new_sha.substring(0, 7) : 'commit'}</code>
+                `;
+                chatMessages.appendChild(msg);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            // Clear issues cache
+            window.currentEditorIssues = [];
+
+            // Reload file to show changes
+            if (data.new_sha) {
+                currentFileSha = data.new_sha;
+                openEditor(null, currentFilePath, data.new_sha);
+            }
+        } else {
+            alert("AUTO_FIX_FAILED: " + (data.error || "UNKNOWN_ERROR"));
+        }
+    } catch (e) {
+        console.error(e);
+        alert("NETWORK_ERROR");
+    } finally {
+        if (btn) {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }
+    }
+};
+
+// Commit and Push to Branch
+window.commitAndPush = async function () {
+    if (!monacoEditor || !monacoWorkingModel) {
+        alert("EDITOR_NOT_READY.");
+        return;
+    }
+    if (!currentRepo || !currentFilePath || !currentFileSha) {
+        alert("NO_FILE_SELECTED.");
+        return;
+    }
+
+    const btn = document.getElementById('commitPushBtn');
+    const btnText = document.getElementById('commitBtnText');
+    const spinner = document.getElementById('commitSpinner');
+
+    // Show loading state
+    if (btn) btn.disabled = true;
+    if (btnText) btnText.classList.add('hidden');
+    if (spinner) spinner.classList.remove('hidden');
+
+    const code = monacoWorkingModel.getValue();
+    const message = prompt("ENTER_COMMIT_MESSAGE:", `Update ${currentFilePath}`);
+
+    if (!message) {
+        // Reset button state
+        if (btn) btn.disabled = false;
+        if (btnText) btnText.classList.remove('hidden');
+        if (spinner) spinner.classList.add('hidden');
+        return;
+    }
+
+    const branch = currentPR ? (currentPR.head.ref || currentPR.head_branch || 'main') : 'main';
+
+    try {
+        const res = await fetch('/api/push-to-branch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                owner: currentRepo.owner,
+                repo: currentRepo.name,
+                path: currentFilePath,
+                content: code,
+                message: message,
+                sha: currentFileSha,
+                branch: branch,
+                github_token: getToken()
+            })
+        });
+
+        const data = await res.json();
+
+        if (data.ok) {
+            // Update SHA for next save
+            currentFileSha = data.new_sha;
+
+            // Show success
+            if (btnText) btnText.textContent = '✓ PUSHED';
+            if (btnText) btnText.classList.remove('hidden');
+            if (spinner) spinner.classList.add('hidden');
+
+            // Reset after 2 seconds
+            setTimeout(() => {
+                if (btnText) btnText.textContent = 'COMMIT & PUSH';
+                if (btn) btn.disabled = false;
+            }, 2000);
+
+            // Show success message in chat with SHA and link
+            const chatMessages = document.getElementById('chatMessages');
+            if (chatMessages) {
+                const msg = document.createElement('div');
+                msg.className = 'chat-message ai';
+                msg.style.color = 'var(--primary-color)';
+
+                // Extract short SHA (first 7 chars)
+                const shortSha = data.new_sha ? data.new_sha.substring(0, 7) : 'unknown';
+
+                msg.innerHTML = `
+                    ✓ COMMITTED TO BRANCH: ${branch}
+                    <br><br>
+                    <strong>Commit:</strong> <code style="background: var(--surface-color); padding: 0.2rem 0.5rem;">${shortSha}</code>
+                    ${data.commit_url ? `<br><a href="${data.commit_url}" target="_blank" style="color: var(--secondary-color);">View on GitHub →</a>` : ''}
+                `;
+
+                chatMessages.appendChild(msg);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        } else {
+            alert("PUSH_FAILED: " + (data.error || data.detail || "UNKNOWN_ERROR"));
+            // Reset button
+            if (btn) btn.disabled = false;
+            if (btnText) btnText.classList.remove('hidden');
+            if (spinner) spinner.classList.add('hidden');
+        }
+    } catch (e) {
+        console.error(e);
+        alert("NETWORK_ERROR");
+        // Reset button
+        if (btn) btn.disabled = false;
+        if (btnText) btnText.classList.remove('hidden');
+        if (spinner) spinner.classList.add('hidden');
+    }
+};
+
+// Save editor file
+window.saveEditorFile = async function () {
+    if (!monacoEditor || !monacoWorkingModel) {
+        alert("EDITOR_NOT_READY.");
+        return;
+    }
+    if (!currentRepo || !currentFilePath || !currentFileSha) {
+        alert("NO_FILE_SELECTED.");
+        return;
+    }
+
+    const code = monacoWorkingModel.getValue();
+    const message = prompt("ENTER_COMMIT_MESSAGE:", `UPDATE ${currentFilePath}`);
+
+    if (!message) return;
+
+    // Use the PR branch if available, otherwise default to main (or warn user)
+    const branch = currentPR ? (currentPR.head_branch || 'main') : 'main';
+
+    try {
+        const res = await fetch('/api/commit-file', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                owner: currentRepo.owner,
+                repo: currentRepo.name,
+                path: currentFilePath,
+                content: code,
+                message: message,
+                sha: currentFileSha,
+                branch: branch, // CRITICAL FIX: Send to PR branch
+                github_token: getToken()
+            })
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+            alert(`FILE_SAVED_TO_BRANCH: ${branch}`);
+            // Update SHA to avoid conflict on next save
+            currentFileSha = data.new_sha;
+        } else {
+            alert("SAVE_FAILED: " + (data.error || data.detail || "UNKNOWN_ERROR"));
+        }
+    } catch (e) {
+        console.error(e);
+        alert("NETWORK_ERROR");
+    }
+};
+
+// Fetch Reports
+window.fetchReports = async function () {
+    const container = document.getElementById('reportsContainer');
+    if (!container) return;
+
+    container.innerHTML = '<div style="text-align: center; color: var(--text-dim); padding: 2rem;">LOADING_REPORTS...</div>';
+
+    try {
+        const res = await fetch('/api/reports');
+        const data = await res.json();
+
+        if (!data.reports || data.reports.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: var(--text-dim); padding: 2rem;">NO_REPORTS_AVAILABLE</div>';
+            return;
+        }
+
+        container.innerHTML = data.reports.map((report, index) => `
+        <div class="report-card" id="report-${index}">
+            <div class="report-header" onclick="toggleReport(${index})">
+                <div>
+                    <div class="report-title">${report.title || 'ANALYSIS_REPORT'}</div>
+                    <div class="report-meta">${report.timestamp || 'UNKNOWN_TIME'} | ${report.pr_number ? `PR #${report.pr_number}` : ''}</div>
+                </div>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="report-body">
+                ${report.summary ? `<div class="report-section"><h4>Summary</h4><p>${report.summary}</p></div>` : ''}
+                
+                ${report.metrics ? `
+                    <div class="report-section">
+                        <h4>Metrics</h4>
+                        <div class="report-metrics">
+                            ${Object.entries(report.metrics).map(([key, value]) => `
+                                <div class="metric-card">
+                                    <div class="metric-label">${key.replace(/_/g, ' ')}</div>
+                                    <div class="metric-value">${value}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${report.issues && report.issues.length > 0 ? `
+                    <div class="report-section">
+                        <h4>Issues</h4>
+                        <ul class="report-issues-list">
+                            ${report.issues.map(issue => `
+                                <li class="report-issue-item ${(issue.severity || '').toLowerCase()}">
+                                    <strong>${issue.category || 'Issue'}:</strong> ${issue.message || ''}
+                                    ${issue.file ? `<br><small style="color: var(--text-dim);">File: ${issue.file}</small>` : ''}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
+            </div>
+        </div>
+    `).join('');
+    } catch (err) {
+        console.error('Failed to fetch reports', err);
+        container.innerHTML = '<div style="text-align: center; color: var(--danger-color); padding: 2rem;">FAILED_TO_LOAD_REPORTS</div>';
+    }
+};
+
+window.toggleReport = function (index) {
+    const reportCard = document.getElementById(`report-${index}`);
+    if (reportCard) {
+        reportCard.classList.toggle('expanded');
+    }
+}
+
+// Manual Diff Analysis
+window.analyzeManualDiff = async function () {
+    const diff = document.getElementById('manualDiffInput').value;
+    const resultDiv = document.getElementById('manualAnalysisResult');
+
+    if (!diff) {
+        alert("PLEASE_PASTE_DIFF_CONTENT");
+        return;
+    }
+
+    resultDiv.innerHTML = '<div class="spinner-text">ANALYZING_DIFF...</div>';
+
+    try {
+        const res = await fetch('/api/analyze-manual-diff', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ diff })
+        });
+        const data = await res.json();
+
+        if (data.analysis) {
+            const summaryDiv = document.createElement('div');
+            summaryDiv.innerHTML = `
+                <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px;">
+                    <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">ANALYSIS_RESULT</h3>
+                    <div style="white-space: pre-wrap;">${data.analysis}</div>
+                </div>
+            `;
+            resultDiv.innerHTML = '';
+            resultDiv.appendChild(summaryDiv);
+        } else {
+            resultDiv.innerHTML = '<div style="color: var(--danger-color);">ANALYSIS_FAILED</div>';
+        }
+    } catch (err) {
+        resultDiv.innerHTML = '<div style="color: var(--danger-color);">NETWORK_ERROR</div>';
+    }
+};
+
+
+// Fetch Repositories
+window.fetchRepos = async function () {
+    const grid = document.getElementById('reposGrid');
+    if (!grid) return;
+
+    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-dim);">LOADING_REPOSITORIES...</div>';
+
+    try {
+        const res = await fetch('/api/repos', {
+            headers: { 'github-token': getToken() }
+        });
+
+        if (res.status === 401) {
+            window.location.href = '/login';
+            return;
+        }
+
+        const repos = await res.json();
+
+        if (!Array.isArray(repos) || repos.length === 0) {
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-dim);">NO_REPOSITORIES_FOUND.</div>';
+            return;
+        }
+
+        grid.innerHTML = repos.map(repo => `
+            <div class="card" onclick="window.location.href='/static/pr_list.html?owner=${repo.owner.login}&repo=${repo.name}'">
+                <div class="card-title">
+                    <span>${repo.name}</span>
+                    ${repo.private ? '<span class="status-badge status-closed">PRIVATE</span>' : '<span class="status-badge status-open">PUBLIC</span>'}
+                </div>
+                <div class="card-meta">
+                    OWNER: ${repo.owner.login} | STARS: ${repo.stargazers_count} | FORKS: ${repo.forks_count}
+                </div>
+                <div style="font-size: 0.9rem; color: var(--text-color); margin-top: 0.5rem;">
+                    ${repo.description || 'NO_DESCRIPTION'}
+                </div>
+                <div style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-dim);">
+                    UPDATED: ${new Date(repo.updated_at).toLocaleDateString()}
+                </div>
+            </div>
+        `).join('');
+
+    } catch (err) {
+        console.error('Failed to fetch repos', err);
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--danger-color);">SYSTEM_ERROR: FAILED_TO_FETCH_REPOSITORIES</div>';
+    }
+};
+
+// Fetch PRs for a Repo
+window.fetchRepoPRs = async function (owner, repo) {
+    const grid = document.getElementById('prListGrid');
+    const title = document.getElementById('repoTitle');
+
+    if (title) title.textContent = `${owner}/${repo}`;
+    if (!grid) return;
+
+    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-dim);">LOADING_PRS...</div>';
+
+    try {
+        const res = await fetch(`/api/repos/${owner}/${repo}/prs`, {
+            headers: { 'github-token': getToken() }
+        });
+
+        if (res.status === 401) {
+            window.location.href = '/login';
+            return;
+        }
+
+        const prs = await res.json();
+
+        if (!Array.isArray(prs) || prs.length === 0) {
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-dim);">NO_OPEN_PRS_FOUND.</div>';
+            return;
+        }
+
+        grid.innerHTML = prs.map(pr => `
+            <div class="card" onclick="window.location.href='/static/pr_details.html?owner=${owner}&repo=${repo}&pr=${pr.number}'">
+                <div class="card-title">
+                    <span>#${pr.number} ${pr.title}</span>
+                    <span class="status-badge status-${pr.state === 'open' ? 'open' : 'closed'}">${pr.state}</span>
+                </div>
+                <div class="card-meta">
+                    AUTHOR: ${pr.user.login} | CREATED: ${new Date(pr.created_at).toLocaleDateString()}
+                </div>
+                <div style="font-size: 0.9rem; color: var(--text-color); margin-top: 0.5rem; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                    ${pr.body || 'NO_DESCRIPTION'}
+                </div>
+            </div>
+        `).join('');
+
+    } catch (err) {
+        console.error('Failed to fetch PRs', err);
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--danger-color);">SYSTEM_ERROR: FAILED_TO_FETCH_PRS</div>';
+    }
+};
+
+// Fetch PR Details
+window.fetchPRDetails = async function (owner, repo, prNumber) {
+    const title = document.getElementById('prDetailTitle');
+    const fileList = document.getElementById('fileListContainer');
+    const reportContainer = document.getElementById('fullAnalysisReport');
+
+    if (title) title.textContent = `LOADING #${prNumber}...`;
+    if (fileList) fileList.innerHTML = '<div style="padding: 1rem; color: var(--text-dim);">LOADING_FILES...</div>';
+
+    try {
+        const res = await fetch(`/api/repos/${owner}/${repo}/prs/${prNumber}`, {
+            headers: { 'Github-Token': getToken() }
+        });
+
+        if (res.status === 401) {
+            window.location.href = '/login';
+            return;
+        }
+
+        const data = await res.json();
+
+        // Update Global State
+        currentPR = data.pr;
+        currentRepo = { owner: owner, name: repo }; // Simplified repo object
+
+        // Update Title
+        if (title) {
+            title.innerHTML = `
+                <span style="color: var(--primary-color);">${owner}/${repo} #${prNumber}</span>
+                <span style="color: var(--text-color); font-weight: normal;">${data.pr.title}</span>
+                <span class="status-badge status-${data.pr.state === 'open' ? 'open' : 'closed'}">${data.pr.state}</span>
+            `;
+        }
+
+        // Render Files
+        if (fileList) {
+            if (!data.files || data.files.length === 0) {
+                fileList.innerHTML = '<div style="padding: 1rem; color: var(--text-dim);">NO_FILES_CHANGED.</div>';
+            } else {
+                fileList.innerHTML = data.files.map(file => `
+                    <div class="file-item" onclick="window.openEditor('${file.raw_url}', '${file.filename}', '${file.sha}')">
+                        <span>${file.filename}</span>
+                        <span style="color: ${file.status === 'added' ? 'var(--primary-color)' : file.status === 'removed' ? 'var(--danger-color)' : 'var(--warning-color)'}; font-size: 0.7rem; text-transform: uppercase;">${file.status}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Render Report
+        if (reportContainer) {
+            const analysis = data.analysis;
+            if (!analysis) {
+                reportContainer.innerHTML = '<div style="text-align: center; color: var(--text-dim);">NO_ANALYSIS_AVAILABLE.</div>';
+            } else {
+                let html = `<div class="analysis-summary-card">
+                    <h3>SUMMARY</h3>
+                    <p>${analysis.summary || 'No summary provided.'}</p>
+                </div>`;
+
+                if (analysis.issues && analysis.issues.length > 0) {
+                    html += `<div class="card-grid">`;
+                    html += analysis.issues.map(issue => `
+                        <div class="issue-card ${issue.severity ? issue.severity.toLowerCase() : 'info'}">
+                            <div class="issue-header">
+                                <span class="issue-title">${issue.category || 'Issue'}</span>
+                                <span class="issue-severity">${issue.severity || 'INFO'}</span>
+                            </div>
+                            <div>${issue.message}</div>
+                            ${issue.file ? `<div style="margin-top:0.5rem; font-size:0.8rem; color:var(--text-dim);">File: ${issue.file}</div>` : ''}
+                        </div>
+                    `).join('');
+                    html += `</div>`;
+                }
+                reportContainer.innerHTML = html;
+            }
+        }
+
+    } catch (err) {
+        console.error('Failed to fetch PR details', err);
+        if (title) title.textContent = 'ERROR_LOADING_PR';
+        if (fileList) fileList.innerHTML = '<div style="padding: 1rem; color: var(--danger-color);">FAILED_TO_LOAD_FILES</div>';
+    }
+};
+
+// Initialization Logic (Router)
+document.addEventListener('DOMContentLoaded', () => {
+    // Sidebar Toggle Logic
+    const sidebar = document.getElementById('sidebar');
+    const dashboardContainer = document.querySelector('.dashboard-container');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+
+    if (sidebar && dashboardContainer && sidebarToggle) {
+        // Don't auto-collapse on dashboard load - always start expanded
+        // User can manually toggle if needed
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            dashboardContainer.classList.toggle('sidebar-collapsed');
+            localStorage.setItem('sidebar_collapsed', sidebar.classList.contains('collapsed'));
+        });
+    }
+
+    // Shared Logic: Check Login
+    if (document.querySelector('.dashboard-container')) {
+        const user = JSON.parse(localStorage.getItem('gh_user') || '{}');
+        if (!user.login) {
+            window.location.href = '/login';
+            return;
+        }
+
+        // Ensure sidebar is visible by default (remove hidden classes)
+        if (sidebar && dashboardContainer) {
+            sidebar.classList.remove('hidden');
+            dashboardContainer.classList.remove('sidebar-hidden');
+        }
+
+        // Set User Info
+        const avatarEl = document.getElementById('userAvatar');
+        const nameEl = document.getElementById('userName');
+        const loginEl = document.getElementById('userLogin');
+
+        if (avatarEl) avatarEl.src = user.avatar_url;
+        if (nameEl) nameEl.textContent = user.name || user.login;
+        if (loginEl) loginEl.textContent = `@${user.login}`;
+
+        // Logout
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                localStorage.removeItem('gh_token');
+                localStorage.removeItem('gh_user');
+                window.location.href = '/login';
+            });
+        }
+    }
+
+    // Route Detection
+    const path = window.location.pathname;
+    const params = new URLSearchParams(window.location.search);
+
+    if (path.includes('dashboard')) {
+        fetchActivityLogs();
+        // Removed auto-refresh to prevent constant loading
+        // User can manually click REFRESH button when needed
+    }
+    else if (path.includes('repositories.html')) {
+        fetchRepos();
+    }
+    else if (path.includes('pr_list.html')) {
+        const owner = params.get('owner');
+        const repo = params.get('repo');
+        if (owner && repo) {
+            fetchRepoPRs(owner, repo);
+        } else {
+            alert("MISSING_REPO_PARAMETERS");
+            window.location.href = '/static/repositories.html';
+        }
+    }
+    else if (path.includes('pr_details.html')) {
+        const owner = params.get('owner');
+        const repo = params.get('repo');
+        const pr = params.get('pr');
+
+        if (owner && repo && pr) {
+            // Completely hide sidebar for PR details to maximize editor width
+            if (sidebar && dashboardContainer) {
+                sidebar.classList.add('hidden');
+                dashboardContainer.classList.add('sidebar-hidden');
+            }
+
+            fetchPRDetails(owner, repo, pr);
+        } else {
+            alert("MISSING_PR_PARAMETERS");
+            window.location.href = '/static/repositories.html';
+        }
+    }
+    else if (path.includes('editor.html')) {
+        const owner = params.get('owner');
+        const repo = params.get('repo');
+        const pr = params.get('pr'); // Optional, but good for context
+        const filename = params.get('filename');
+        const sha = params.get('sha');
+
+        if (owner && repo && filename) {
+            // Set global state
+            currentRepo = { owner, name: repo };
+            if (pr) currentPR = { number: pr, head_branch: 'main' }; // We might need to fetch full PR details if branch is needed
+
+            // Wait for Monaco to load then open file
+            const checkMonaco = setInterval(() => {
+                if (window.monacoEditor && window.monacoWorkingModel) {
+                    clearInterval(checkMonaco);
+                    openEditor(null, filename, sha); // URL is null because we use backend fetch
+                }
+            }, 100);
+        } else {
+            alert("MISSING_EDITOR_PARAMETERS");
+            window.location.href = '/dashboard';
+        }
+    }
+    else if (path.includes('reports.html')) {
+        fetchReports();
+    }
+});
+
+const sidebarToggle = document.getElementById('sidebarToggle');
+const sidebar = document.getElementById('sidebar');
+if (sidebarToggle && sidebar) {
+    sidebarToggle.addEventListener("click", () => {
+        sidebar.classList.toggle("collapsed");
+        const dashboardContainer = document.querySelector('.dashboard-container');
+        if (dashboardContainer) dashboardContainer.classList.toggle('sidebar-collapsed');
+    });
+}
+
+// Tab Switching
+window.switchTab = function (tabName) {
+    // Update Tab Buttons
+    document.querySelectorAll('.pr-tab').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(tabName)) {
+            btn.classList.add('active');
+        }
+    });
+
+    // Update Tab Content
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    const activeContent = document.getElementById(`tab-${tabName}`);
+    if (activeContent) {
+        activeContent.classList.add('active');
+    }
+};
+
+// Chat Placeholder
+// Chat with Backend
+window.sendChatMessage = async function () {
+    const input = document.getElementById('chatInput');
+    const messages = document.getElementById('chatMessages');
+    if (!input || !messages) return;
+
+    const text = input.value.trim();
+    if (!text) return;
+
+    // User Message
+    const userMsg = document.createElement('div');
+    userMsg.className = 'chat-message user';
+    userMsg.textContent = text;
+    messages.appendChild(userMsg);
+
+    input.value = '';
+    messages.scrollTop = messages.scrollHeight;
+
+    // AI Loading Message
+    const aiMsg = document.createElement('div');
+    aiMsg.className = 'chat-message ai';
+    aiMsg.textContent = "THINKING...";
+    messages.appendChild(aiMsg);
+    messages.scrollTop = messages.scrollHeight;
+
+    try {
+        // Prepare context from current editor if available
+        let context = {};
+        if (monacoWorkingModel) {
+            context.code = monacoWorkingModel.getValue();
+            context.filename = currentFilePath;
+            context.issues = window.currentEditorIssues || [];
+        }
+
+        const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                message: text,
+                context: context,
+                history: chatHistory
+            })
+        });
+
+        const data = await res.json();
+
+        // Update History
+        chatHistory.push({ role: 'user', content: text });
+        chatHistory.push({ role: 'ai', content: data.response });
+
+        // Update UI
+        aiMsg.innerHTML = marked.parse(data.response); // Assuming marked is available, otherwise textContent
+
+        // Check for code blocks and add "Apply" buttons if needed (advanced)
+        // For now, simple text response is fine.
+
+    } catch (err) {
+        console.error(err);
+        aiMsg.textContent = "ERROR: FAILED_TO_CONNECT_TO_BRAIN.";
+        aiMsg.style.color = "var(--danger-color)";
+    }
+};
+
+// File rendering has been updated in fetchPRDetails (line 881-888)
+
+// PR Details Tab Switching
+window.switchPRTab = function (tabName) {
+    // Switch tab buttons
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    tabBtns.forEach(btn => {
+        if (btn.textContent.trim().toLowerCase() === tabName.toLowerCase()) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+
+    // Switch tab content
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabContents.forEach(content => {
+        if (content.id === `tab-${tabName}`) {
+            content.classList.add('active');
+        } else {
+            content.classList.remove('active');
+        }
+    });
+
+    // Trigger Monaco resize if switching to files tab
+    if (tabName === 'files' && monacoEditor) {
+        setTimeout(() => monacoEditor.layout(), 100);
+    }
+};
+
+// Run Multi-Agent Analysis
+window.runMultiAgentAnalysis = async function () {
+    if (!currentRepo || !currentPR) {
+        alert("NO PR SELECTED. PLEASE SELECT A PR FIRST.");
+        return;
+    }
+
+    const analysisBtn = document.getElementById('analysisBtnText');
+    const analysisSpinner = document.getElementById('analysisSpinner');
+    const reportContent = document.getElementById('reportContent');
+    const linterResults = document.getElementById('linterResults');
+    const codeQualityResults = document.getElementById('codeQualityResults');
+    const securityResults = document.getElementById('securityResults');
+    const performanceResults = document.getElementById('performanceResults');
+
+    // Show loading state
+    if (analysisBtn) analysisBtn.classList.add('hidden');
+    if (analysisSpinner) analysisSpinner.classList.remove('hidden');
+
+    if (reportContent) {
+        reportContent.innerHTML = '<div style="color: var(--text-dim); text-align: center; padding: 2rem;">RUNNING MULTI-AGENT ANALYSIS...</div>';
+    }
+
+    try {
+        const res = await fetch(`/api/repos/${currentRepo.owner}/${currentRepo.name}/prs/${currentPR.number}/analyze`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                github_token: getToken()
+            })
+        });
+
+        const data = await res.json();
+
+        if (data.ok && data.analysis) {
+            const analysis = data.analysis;
+
+            // Update main report content
+            if (reportContent) {
+                reportContent.innerHTML = `
+                    <div style="color: var(--primary-color); margin-bottom: 1rem;">
+                        <strong>ANALYSIS COMPLETE</strong>
+                    </div>
+                    <div style="color: var(--text-color); line-height: 1.6;">
+                        ${analysis.summary || 'Analysis completed successfully.'}
+                    </div>
+                `;
+            }
+
+            // Helper to render issues
+            const renderIssues = (issues, emptyMsg) => {
+                if (!issues || issues.length === 0) return `<p style="color: var(--text-dim);">${emptyMsg}</p>`;
+
+                return issues.map(issue => `
+                    <div style="margin-bottom: 0.75rem; padding: 0.5rem; border-left: 2px solid var(--secondary-color); background: var(--surface-color);">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--secondary-color); font-weight: bold;">${issue.category || 'ISSUE'}</span>
+                            <span style="color: var(--text-dim); font-size: 0.8rem;">${issue.severity || 'INFO'}</span>
+                        </div>
+                        <div style="color: var(--text-color); margin-top: 0.25rem;">${issue.message || ''}</div>
+                        ${issue.file ? `<div style="color: var(--text-dim); font-size: 0.8rem; margin-top: 0.25rem;">File: ${issue.file} ${issue.line ? `(Line ${issue.line})` : ''}</div>` : ''}
+                        ${issue.suggestion ? `<div style="color: var(--text-dim); font-size: 0.8rem; margin-top: 0.25rem; border-top: 1px dashed var(--surface-border); padding-top: 0.25rem;">💡 ${issue.suggestion}</div>` : ''}
+                    </div>
+                `).join('');
+            };
+
+            // Update linter results
+            if (linterResults) {
+                linterResults.innerHTML = renderIssues(analysis.linter, 'No linter issues found.');
+            }
+
+            // Update code quality results
+            if (codeQualityResults) {
+                // Use warning color for code quality
+                const issuesHtml = (analysis.issues || []).map(issue => `
+                    <div style="margin-bottom: 0.75rem; padding: 0.5rem; border-left: 2px solid var(--warning-color); background: var(--surface-color);">
+                        <div style="color: var(--warning-color); font-weight: bold;">${issue.category || 'ISSUE'}</div>
+                        <div style="color: var(--text-color); margin-top: 0.25rem;">${issue.message || ''}</div>
+                         ${issue.file ? `<div style="color: var(--text-dim); font-size: 0.8rem; margin-top: 0.25rem;">File: ${issue.file} ${issue.line ? `(Line ${issue.line})` : ''}</div>` : ''}
+                    </div>
+                `).join('');
+                codeQualityResults.innerHTML = issuesHtml || '<p style="color: var(--text-dim);">No code quality issues found.</p>';
+            }
+
+            // Update security results
+            if (securityResults) {
+                securityResults.innerHTML = renderIssues(analysis.security, 'No security vulnerabilities found.');
+            }
+
+            // Update performance results
+            if (performanceResults) {
+                performanceResults.innerHTML = renderIssues(analysis.performance, 'No performance issues found.');
+            }
+        } else {
+            if (reportContent) {
+                reportContent.innerHTML = `
+                    <div style="color: var(--danger-color); text-align: center; padding: 2rem;">
+                        ANALYSIS FAILED: ${data.error || data.detail || 'UNKNOWN ERROR'}
+                    </div>
+                `;
+            }
+        }
+    } catch (error) {
+        console.error('Analysis error:', error);
+        if (reportContent) {
+            reportContent.innerHTML = `
+                <div style="color: var(--danger-color); text-align: center; padding: 2rem;">
+                    NETWORK ERROR: Failed to run analysis
+                </div>
+            `;
+        }
+    } finally {
+        // Reset button state
+        if (analysisBtn) analysisBtn.classList.remove('hidden');
+        if (analysisSpinner) analysisSpinner.classList.add('hidden');
+    }
+};

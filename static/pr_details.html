@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+    .dashboard-container {
+        display: block !important;
+        grid-template-columns: 260px 1fr;
+        height: 100vh;
+        transition: grid-template-columns 0.1s steps(1);
+    }
+</style>
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PR Details - PR Analyzer</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <button class="btn-icon toggle-sidebar-btn" id="sidebarToggle" title="Toggle Sidebar">☰</button>
+            </div>
+            <div class="user-profile">
+                <img src="" alt="Avatar" class="avatar" id="userAvatar">
+                <div class="user-info">
+                    <div class="username" id="userName">INITIALIZING...</div>
+                    <div style="font-size: 0.8rem; color: var(--text-dim);" id="userLogin">@...</div>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/dashboard">› ACTIVITY_LOG</a></li>
+                <li><a href="/static/repositories.html" class="active">› REPOSITORIES</a></li>
+                <li><a href="/static/reports.html">› REPORTS</a></li>
+                <li><a href="/static/manual.html">› MANUAL_OVERRIDE</a></li>
+            </ul>
+            <div style="margin-top: auto;">
+                <button class="btn logout-btn" id="logoutBtn">LOGOUT</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <section class="content-section">
+                <div class="pr-details-header">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                        <button class="btn-sm" onclick="window.history.back()"
+                            style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span>←</span>
+                            <span>BACK</span>
+                        </button>
+                    </div>
+                    <h2 id="prTitle">LOADING PR DETAILS...</h2>
+                    <div class="pr-meta">
+                        <span id="prNumber">#--</span>
+                        <span id="prAuthor">AUTHOR: --</span>
+                        <span id="prCreated">CREATED: --</span>
+                    </div>
+                </div>
+
+                <!-- Tab Navigation -->
+                <div class="tab-navigation">
+                    <button class="tab-btn active" onclick="switchPRTab('files')">FILES</button>
+                    <button class="tab-btn" onclick="switchPRTab('report')">REPORT</button>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="tab-container">
+                    <!-- FILES TAB: 3-Pane Editor -->
+                    <div id="tab-files" class="tab-content active">
+                        <div class="pr-split-view" id="prSplitView">
+                            <!-- Left: File List -->
+                            <div class="file-list-panel">
+                                <div class="panel-header">FILES</div>
+                                <div id="fileListContainer" class="file-list">
+                                    <!-- Files injected here -->
+                                </div>
+                            </div>
+
+                            <!-- Middle: Editor -->
+                            <div class="editor-panel">
+                                <div class="editor-header">
+                                    <span id="editorFileName">SELECT A FILE</span>
+                                    <div class="editor-actions">
+                                        <button class="btn-sm" id="commitPushBtn" onclick="commitAndPush()">
+                                            <span id="commitBtnText">COMMIT & PUSH</span>
+                                            <span id="commitSpinner" class="hidden">⟳</span>
+                                        </button>
+                                        <button class="btn-sm" onclick="autoFixFile()">AUTO-FIX</button>
+                                    </div>
+                                </div>
+                                <div id="monacoEditor"></div>
+                            </div>
+
+                            <!-- Right: AI Chat -->
+                            <div class="chat-panel" id="chatPanel">
+                                <div class="panel-header">
+                                    <span>AI ASSISTANT</span>
+                                    <button class="btn-icon" onclick="toggleChat()" title="Toggle Chat">_</button>
+                                </div>
+                                <div class="chat-container">
+                                    <div id="chatMessages" class="chat-messages">
+                                        <div style="color: var(--text-dim); text-align: center; margin-top: 1rem;">
+                                            SELECT A FILE TO START ANALYSIS...
+                                        </div>
+                                    </div>
+                                    <div class="chat-input-area">
+                                        <input type="text" id="chatInput" placeholder="Ask about this code..."
+                                            onkeypress="handleChatInput(event)">
+                                        <button class="btn" onclick="sendChatMessage()">SEND</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- REPORT TAB -->
+                    <div id="tab-report" class="tab-content">
+                        <div class="report-container">
+                            <div class="report-header">
+                                <h3>MULTI-AGENT ANALYSIS REPORT</h3>
+                                <button class="btn-sm" onclick="runMultiAgentAnalysis()">
+                                    <span id="analysisBtnText">RUN ANALYSIS</span>
+                                    <span id="analysisSpinner" class="hidden">⟳</span>
+                                </button>
+                            </div>
+
+                            <div id="reportContent" class="report-content">
+                                <div style="color: var(--text-dim); text-align: center; padding: 2rem;">
+                                    CLICK "RUN ANALYSIS" TO GENERATE REPORT...
+                                </div>
+                            </div>
+
+                            <div class="report-sections">
+
+
+
+
+                                <div class="report-section">
+                                    <h4> SECURITY ANALYSIS</h4>
+                                    <div id="securityResults" class="report-section-content">
+                                        <p style="color: var(--text-dim);">No security analysis available.</p>
+                                    </div>
+                                </div>
+
+                                <div class="report-section">
+                                    <h4> PERFORMANCE</h4>
+                                    <div id="performanceResults" class="report-section-content">
+                                        <p style="color: var(--text-dim);">No performance analysis available.</p>
+                                    </div>
+                                </div>
+                                <div class="report-section">
+                                    <h4> CODE QUALITY</h4>
+                                    <div id="codeQualityResults" class="report-section-content">
+                                        <p style="color: var(--text-dim);">No analysis results available.</p>
+                                    </div>
+                                </div>
+
+                                <div class="report-section">
+                                    <h4> LINTER RESULTS</h4>
+                                    <div id="linterResults" class="report-section-content">
+                                        <p style="color: var(--text-dim);">No linter results available.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="/static/app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/loader.min.js"></script>
+    <script>
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs' } });
+        require(['vs/editor/editor.main'], function () {
+            window.monaco = monaco;
+            if (window.createMonacoEditor) {
+                window.createMonacoEditor();
+            }
+        });
+    </script>
+</body>
+
+</html>

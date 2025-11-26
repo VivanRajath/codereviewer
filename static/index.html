@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - PR Analyzer</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo" style="font-size: 4rem; margin-bottom: 1rem;">
+                ⌘
+            </div>
+            <h1>PR_ANALYZER</h1>
+            <div class="subtitle" style="margin-bottom: 2rem;">
+                SYSTEM_ACCESS_REQUIRED
+            </div>
+
+            <a href="/login/oauth" class="btn"
+                style="display: block; width: 100%; margin-bottom: 1rem; text-decoration: none;">
+                <span>⚡</span> LOGIN_WITH_GITHUB
+            </a>
+
+            <div class="divider" style="margin: 1.5rem 0; display: flex; align-items: center; color: var(--text-dim);">
+                <span style="flex: 1; height: 1px; background: var(--surface-border);"></span>
+                <span style="padding: 0 0.5rem;">OR_USE_TOKEN</span>
+                <span style="flex: 1; height: 1px; background: var(--surface-border);"></span>
+            </div>
+
+            <form id="loginForm">
+                <input type="password" id="token" placeholder="GH_PERSONAL_ACCESS_TOKEN" style="margin-bottom: 1rem;">
+                <button type="submit" class="btn" id="loginBtn" style="width: 100%;">
+                    <span class="btn-text">AUTHENTICATE</span>
+                    <span id="loginSpinner" class="hidden">CONNECTING...</span>
+                </button>
+                <div id="loginError" class="hidden" style="color: var(--danger-color); margin-top: 1rem;"></div>
+            </form>
+        </div>
+    </div>
+    <script src="/static/app.js"></script>
+</body>
+
+</html>
