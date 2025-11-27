@@ -1,100 +1,120 @@
-# AI Code Reviewer & PR Agent 🤖
+# AI Code Reviewer & PR Agent
 
-An intelligent, automated code review system powered by Google Gemini. This agent integrates with GitHub Webhooks to analyze Pull Requests in real-time, providing actionable feedback on code quality, security, performance, and style. It also features a dashboard for manual review and an interactive chat for discussing code improvements.
+> **Lyzer AI Backend Intern Challenge Submission**
 
-## 🚀 Features
+An intelligent automated code review system powered by Google Gemini that integrates with GitHub to provide real-time pull request analysis, security scanning, and actionable feedback.
 
-- **Multi-Agent Analysis**:
-  - **Linter Agent**: Checks for syntax errors and style violations.
-  - **Security Agent**: Identifies potential vulnerabilities (e.g., injection flaws, hardcoded secrets).
-  - **Performance Agent**: Suggests optimizations for speed and efficiency.
-  - **Code Quality Agent**: Reviews readability, maintainability, and best practices.
-- **Automated PR Reviews**: Automatically analyzes new PRs and posts comments/reports.
-- **Interactive Dashboard**: View analysis history, recent commits, and file changes.
-- **Chat with Codebase**: Ask questions about the code and get context-aware answers.
-- **Auto-Fix**: AI-generated code fixes that can be applied directly to the branch.
-- **Render Ready**: Pre-configured for easy deployment on Render.com.
+## ✨ Overview
 
-## 🛠️ Tech Stack
+This project delivers comprehensive code analysis through multiple specialized agents, combining automated PR reviews with an interactive dashboard for manual code inspection. Built for the Lyzer AI Backend Intern Challenge, it extends beyond basic requirements to include chatbot capabilities, individual file reviews, and automated code improvement suggestions.
 
-- **Backend**: Python, FastAPI
-- **AI Model**: Google Gemini 1.5 Flash
-- **Frontend**: HTML5, CSS3 (Terminal/Hacker Theme), JavaScript
-- **Deployment**: Render (Gunicorn + Uvicorn)
+## 🎯 Key Features
 
-## 📋 Prerequisites
+### Automated Analysis
+- **Multi-Agent Architecture**: Four specialized agents work in parallel
+  - **Linter Agent**: Detects syntax errors and style violations
+  - **Security Agent**: Identifies vulnerabilities including injection flaws and exposed secrets
+  - **Performance Agent**: Recommends optimizations for speed and resource efficiency
+  - **Code Quality Agent**: Evaluates readability, maintainability, and adherence to best practices
 
-- Python 3.11+
-- A GitHub Account & Personal Access Token (PAT)
-- Google Gemini API Key
+### GitHub Integration
+- **Webhook-Triggered Reviews**: Automatically analyzes pull requests as they're created
+- **Inline Comments**: Posts detailed feedback directly on PR diffs
+- **Auto-Fix Suggestions**: Generates code improvements that can be committed to the branch
 
-## ⚙️ Local Setup
+### Interactive Interface
+- **Dashboard**: Visualize analysis history, recent commits, and file-level changes
+- **Codebase Chat**: Ask questions about the code and receive context-aware answers
+- **Manual Review Tools**: Trigger analysis for specific files or commits on demand
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/codereviewer.git
-   cd codereviewer
-   ```
+## 🏗️ Architecture
 
-2. **Create a virtual environment**
-   ```bash
-   python -m venv venv
-   # Windows
-   venv\Scripts\activate
-   # Mac/Linux
-   source venv/bin/activate
-   ```
+**Backend**: FastAPI (Python)  
+**AI Engine**: Google Gemini 1.5 Flash  
+**Frontend**: HTML5/CSS3/JavaScript (Terminal-inspired UI)  
+**Deployment**: Render (Gunicorn + Uvicorn workers)
 
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+## 🚦 Getting Started
 
-4. **Configure Environment Variables**
-   Create a `.env` file in the root directory:
-   ```env
-   # GitHub Configuration
-   GITHUB_TOKEN=your_github_pat_here
-   GITHUB_WEBHOOK_SECRET=your_webhook_secret_here
-   GITHUB_CLIENT_ID=your_oauth_client_id
-   GITHUB_CLIENT_SECRET=your_oauth_client_secret
+### Prerequisites
 
-   # Google Gemini Configuration
-   GOOGLE_API_KEY=your_gemini_api_key_here
-   ```
+- Python 3.11 or higher
+- GitHub Personal Access Token with repo permissions
+- Google Gemini API key
 
-5. **Run the Application**
-   ```bash
-   uvicorn app.main:app --reload
-   ```
-   Access the dashboard at `http://localhost:8000`.
+### Installation
 
-## ☁️ Deployment (Render)
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/codereviewer.git
+cd codereviewer
 
-This project is configured for easy deployment on Render.
+# Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-1. **Push to GitHub**: Ensure your code is pushed to a GitHub repository.
-2. **Create Web Service**:
-   - Go to [Render Dashboard](https://dashboard.render.com/).
-   - Select **New +** > **Web Service**.
-   - Connect your repository.
-3. **Configuration**:
-   - Render will automatically detect `render.yaml`.
-   - **Important**: You must manually add your environment variables (`GITHUB_TOKEN`, `GOOGLE_API_KEY`, etc.) in the Render dashboard during setup.
-4. **Deploy**: Click create. Your app will be live in minutes!
+# Install dependencies
+pip install -r requirements.txt
+```
 
-> **Note**: On Render's free tier, the filesystem is ephemeral. Data stored in `data/` (like analysis logs) will be lost on restart. For production persistence, consider integrating a database.
+### Configuration
 
-## 🔌 Webhook Setup
+Create a `.env` file in the project root:
 
-To enable automatic PR reviews:
-1. Go to your GitHub Repository Settings > **Webhooks**.
-2. Click **Add webhook**.
-3. **Payload URL**: `https://your-app-url.onrender.com/webhook`
-4. **Content type**: `application/json`
-5. **Secret**: The same value as `GITHUB_WEBHOOK_SECRET` in your env.
-6. **Events**: Select "Let me select individual events" and check **Pull requests**.
+```env
+# GitHub
+GITHUB_TOKEN=ghp_your_token_here
+GITHUB_WEBHOOK_SECRET=your_webhook_secret
+GITHUB_CLIENT_ID=your_oauth_client_id
+GITHUB_CLIENT_SECRET=your_oauth_client_secret
 
-## 🛡️ License
+# Google Gemini
+GOOGLE_API_KEY=your_gemini_api_key
+```
 
-MIT License
+### Running Locally
+
+```bash
+uvicorn app.main:app --reload
+```
+
+Navigate to `http://localhost:8000` to access the dashboard.
+
+## 🌐 Live Demo
+
+**Deployment**: https://codereviewer-0nfb.onrender.com/
+
+The application is hosted on Render with production-ready configuration using Gunicorn and Uvicorn workers.
+
+## 📁 Project Structure
+
+```
+codereviewer/
+├── app/
+│   ├── main.py           # FastAPI application entry point
+│   ├── agents/           # Multi-agent analysis logic
+│   ├── routes/           # API endpoints
+│   └── services/         # GitHub & Gemini integrations
+├── static/               # Frontend assets
+├── templates/            # HTML templates
+├── requirements.txt      # Python dependencies
+└── .env                  # Environment configuration
+```
+
+##  Security Notes
+
+- Never commit `.env` files or expose API keys
+- GitHub webhooks should use secret validation
+- Use environment variables for all sensitive configuration
+
+## 🤝 Contributing
+
+This project was created as part of the Lyzer AI Backend Intern Challenge. Feedback and suggestions are welcome through issues or pull requests.
+
+## 📄 License
+
+MIT License - see LICENSE file for details
+
+---
+
+**Built with** ❤️ **for the Lyzer AI Backend Intern Challenge**
