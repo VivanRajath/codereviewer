@@ -11,9 +11,8 @@ import random
 from functools import wraps
 from google.api_core import exceptions as google_exceptions
 
-# --------------------------------------------------------------------
 # Logging Setup
-# --------------------------------------------------------------------
+
 logger = logging.getLogger("ReviewEngine")
 logger.setLevel(logging.DEBUG)
 
@@ -21,16 +20,13 @@ handler = logging.StreamHandler()
 handler.setFormatter(logging.Formatter("[%(levelname)s] %(message)s"))
 logger.addHandler(handler)
 
-# --------------------------------------------------------------------
-# Gemini API Setup
-# --------------------------------------------------------------------
+
+# Gemini API 
 GENAI_API_KEY = os.getenv("GEMINI_API_KEY")
 if GENAI_API_KEY:
     genai.configure(api_key=GENAI_API_KEY)
 
-# --------------------------------------------------------------------
-# Retry Decorator
-# --------------------------------------------------------------------
+
 def retry_with_backoff(retries=3, initial_delay=1.0, backoff_factor=2.0):
     def decorator(func):
         @wraps(func)
@@ -44,19 +40,19 @@ def retry_with_backoff(retries=3, initial_delay=1.0, backoff_factor=2.0):
                         logger.error(f"Quota exceeded after {retries} retries: {e}")
                         raise e
                     
-                    sleep_time = delay + random.uniform(0, 0.1) # Add jitter
+                    sleep_time = delay + random.uniform(0, 0.1) 
                     logger.warning(f"Quota exceeded. Retrying in {sleep_time:.2f}s (Attempt {i+1}/{retries})...")
                     time.sleep(sleep_time)
                     delay *= backoff_factor
                 except Exception as e:
-                    # For other exceptions, re-raise immediately
+                   
                     raise e
         return wrapper
     return decorator
 
-# --------------------------------------------------------------------
+
 # GitHub Raw Content Fetcher
-# --------------------------------------------------------------------
+
 def fetch_raw_file(raw_url: str) -> str:
     """
     Fetches the raw file content from GitHub using raw_url.
@@ -75,25 +71,21 @@ def fetch_raw_file(raw_url: str) -> str:
         return ""
 
 
-# --------------------------------------------------------------------
+
 # Patch → File Rebuilder
-# --------------------------------------------------------------------
+
 def apply_patch_to_content(original: str, patch: str) -> str:
     """
     Uses 'git apply' to apply a unified diff to original text.
     """
     try:
         with tempfile.TemporaryDirectory() as temp_dir:
-            # 1. Write original content to a temp file
+          
             src_path = os.path.join(temp_dir, "temp_file")
             with open(src_path, "w", encoding="utf-8") as f:
                 f.write(original)
 
-            # 2. Construct a valid git patch with headers
-            # Git apply expects:
-            # --- a/filename
-            # +++ b/filename
-            # @@ ...
+           
             
             patch_header = f"--- a/temp_file\n+++ b/temp_file\n"
             full_patch = patch_header + patch
@@ -102,13 +94,12 @@ def apply_patch_to_content(original: str, patch: str) -> str:
             with open(patch_path, "w", encoding="utf-8") as f:
                 f.write(full_patch)
 
-            # 3. Run git apply
-            # --ignore-space-change and --ignore-whitespace help with line ending issues
+           
             cmd = ["git", "apply", "--ignore-space-change", "--ignore-whitespace", "patch.diff"]
             
             subprocess.run(cmd, cwd=temp_dir, check=True, capture_output=True, text=True)
 
-            # 4. Read back the patched file
+            
             if os.path.exists(src_path):
                 with open(src_path, "r", encoding="utf-8") as f:
                     return f.read()
@@ -123,9 +114,8 @@ def apply_patch_to_content(original: str, patch: str) -> str:
     return original
 
 
-# --------------------------------------------------------------------
 # Linting Engine
-# --------------------------------------------------------------------
+
 def run_linter(file_content: str, filename: str) -> List[Dict[str, Any]]:
     """
     Runs pylint on the fully reconstructed file.
@@ -172,9 +162,9 @@ def run_linter(file_content: str, filename: str) -> List[Dict[str, Any]]:
     return issues
 
 
-# --------------------------------------------------------------------
+
 # Multi-Agent AI Review
-# --------------------------------------------------------------------
+
 @retry_with_backoff(retries=3, initial_delay=2.0)
 def run_multi_agent_review(files: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
@@ -272,17 +262,17 @@ IMPORTANT: Do not include markdown formatting (like ```json). Just the raw JSON.
 
         result = json.loads(response.text)
 
-        # Merge lint + ai issues
+      
         all_issues.extend(result.get("issues", []))
 
-        # Bucket issues into categories
+      
         categorized_result = {
             "summary": result.get("summary", "Analysis complete."),
             "recommendation": result.get("recommendation", "Review"),
             "linter": [],
             "security": [],
             "performance": [],
-            "issues": [] # Code Quality / Logic / Clean Code
+            "issues": [] 
         }
 
         for issue in all_issues:
@@ -295,7 +285,7 @@ IMPORTANT: Do not include markdown formatting (like ```json). Just the raw JSON.
             elif any(x in cat for x in ["performance", "efficiency", "scalability", "memory", "speed", "optimiz"]):
                 categorized_result["performance"].append(issue)
             else:
-                # Default bucket for Logic, Clean Code, etc.
+                
                 categorized_result["issues"].append(issue)
 
         return categorized_result
@@ -308,9 +298,9 @@ IMPORTANT: Do not include markdown formatting (like ```json). Just the raw JSON.
         }
 
 
-# --------------------------------------------------------------------
+
 # Chat Engine
-# --------------------------------------------------------------------
+
 @retry_with_backoff(retries=3, initial_delay=2.0)
 def chat_with_agent(message: str, context: Dict[str, Any], history: List[Dict[str, str]]):
     """
@@ -352,9 +342,9 @@ Respond concisely and professionally.
         return f"Error: {str(e)}"
 
 
-# --------------------------------------------------------------------
+
 # Full File Deep Review
-# --------------------------------------------------------------------
+
 @retry_with_backoff(retries=3, initial_delay=2.0)
 def analyze_full_code(code: str, filename: str) -> Dict[str, Any]:
     if not GENAI_API_KEY:
@@ -400,9 +390,7 @@ Output JSON:
         }
 
 
-# --------------------------------------------------------------------
 # Auto-Fix & Push Agent
-# --------------------------------------------------------------------
 @retry_with_backoff(retries=3, initial_delay=2.0)
 def auto_fix_and_push(
     owner: str, 
@@ -419,7 +407,7 @@ def auto_fix_and_push(
     if not GENAI_API_KEY:
         return {"ok": False, "error": "Missing Gemini API Key"}
 
-    # 1. Generate Fix
+
     prompt = f"""
 You are a Senior Software Engineer tasked with fixing code issues.
 
@@ -449,14 +437,14 @@ Task:
     except Exception as e:
         return {"ok": False, "error": f"AI Generation Failed: {str(e)}"}
 
-    # 2. Push to GitHub
+   
     url = f"https://api.github.com/repos/{owner}/{repo}/contents/{filename}"
     headers = {
         "Authorization": f"token {github_token}",
         "Accept": "application/vnd.github+json"
     }
 
-    # Get current SHA first (to avoid conflict)
+    
     sha = None
     try:
         get_res = requests.get(url, headers=headers, params={"ref": branch})
@@ -465,7 +453,7 @@ Task:
     except Exception as e:
         logger.error(f"Failed to fetch SHA: {e}")
 
-    # Commit
+    
     import base64
     content_bytes = fixed_code.encode('utf-8')
     base64_content = base64.b64encode(content_bytes).decode('utf-8')
@@ -487,9 +475,9 @@ Task:
     except Exception as e:
         return {"ok": False, "error": f"Network Error: {str(e)}"}
 
-# --------------------------------------------------------------------
+
 # Single Issue Fix Generator
-# --------------------------------------------------------------------
+
 @retry_with_backoff(retries=3, initial_delay=2.0)
 def generate_fix_for_issue(code: str, issue: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -528,9 +516,9 @@ Task:
     except Exception as e:
         return {"ok": False, "error": f"AI Generation Failed: {str(e)}"}
 
-# --------------------------------------------------------------------
+
 # Pushing Agent
-# --------------------------------------------------------------------
+
 async def push_file_to_branch(
     owner: str,
     repo: str,
@@ -552,8 +540,7 @@ async def push_file_to_branch(
         "Authorization": f"token {github_token}",
         "Accept": "application/vnd.github+json"
     }
-    
-    # Base64 encode content
+
     content_bytes = content.encode('utf-8')
     base64_content = base64.b64encode(content_bytes).decode('utf-8')
     

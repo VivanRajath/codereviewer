@@ -1,4 +1,4 @@
-# app/main.py
+
 import os
 import hmac
 import hashlib
@@ -30,9 +30,7 @@ from app.agents import run_multi_agent_review, chat_with_agent
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 WEBHOOK_SECRET = os.getenv("GITHUB_WEBHOOK_SECRET")
 
-# We don't strictly enforce these for the manual endpoint, but needed for webhook
-# if not GITHUB_TOKEN:
-#     raise RuntimeError("GITHUB_TOKEN not set in environment")
+
 
 app = FastAPI(title="PR Webhook Receiver")
 
@@ -65,12 +63,12 @@ oauth.register(
     client_kwargs={'scope': 'user:email repo'}
 )
 
-# -------------------------------
+
 # Verify webhook signature
-# -------------------------------
+
 def verify_signature(body_bytes: bytes, signature_header: Optional[str]) -> bool:
     if not WEBHOOK_SECRET:
-        return True # Dev mode bypass if secret not set
+        return True 
     if signature_header is None:
         return False
 
@@ -88,9 +86,9 @@ def verify_signature(body_bytes: bytes, signature_header: Optional[str]) -> bool
     return hmac.compare_digest(computed, signature)
 
 
-# -------------------------------
+
 # Convert unified diff patch → hunks
-# -------------------------------
+
 def parse_patch_to_hunks(patch: str):
     if not patch:
         return []
@@ -113,9 +111,9 @@ def parse_patch_to_hunks(patch: str):
     return hunks
 
 
-# -------------------------------
+
 # Fetch list of PR changed files
-# -------------------------------
+
 async def fetch_pr_files(owner: str, repo: str, pr_number: int, github_token: Optional[str] = None):
     token = github_token or GITHUB_TOKEN
     if not token:
@@ -155,9 +153,9 @@ async def fetch_pr_files(owner: str, repo: str, pr_number: int, github_token: Op
     return files
 
 
-# -------------------------------
+
 # Webhook Handler
-# -------------------------------
+
 @app.post("/webhook")
 async def github_webhook(
     request: Request,
@@ -167,7 +165,6 @@ async def github_webhook(
 
     body_bytes = await request.body()
 
-    # Verify webhook signature
     if not verify_signature(body_bytes, x_hub_signature_256):
         raise HTTPException(status_code=401, detail="Invalid signature")
 
@@ -176,7 +173,6 @@ async def github_webhook(
     except:
         raise HTTPException(status_code=400, detail="Invalid JSON")
 
-    # Only process pull_request events
     if x_github_event != "pull_request":
         return JSONResponse({"ok": True, "msg": f"ignored event: {x_github_event}"})
 
@@ -186,7 +182,6 @@ async def github_webhook(
     if action not in allowed_actions:
         return JSONResponse({"ok": True, "msg": f"no-op action: {action}"})
 
-    # Extract basic info
     pr = payload.get("pull_request", {})
     repo = payload.get("repository", {})
 
@@ -197,7 +192,6 @@ async def github_webhook(
     if not all([owner, repo_name, pr_number]):
         raise HTTPException(status_code=400, detail="Missing repo/pr info")
 
-    # Fetch changed files
     try:
         files_raw = await fetch_pr_files(owner, repo_name, pr_number)
     except httpx.HTTPStatusError as e:
@@ -206,15 +200,9 @@ async def github_webhook(
             status_code=500
         )
 
-    # -------------------------------
-    # Run AI analysis
-    # -------------------------------
-    # We pass the raw files (with patches) to the agent
+ 
     analysis_report = run_multi_agent_review(files_raw)
 
-    # -------------------------------
-    # Final API response
-    # -------------------------------
     result_data = {
         "ok": True,
         "action": action,
@@ -223,10 +211,10 @@ async def github_webhook(
         "pr_number": pr_number,
         "changed_files_count": len(files_raw),
         "analysis": analysis_report,
-        "timestamp": os.getenv("TIMESTAMP", "") # You might want to add a real timestamp here
+        "timestamp": os.getenv("TIMESTAMP", "") 
     }
     
-    # Store in memory (limit to last 50)
+   
     analysis_results.insert(0, result_data)
     if len(analysis_results) > 50:
         analysis_results.pop()
@@ -235,35 +223,28 @@ async def github_webhook(
 
     return JSONResponse(result_data)
 
-# -------------------------------
-# OAuth Routes
-# -------------------------------
 
-# Login route
+# OAuth Routes
+
+
 @app.get("/login/oauth")
 async def github_login(request: Request):
-    # Support for production BASE_URL (Default to live site if env var missing)
     base_url = os.getenv("BASE_URL", "https://codereviewer-0nfb.onrender.com")
     if base_url:
-        # Ensure no trailing slash
         base_url = base_url.rstrip("/")
         redirect_uri = f"{base_url}/login/callback"
     else:
-        # Fallback to request logic
         redirect_uri = request.url_for("github_callback")
         
-        # Determine scheme (http vs https) and ensure we are using the correct one
-        # Render/Production usually needs https
         if "onrender.com" in str(redirect_uri) and str(redirect_uri).startswith("http://"):
              redirect_uri = str(redirect_uri).replace("http://", "https://")
 
-    # For localhost development key fix:
-    # Fix CSRF/State mismatch by ensuring we are on localhost if that is the redirect target
+    
     if request.url.hostname == "127.0.0.1":
-         # If we are effectively on localhost, ensure redirect_uri matches
+         
          redirect_uri = "http://localhost:8000/login/callback"
          
-    # Final check for localhost to avoid 127.0.0.1 vs localhost mismatch
+  
     if "localhost" in str(redirect_uri) or "127.0.0.1" in str(redirect_uri):
         redirect_uri = "http://localhost:8000/login/callback"
         
@@ -299,9 +280,9 @@ async def logout(request: Request):
     request.session.clear()
     return RedirectResponse(url="/")
 
-# -------------------------------
+
 # Manual Trigger Endpoint
-# -------------------------------
+
 @app.post("/analyze-pr")
 async def analyze_pr_manual(payload: dict):
     owner = payload.get("owner")
@@ -331,9 +312,9 @@ async def analyze_pr_manual(payload: dict):
         "analysis": analysis_report
     })
 
-# -------------------------------
+
 # Merge PR Endpoint
-# -------------------------------
+
 @app.post("/api/merge-pr")
 async def merge_pr(payload: dict):
     owner = payload.get("owner")
@@ -375,9 +356,9 @@ async def merge_pr(payload: dict):
                 status_code=500
             )
 
-# -------------------------------
+
 # NEW: Fetch User Repositories
-# -------------------------------
+
 @app.get("/api/repos")
 async def get_repositories(github_token: Optional[str] = Header(None)):
     if not github_token:
@@ -395,9 +376,9 @@ async def get_repositories(github_token: Optional[str] = Header(None)):
              raise HTTPException(status_code=r.status_code, detail=r.text)
         return r.json()
 
-# -------------------------------
+
 # NEW: Fetch PRs for a Repo
-# -------------------------------
+
 @app.get("/api/repos/{owner}/{repo}/prs")
 async def get_repo_prs(owner: str, repo: str, github_token: Optional[str] = Header(None)):
     if not github_token:
@@ -415,9 +396,8 @@ async def get_repo_prs(owner: str, repo: str, github_token: Optional[str] = Head
              raise HTTPException(status_code=r.status_code, detail=r.text)
         return r.json()
 
-# -------------------------------
 # NEW: Fetch PR Files
-# -------------------------------
+
 async def fetch_pr_files(owner: str, repo: str, pr_number: int, github_token: str) -> List[Dict[str, Any]]:
     url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/files"
     headers = {
@@ -428,14 +408,14 @@ async def fetch_pr_files(owner: str, repo: str, pr_number: int, github_token: st
     async with httpx.AsyncClient(timeout=30.0) as client:
         res = await client.get(url, headers=headers)
         if res.status_code != 200:
-            # Log error or return empty list, but better to raise to know why
+            
             print(f"Error fetching files: {res.text}")
             return []
         return res.json()
 
-# -------------------------------
+
 # NEW: Fetch PR Details (Files + Analysis)
-# -------------------------------
+
 @app.get("/api/repos/{owner}/{repo}/prs/{pr_number}")
 async def get_pr_details(owner: str, repo: str, pr_number: int, github_token: Optional[str] = Header(None)):
     if not github_token:
@@ -454,13 +434,11 @@ async def get_pr_details(owner: str, repo: str, pr_number: int, github_token: Op
             raise HTTPException(status_code=pr_res.status_code, detail=pr_res.text)
         pr_data = pr_res.json()
 
-    # 2. Fetch Files
+ 
     files = await fetch_pr_files(owner, repo, pr_number, github_token)
 
-    # 3. Run Analysis - Always run fresh analysis on each PR view
     analysis = run_multi_agent_review(files)
     
-    # Save to history
     analysis_results.insert(0, {
         "ok": True,
         "action": "analyzed",
@@ -484,9 +462,9 @@ async def get_pr_details(owner: str, repo: str, pr_number: int, github_token: Op
         "analysis": analysis
     }
 
-# -------------------------------
+
 # NEW: Run Analysis on PR (for Report Tab)
-# -------------------------------
+
 @app.post("/api/repos/{owner}/{repo}/prs/{pr_number}/analyze")
 async def analyze_pr_endpoint(owner: str, repo: str, pr_number: int, payload: dict):
     github_token = payload.get("github_token")
@@ -537,9 +515,9 @@ async def analyze_pr_endpoint(owner: str, repo: str, pr_number: int, payload: di
             "error": str(e)
         }, status_code=500)
 
-# -------------------------------
+
 # NEW: Chat with Agent
-# -------------------------------
+
 @app.post("/api/chat")
 async def chat_endpoint(payload: dict):
     message = payload.get("message")
@@ -552,9 +530,9 @@ async def chat_endpoint(payload: dict):
     response = chat_with_agent(message, context, history)
     return {"response": response}
 
-# -------------------------------
+
 # NEW: Save as Branch
-# -------------------------------
+
 @app.post("/api/save-branch")
 async def save_branch(payload: dict):
     owner = payload.get("owner")
@@ -595,9 +573,9 @@ async def save_branch(payload: dict):
                 status_code=create_res.status_code
             )
 
-# -------------------------------
+
 # NEW: Fetch Single File Content
-# -------------------------------
+
 @app.post("/api/fetch-file")
 async def fetch_file_content(payload: dict):
     owner = payload.get("owner")
@@ -643,9 +621,9 @@ async def proxy_content(url: str, github_token: Optional[str] = Header(None)):
             print(f"Proxy error: {e}")
             raise HTTPException(status_code=502, detail=f"Proxy error: {str(e)}")
 
-# -------------------------------
+
 # NEW: Commit File
-# -------------------------------
+
 @app.post("/api/commit-file")
 async def commit_file(payload: dict):
     owner = payload.get("owner")
@@ -689,9 +667,9 @@ async def commit_file(payload: dict):
                 status_code=r.status_code
             )
 
-# -------------------------------
+
 # NEW: Analyze Code (Full File)
-# -------------------------------
+
 @app.post("/api/analyze-code")
 async def analyze_code_endpoint(payload: dict):
     code = payload.get("code")
@@ -705,9 +683,9 @@ async def analyze_code_endpoint(payload: dict):
     analysis = analyze_full_code(code, filename)
     return {"ok": True, "analysis": analysis}
 
-# -------------------------------
+
 # NEW: Auto-Fix Endpoint
-# -------------------------------
+
 @app.post("/api/auto-fix")
 async def auto_fix_endpoint(payload: dict):
     owner = payload.get("owner")
@@ -726,9 +704,9 @@ async def auto_fix_endpoint(payload: dict):
     result = auto_fix_and_push(owner, repo, branch, filename, code, issues, github_token)
     return result
 
-# -------------------------------
+
 # NEW: Push to Branch (Pushing Agent)
-# -------------------------------
+
 @app.post("/api/push-to-branch")
 async def push_to_branch(payload: dict):
     """
@@ -755,9 +733,9 @@ async def push_to_branch(payload: dict):
     
     return result
 
-# -------------------------------
+
 # NEW: Generate Single Fix Endpoint
-# -------------------------------
+
 @app.post("/api/generate-fix")
 async def generate_fix_endpoint(payload: dict):
     code = payload.get("code")
@@ -777,9 +755,9 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 import json
 from pathlib import Path
 
-# -------------------------------
+
 # Persistence Logic
-# -------------------------------
+
 DATA_DIR = Path("data")
 DATA_FILE = DATA_DIR / "analysis_results.json"
 
@@ -799,14 +777,14 @@ def save_data(data):
     except Exception as e:
         print(f"Error saving data: {e}")
 
-# -------------------------------
+
 # In-Memory Store for Analysis Results
-# -------------------------------
+
 analysis_results = load_data()
 
-# -------------------------------
+
 # API Endpoints for Dashboard
-# -------------------------------
+
 @app.get("/api/analysis")
 async def get_analysis_results():
     """
@@ -912,10 +890,9 @@ async def get_activity_logs(github_token: Optional[str] = Header(None)):
         })
 
 
-# -------------------------------
+
 # Dashboard Page
-# -------------------------------
-# (Already defined above)
+
 
 @app.get("/")
 async def read_index():
