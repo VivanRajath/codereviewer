@@ -242,16 +242,28 @@ async def github_webhook(
 # Login route
 @app.get("/login/oauth")
 async def github_login(request: Request):
+    # Support for production BASE_URL (Default to live site if env var missing)
+    base_url = os.getenv("BASE_URL", "https://codereviewer-0nfb.onrender.com")
+    if base_url:
+        # Ensure no trailing slash
+        base_url = base_url.rstrip("/")
+        redirect_uri = f"{base_url}/login/callback"
+    else:
+        # Fallback to request logic
+        redirect_uri = request.url_for("github_callback")
+        
+        # Determine scheme (http vs https) and ensure we are using the correct one
+        # Render/Production usually needs https
+        if "onrender.com" in str(redirect_uri) and str(redirect_uri).startswith("http://"):
+             redirect_uri = str(redirect_uri).replace("http://", "https://")
+
+    # For localhost development key fix:
     # Fix CSRF/State mismatch by ensuring we are on localhost if that is the redirect target
     if request.url.hostname == "127.0.0.1":
-        return RedirectResponse(str(request.url).replace("127.0.0.1", "localhost"))
-
-    # Determine scheme (http vs https)
-    # Using 'http' for localhost explicitly to avoid proxy issues, or matching the request
-    redirect_uri = request.url_for("github_callback")
-    
-    # For localhost development, force http://localhost if the request came that way
-    # This helps if for some reason it resolves to 127.0.0.1 but GitHub expects localhost
+         # If we are effectively on localhost, ensure redirect_uri matches
+         redirect_uri = "http://localhost:8000/login/callback"
+         
+    # Final check for localhost to avoid 127.0.0.1 vs localhost mismatch
     if "localhost" in str(redirect_uri) or "127.0.0.1" in str(redirect_uri):
         redirect_uri = "http://localhost:8000/login/callback"
         
