@@ -11,8 +11,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import httpx
 from dotenv import load_dotenv
+from starlette.middleware.sessions import SessionMiddleware
+from authlib.integrations.starlette_client import OAuth
 
-load_dotenv()
+
+load_dotenv(override=True)
+print("DEBUG: Loading .env file")
+print(f"DEBUG: GITHUB_CLIENT_ID={os.getenv('GITHUB_CLIENT_ID')}")
+print(f"DEBUG: Current Working Directory: {os.getcwd()}")
+
 
 # Setup logger
 logger = logging.getLogger("MainAPI")
@@ -35,6 +42,27 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+)
+
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY", "secret"))
+
+# OAuth Setup
+
+GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
+GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
+
+if not GITHUB_CLIENT_ID or not GITHUB_CLIENT_SECRET:
+    raise RuntimeError("GitHub OAuth credentials missing. Check .env file.")
+
+oauth = OAuth()
+oauth.register(
+    name='github',
+    client_id=GITHUB_CLIENT_ID,
+    client_secret=GITHUB_CLIENT_SECRET,
+    access_token_url='https://github.com/login/oauth/access_token',
+    authorize_url='https://github.com/login/oauth/authorize',
+    api_base_url='https://api.github.com/',
+    client_kwargs={'scope': 'user:email repo'}
 )
 
 # -------------------------------
@@ -206,6 +234,58 @@ async def github_webhook(
     save_data(analysis_results)
 
     return JSONResponse(result_data)
+
+# -------------------------------
+# OAuth Routes
+# -------------------------------
+
+# Login route
+@app.get("/login/oauth")
+async def github_login(request: Request):
+    # Fix CSRF/State mismatch by ensuring we are on localhost if that is the redirect target
+    if request.url.hostname == "127.0.0.1":
+        return RedirectResponse(str(request.url).replace("127.0.0.1", "localhost"))
+
+    # Determine scheme (http vs https)
+    # Using 'http' for localhost explicitly to avoid proxy issues, or matching the request
+    redirect_uri = request.url_for("github_callback")
+    
+    # For localhost development, force http://localhost if the request came that way
+    # This helps if for some reason it resolves to 127.0.0.1 but GitHub expects localhost
+    if "localhost" in str(redirect_uri) or "127.0.0.1" in str(redirect_uri):
+        redirect_uri = "http://localhost:8000/login/callback"
+        
+    print(f"DEBUG: Redirecting to GitHub with redirect_uri={redirect_uri}")
+    return await oauth.github.authorize_redirect(request, redirect_uri)
+
+
+# Callback route
+@app.get("/login/callback")
+async def github_callback(request: Request):
+    try:
+        token = await oauth.github.authorize_access_token(request)
+    except Exception as e:
+        logger.error(f"OAuth error: {e}")
+        raise HTTPException(status_code=400, detail="OAuth failed")
+
+    access_token = token.get("access_token")
+    if not access_token:
+        raise HTTPException(status_code=400, detail="No access token returned")
+
+    # Redirect to dashboard with token
+    return RedirectResponse(
+        url=f"/dashboard#token={access_token}",
+        status_code=302
+    )
+
+@app.get("/dashboard")
+async def dashboard(request: Request):
+    return FileResponse("static/dashboard.html")
+
+@app.get("/logout")
+async def logout(request: Request):
+    request.session.clear()
+    return RedirectResponse(url="/")
 
 # -------------------------------
 # Manual Trigger Endpoint
@@ -819,75 +899,19 @@ async def get_activity_logs(github_token: Optional[str] = Header(None)):
             "error": str(e)
         })
 
-@app.get("/login")
-async def login_page():
-    return FileResponse("static/login.html")
-
-@app.get("/dashboard")
-async def dashboard_page():
-    return FileResponse("static/dashboard.html")
 
 # -------------------------------
-# Manual Diff Analysis Endpoint
+# Dashboard Page
 # -------------------------------
-@app.post("/api/analyze-diff")
-async def analyze_diff_manual(payload: dict):
-    diff_text = payload.get("diff")
-    if not diff_text:
-        raise HTTPException(status_code=400, detail="Missing diff text")
-    
-    from app.agents import run_diff_analysis
-    analysis_report = run_diff_analysis(diff_text)
-    
-    return JSONResponse({"ok": True, "analysis": analysis_report})
+# (Already defined above)
 
 @app.get("/")
 async def read_index():
     return FileResponse("static/login.html")
 
-# -------------------------------
-# NEW: OAuth Endpoints
-# -------------------------------
-GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
-GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
+@app.get("/login")
+async def login_alias():
+    return FileResponse("static/login.html")
 
-@app.get("/login/oauth")
-async def login_oauth():
-    if not GITHUB_CLIENT_ID:
-        raise HTTPException(status_code=500, detail="GITHUB_CLIENT_ID not configured")
-    
-    scope = "repo user"
-    return RedirectResponse(
-        f"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}&scope={scope}"
-    )
-
-@app.get("/auth/callback")
-async def auth_callback(code: str):
-    if not GITHUB_CLIENT_ID or not GITHUB_CLIENT_SECRET:
-        raise HTTPException(status_code=500, detail="OAuth credentials not configured")
-        
-    # Exchange code for token
-    token_url = "https://github.com/login/oauth/access_token"
-    headers = {"Accept": "application/json"}
-    data = {
-        "client_id": GITHUB_CLIENT_ID,
-        "client_secret": GITHUB_CLIENT_SECRET,
-        "code": code
-    }
-    
-    async with httpx.AsyncClient() as client:
-        r = await client.post(token_url, headers=headers, json=data)
-        if r.status_code != 200:
-            raise HTTPException(status_code=400, detail="Failed to exchange code")
-        
-        token_data = r.json()
-        access_token = token_data.get("access_token")
-        
-        if not access_token:
-            raise HTTPException(status_code=400, detail="No access token returned")
-            
-        # Redirect to dashboard with token in fragment (simple way to pass to frontend)
-        # In a real app, we'd set a secure cookie or session
-        return RedirectResponse(f"/dashboard#token={access_token}")
 
 

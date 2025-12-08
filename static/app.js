@@ -14,9 +14,9 @@ function getHeaders() {
     };
 }
 
-// Login Logic
-if (document.getElementById('loginForm')) {
-    // Check for OAuth token in URL hash
+// Login & Initialization Logic
+document.addEventListener('DOMContentLoaded', () => {
+    // Check for OAuth token in URL hash (Global check for dashboard redirect)
     const hash = window.location.hash;
     if (hash && hash.includes('token=')) {
         const token = hash.split('token=')[1];
@@ -35,57 +35,85 @@ if (document.getElementById('loginForm')) {
                 .then(user => {
                     localStorage.setItem('gh_token', token);
                     localStorage.setItem('gh_user', JSON.stringify(user));
-                    window.location.href = '/dashboard';
+
+                    // Update UI if on dashboard
+                    if (document.getElementById('userName')) {
+                        document.getElementById('userName').textContent = user.login;
+                    }
+                    if (document.getElementById('userLogin')) {
+                        document.getElementById('userLogin').textContent = '@' + user.login;
+                    }
+                    if (document.getElementById('userAvatar')) {
+                        document.getElementById('userAvatar').src = user.avatar_url;
+                    }
+
+                    // If we are on login page, go to dashboard. 
+                    // If we are already on dashboard, just clear the hash
+                    if (window.location.pathname === '/' || window.location.pathname === '/login') {
+                        window.location.href = '/dashboard';
+                    } else {
+                        // Clean URL
+                        window.history.replaceState(null, null, window.location.pathname);
+                        // Reload specific dashboard elements if needed
+                        if (typeof window.fetchActivityLogs === 'function') {
+                            window.fetchActivityLogs();
+                        }
+                    }
                 })
                 .catch(err => {
                     console.error(err);
-                    alert('Authentication failed');
+                    if (window.location.pathname === '/dashboard') {
+                        alert('Authentication failed: ' + err.message);
+                    }
                 });
         }
     }
 
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const token = document.getElementById('token').value.trim();
-        const btn = document.getElementById('loginBtn');
-        const spinner = document.getElementById('loginSpinner');
-        const errorDiv = document.getElementById('loginError');
-        const btnText = btn.querySelector('.btn-text');
+    // Manual login form logic
+    if (document.getElementById('loginForm')) {
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = document.getElementById('token').value.trim();
+            const btn = document.getElementById('loginBtn');
+            const spinner = document.getElementById('loginSpinner');
+            const errorDiv = document.getElementById('loginError');
+            const btnText = btn.querySelector('.btn-text');
 
-        if (!token) return;
+            if (!token) return;
 
-        btn.disabled = true;
-        if (btnText) btnText.classList.add('hidden');
-        if (spinner) spinner.classList.remove('hidden');
-        if (errorDiv) errorDiv.classList.add('hidden');
+            btn.disabled = true;
+            if (btnText) btnText.classList.add('hidden');
+            if (spinner) spinner.classList.remove('hidden');
+            if (errorDiv) errorDiv.classList.add('hidden');
 
-        try {
-            const res = await fetch(`${GITHUB_API_BASE}/user`, {
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Accept': 'application/vnd.github.v3+json'
+            try {
+                const res = await fetch(`${GITHUB_API_BASE}/user`, {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                if (res.ok) {
+                    const user = await res.json();
+                    localStorage.setItem('gh_token', token);
+                    localStorage.setItem('gh_user', JSON.stringify(user));
+                    window.location.href = '/dashboard';
+                } else {
+                    throw new Error('Invalid token');
                 }
-            });
-
-            if (res.ok) {
-                const user = await res.json();
-                localStorage.setItem('gh_token', token);
-                localStorage.setItem('gh_user', JSON.stringify(user));
-                window.location.href = '/dashboard';
-            } else {
-                throw new Error('Invalid token');
+            } catch (err) {
+                if (errorDiv) {
+                    errorDiv.textContent = err.message || 'Failed to login';
+                    errorDiv.classList.remove('hidden');
+                }
+                btn.disabled = false;
+                if (btnText) btnText.classList.remove('hidden');
+                if (spinner) spinner.classList.add('hidden');
             }
-        } catch (err) {
-            if (errorDiv) {
-                errorDiv.textContent = err.message || 'Failed to login';
-                errorDiv.classList.remove('hidden');
-            }
-            btn.disabled = false;
-            if (btnText) btnText.classList.remove('hidden');
-            if (spinner) spinner.classList.add('hidden');
-        }
-    });
-}
+        });
+    }
+});
 
 // State
 let currentRepo = null;
@@ -1208,10 +1236,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Shared Logic: Check Login
     if (document.querySelector('.dashboard-container')) {
-        const user = JSON.parse(localStorage.getItem('gh_user') || '{}');
-        if (!user.login) {
-            window.location.href = '/login';
-            return;
+        // specific check: if we are processing a login hash, DO NOT redirect
+        if (window.location.hash && window.location.hash.includes('token=')) {
+            console.log('Processing OAuth callback, skipping auth check redirect...');
+            // let the hash handler (defined above) do its work
+        } else {
+            const user = JSON.parse(localStorage.getItem('gh_user') || '{}');
+            if (!user.login) {
+                window.location.href = '/login';
+                return;
+            }
         }
 
         // Ensure sidebar is visible by default (remove hidden classes)

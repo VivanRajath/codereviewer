@@ -5,3 +5,5 @@ httpx
 google-generativeai
 pylint
 gunicorn
+authlib
+itsdangerous

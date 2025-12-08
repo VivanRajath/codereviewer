@@ -4,6 +4,1851 @@
     "action": "analyzed",
     "owner": "VivanRajath",
     "repo": "PR-test",
+    "pr_number": 23,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "The code review covers several new Python modules implementing student management, weather simulation, order processing, and banking, alongside a minor HTML change. While the Python code is generally well-structured and readable, there are significant logic and performance issues in the student management system, a crucial HTML syntax error, and minor clean code improvements applicable across all Python files.",
+      "recommendation": "Request Changes",
+      "linter": [],
+      "security": [],
+      "performance": [
+        {
+          "category": "Performance",
+          "severity": "High",
+          "file": "code.py",
+          "line": 16,
+          "message": "The `load_data()` and `save_data()` methods are called on every `add_student` and `remove_student` operation. This leads to frequent and inefficient disk I/O, especially with a large number of operations or students.",
+          "suggestion": "Implement a batch saving mechanism or consider a more robust persistence layer (e.g., a simple database) that doesn't require reloading and saving the entire dataset for every single change. Alternatively, save data less frequently, perhaps on application exit or after a batch of changes."
+        },
+        {
+          "category": "Performance",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 34,
+          "message": "The `get_student` method performs a linear search (O(N)) through the list of students. For a large number of students, this will be inefficient.",
+          "suggestion": "If 'roll' numbers are unique, consider storing students in a dictionary where the key is the roll number, enabling O(1) average time complexity for lookups."
+        }
+      ],
+      "issues": [
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "code.py",
+          "line": 26,
+          "message": "The 'average' calculation in `add_student` does not handle the edge case where 'marks' might be an empty dictionary, which would lead to a ZeroDivisionError.",
+          "suggestion": "Add a check for `len(marks) > 0` before calculating the average, or ensure 'marks' always contains subjects."
+        },
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "code.py",
+          "line": 23,
+          "message": "The student 'roll' number is not enforced as unique. This can lead to inconsistencies where `get_student` might return an arbitrary (first matching) student, and `remove_student` would remove all students with the same roll number.",
+          "suggestion": "Modify `add_student` to check for roll number uniqueness before adding, and consider changing `self.data` to a dictionary (e.g., `{'roll': student_object}`) for O(1) lookups and guaranteed uniqueness."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 64,
+          "message": "Input validation is missing for 'marks'. Negative values can be entered for marks, which might be invalid depending on business rules.",
+          "suggestion": "Add validation in `add_student` or during input for marks to ensure they are non-negative and within a valid range."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 13,
+          "message": "Missing robust error handling for file I/O operations (e.g., `open`, `json.load`, `json.dump`). Permissions issues, disk full, or corrupted JSON files could lead to unhandled exceptions.",
+          "suggestion": "Wrap file operations in `try-except` blocks to gracefully handle `IOError`, `json.JSONDecodeError`, and other potential exceptions."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "index.html",
+          "line": 13,
+          "message": "HTML syntax error: The newly added paragraph tag is not properly closed. '<p> change number 1 <p>' should be '<p> change number 1 </p>'.",
+          "suggestion": "Correct the closing tag to `</p>`."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "main.py",
+          "line": 37,
+          "message": "Missing a newline character at the end of the file, which is a common practice for clean code and can avoid issues with some tools.",
+          "suggestion": "Add a blank line at the end of the file."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "new.py",
+          "line": 20,
+          "message": "The `calculate_total` method assumes that every item in the `products` list will have 'price' and 'qty' keys. If these keys are missing, a KeyError will be raised.",
+          "suggestion": "Add defensive programming to check for the existence of 'price' and 'qty' keys within each product item, or use `.get()` with default values, or wrap in a `try-except` block."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "new.py",
+          "line": 59,
+          "message": "Missing a newline character at the end of the file.",
+          "suggestion": "Add a blank line at the end of the file."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "sol.py",
+          "line": 52,
+          "message": "User input for `amt` (amount) is converted to `float` directly without error handling. Entering non-numeric input will cause a `ValueError` crash.",
+          "suggestion": "Wrap the `float(input(...))` calls in a `try-except ValueError` block to handle invalid input gracefully."
+        },
+        {
+          "category": "Logic",
+          "severity": "Low",
+          "file": "sol.py",
+          "line": 21,
+          "message": "The `withdraw` method implicitly handles negative amounts as 'Insufficient funds'. While functionally correct, explicit validation for `amt > 0` might improve clarity.",
+          "suggestion": "Consider adding an explicit check `if amt <= 0: print('Invalid amount')` before checking `amt <= self.balance`."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "sol.py",
+          "line": 77,
+          "message": "Missing a newline character at the end of the file.",
+          "suggestion": "Add a blank line at the end of the file."
+        }
+      ]
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 23,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "The introduced code changes span multiple Python modules (student management, weather simulation, order processing, bank accounts) and a minor HTML update. While the Python code demonstrates basic functionality for each domain, it generally lacks robust error handling, input validation, and optimal data management strategies for scalability and security. The HTML change contains a minor syntax error.",
+      "recommendation": "Request Changes",
+      "linter": [],
+      "security": [
+        {
+          "category": "Security",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 0,
+          "message": "Sensitive data (student names, marks) is stored in a plain text JSON file without any encryption. While acceptable for a simple local demo, this is a data exposure risk in a production environment.",
+          "suggestion": "For sensitive data in a real application, implement encryption at rest for data persistence and secure transmission if data is moved across networks."
+        },
+        {
+          "category": "Security",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 0,
+          "message": "The Student Management system, like others (`sol.py`), lacks any form of authentication or authorization. Any user running the script has full access to all student data and operations.",
+          "suggestion": "For a real-world application, implement user authentication and role-based authorization to control access to different functionalities and data."
+        }
+      ],
+      "performance": [
+        {
+          "category": "Performance",
+          "severity": "High",
+          "file": "code.py",
+          "line": 30,
+          "message": "The `save_data` method is called after every `add_student` and `remove_student` operation, writing the entire student list to disk. For a large number of students or frequent operations, this will lead to significant I/O overhead and performance bottlenecks.",
+          "suggestion": "Consider a strategy for batch saving or an explicit save mechanism. For a more robust solution, a simple in-memory list backed by occasional saves is acceptable for small datasets, but for larger scale, an actual database or a more advanced persistence layer is recommended."
+        },
+        {
+          "category": "Performance",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 39,
+          "message": "The `get_student` method performs a linear search (O(N)) through the list of students. For a large number of students, this will become slow.",
+          "suggestion": "Consider storing students in a dictionary where the `roll` number is the key, allowing O(1) average time complexity for student lookups and removals."
+        },
+        {
+          "category": "Performance",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 33,
+          "message": "The `remove_student` method creates a new list excluding the student to be removed. While functionally correct, for large lists and frequent removals, this can be inefficient as it involves iterating and creating a new data structure each time.",
+          "suggestion": "If switching to a dictionary for student storage (as suggested for `get_student`), removal would also become O(1) on average."
+        }
+      ],
+      "issues": [
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "code.py",
+          "line": 27,
+          "message": "Division by zero risk in `add_student` if the 'marks' dictionary is empty when calculating the average. `len(marks)` would be 0.",
+          "suggestion": "Add a check for an empty 'marks' dictionary before calculating the average, or handle the case where `len(marks)` is zero to avoid a `ZeroDivisionError`."
+        },
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "code.py",
+          "line": 16,
+          "message": "The `load_data` method does not handle potential `json.JSONDecodeError` if the 'students.json' file is corrupted or malformed. This can crash the application.",
+          "suggestion": "Wrap the `json.load(f)` call in a `try-except json.JSONDecodeError` block to gracefully handle corrupted JSON files, perhaps returning an empty list or logging an error."
+        },
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "code.py",
+          "line": 52,
+          "message": "Input for 'marks' (`int(input(...))`) lacks error handling. Entering non-integer text will cause a `ValueError` and crash the application.",
+          "suggestion": "Implement a `try-except ValueError` block for all `int(input())` and `float(input())` calls to catch invalid user inputs and prompt for re-entry or provide an error message."
+        },
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "sol.py",
+          "line": 54,
+          "message": "Input for 'amount' (`float(input(...))`) in `main` lacks error handling. Entering non-numeric text will cause a `ValueError` and crash the application. This applies to deposit and withdraw operations.",
+          "suggestion": "Implement a `try-except ValueError` block for all `int(input())` and `float(input())` calls to catch invalid user inputs and prompt for re-entry or provide an error message. (Also applies to line 61 in `sol.py`)"
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Medium",
+          "file": "index.html",
+          "line": 9,
+          "message": "HTML syntax error: The `<p>` tag is not properly closed; it's `<p> change number 1 <p>` instead of `<p> change number 1 </p>`.",
+          "suggestion": "Correct the closing tag to `</p>`."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 48,
+          "message": "The `main` function in `StudentManagement` is quite long and mixes user interface logic with calls to the business logic layer. This reduces readability and makes it harder to test or modify specific parts.",
+          "suggestion": "Refactor `main` into smaller, more focused functions, e.g., `_handle_add_student()`, `_handle_remove_student()`, `_get_user_choice()`, etc., to separate concerns."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "code.py",
+          "line": 49,
+          "message": "Hardcoded strings like 'Math', 'Science', 'English' are used directly within the `main` function. If these subjects change or more are added, it requires modifying the code.",
+          "suggestion": "Define these subjects as a class constant in `StudentManagement` or `main` to improve maintainability."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "code.py",
+          "line": 46,
+          "message": "No explicit feedback is given to the user after calling `remove_student` if the student was successfully removed or not found.",
+          "suggestion": "Add user-friendly messages, e.g., 'Student with roll [roll] removed.' or 'Student with roll [roll] not found.'."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "code.py",
+          "line": 62,
+          "message": "When `get_student` returns `None`, the output `print(sms.get_student(roll))` displays 'None', which is not user-friendly.",
+          "suggestion": "Add an `if` condition to check if the student was found: `student = sms.get_student(roll); if student: print(student) else: print('Student not found.')`"
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "main.py",
+          "line": 15,
+          "message": "The temperature, humidity, and wind speed limits are hardcoded within the `simulate_change` method. Defining them as class constants would improve readability and maintainability.",
+          "suggestion": "Define `MIN_TEMP`, `MAX_TEMP`, `MIN_HUMIDITY`, `MAX_HUMIDITY`, `MIN_WIND_SPEED` as class attributes in `WeatherEngine`."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "index.html",
+          "line": 9,
+          "message": "Inconsistent indentation of the new `<p>` tag relative to its siblings.",
+          "suggestion": "Ensure consistent indentation across all HTML elements for better readability."
+        }
+      ]
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 22,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "This review covers several new Python utilities and an HTML file. Key findings include critical logic flaws in `sol.py`'s banking system and `code.py`'s student management system, along with several performance and clean code concerns across all Python files. The HTML change introduces a minor formatting error.",
+      "recommendation": "Request Changes",
+      "linter": [],
+      "security": [
+        {
+          "category": "Security",
+          "severity": "Low",
+          "file": "code.py",
+          "line": 56,
+          "message": "User inputs for 'name' and 'roll' are used directly without any sanitization or validation. While not a direct exploit in this specific CLI context, it's a poor practice that could lead to vulnerabilities if used in other contexts (e.g., database queries, shell commands, or web display).",
+          "suggestion": "Implement input validation and sanitization for all user-provided strings, especially if they might interact with other systems or be displayed to other users. For example, strip whitespace or enforce character sets."
+        }
+      ],
+      "performance": [
+        {
+          "category": "Performance",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 23,
+          "message": "The `save_data` method is called after every `add_student` and `remove_student` operation. For an application with frequent updates or a large dataset, this can lead to significant I/O overhead and performance degradation as the entire dataset is written to disk each time.",
+          "suggestion": "Consider batching save operations, implementing a 'dirty' flag to save only when necessary, or saving upon application exit. For a simple demo, it might be acceptable, but for scalability, it's a concern."
+        },
+        {
+          "category": "Performance",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 36,
+          "message": "The `get_student` method performs a linear search (O(N)) through the list of students. For a large number of students, this can become inefficient.",
+          "suggestion": "If roll numbers are intended to be unique identifiers, consider using a dictionary (hash map) to store students, with roll numbers as keys. This would allow O(1) average time complexity for lookups and potentially faster removals."
+        }
+      ],
+      "issues": [
+        {
+          "category": "Logic",
+          "severity": "Critical",
+          "file": "sol.py",
+          "line": 19,
+          "message": "The `withdraw` method allows withdrawing a negative amount, which effectively increases the account balance. This is a critical flaw.",
+          "suggestion": "Add a check for positive amount in the `withdraw` method, similar to the `deposit` method. For example: `if amt <= 0: print(\"Invalid amount\"); return`."
+        },
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "code.py",
+          "line": 28,
+          "message": "The `add_student` method can raise a `ZeroDivisionError` if the `marks` dictionary is empty when calculating the average.",
+          "suggestion": "Add a check for `len(marks) > 0` before calculating the average. If `marks` is empty, the average could be set to 0 or handled as an error condition."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 64,
+          "message": "User input for marks (and amounts in `sol.py`'s `main` function) are directly converted to `int()` (or `float()`) without error handling for non-numeric input, which can cause `ValueError`.",
+          "suggestion": "Wrap `int(input(...))` (and `float(input(...))`) in a `try-except ValueError` block to robustly handle invalid input from the user."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Medium",
+          "file": "index.html",
+          "line": 9,
+          "message": "The added HTML snippet contains an unclosed `<p>` tag: `<p> change number 1 <p>` should be `<p> change number 1 </p>`.",
+          "suggestion": "Correct the closing tag to `</p>`."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "index.html",
+          "line": 10,
+          "message": "The indentation of the new `<p>` tag is inconsistent with the surrounding HTML structure.",
+          "suggestion": "Maintain consistent indentation for readability. The new tag should align with its sibling `<p>` tags."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "code.py",
+          "line": 39,
+          "message": "The `display_all` method prints the raw dictionary representation of each student, which is not very user-friendly.",
+          "suggestion": "Format the student information for better readability, perhaps in a `__str__` method for the student object (if there was one) or a dedicated formatting function."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "main.py",
+          "line": 15,
+          "message": "The `simulate_change` method uses 'magic numbers' for temperature, humidity, and wind speed bounds (e.g., 50, -10, 100, 0).",
+          "suggestion": "Define these bounds as class constants (e.g., `MAX_TEMP = 50`) to improve readability and maintainability."
+        }
+      ]
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 22,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "The code review covers multiple new Python files and an HTML file. The Python applications demonstrate basic object-oriented design for different use cases (student management, weather simulation, order processing, banking). Key areas for improvement include input validation, error handling, performance optimization for data operations, and adopting a more object-oriented approach for data structures. A minor HTML syntax error was also found.",
+      "recommendation": "Request Changes",
+      "linter": [],
+      "security": [
+        {
+          "category": "Security",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 10,
+          "message": "The `filename` for storing student data is hardcoded. If this were ever user-controlled without proper sanitization, it could be vulnerable to path traversal attacks.",
+          "suggestion": "Ensure any user-provided file paths are strictly validated and sanitized to prevent directory traversal. For this local script, it's less critical but good practice to note."
+        },
+        {
+          "category": "Security",
+          "severity": "Low",
+          "file": "code.py",
+          "line": 0,
+          "message": "Direct use of `input()` without sanitization in `main` for names, rolls, and marks, could lead to unexpected behavior or potential injection in other contexts (e.g., if used in a shell command).",
+          "suggestion": "While less critical for a console app, it's good practice to validate and sanitize all user inputs, especially if they interact with external systems or commands."
+        },
+        {
+          "category": "Security",
+          "severity": "Low",
+          "file": "sol.py",
+          "line": 0,
+          "message": "Direct use of `input()` without sanitization in `main` for names and amounts, similar to `code.py`.",
+          "suggestion": "While less critical for a console app, it's good practice to validate and sanitize all user inputs, especially if they interact with external systems or commands."
+        }
+      ],
+      "performance": [
+        {
+          "category": "Performance",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 13,
+          "message": "The `load_data()` and `save_data()` methods are called on every `add_student` and `remove_student` operation, reading/writing the entire JSON file. For a large number of students or frequent operations, this can be a performance bottleneck and increase I/O operations.",
+          "suggestion": "Consider batching saves (e.g., saving periodically or on application exit) or implementing a proper database if data size and operation frequency grow. For smaller datasets, this might be acceptable."
+        },
+        {
+          "category": "Performance",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 39,
+          "message": "The `get_student` method uses a linear search (`O(N)`) to find a student by roll number. For a large number of students, this can become inefficient.",
+          "suggestion": "Store students in a dictionary (hash map) where the key is the roll number. This would allow `O(1)` average time complexity for student lookups and removals."
+        }
+      ],
+      "issues": [
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "code.py",
+          "line": 26,
+          "message": "The calculation for 'average' in `add_student` can lead to a `ZeroDivisionError` if the 'marks' dictionary is empty.",
+          "suggestion": "Add a check to ensure `len(marks)` is not zero before performing the division, or handle the error gracefully. For example: `average = sum(marks.values()) / len(marks) if marks else 0`."
+        },
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "code.py",
+          "line": 52,
+          "message": "The `int(input(...))` calls for marks do not handle non-integer input, which will cause a `ValueError` and crash the application.",
+          "suggestion": "Implement a `try-except ValueError` block around `int(input(...))` to prompt the user again or provide a default value for invalid input."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 8,
+          "message": "Student data is stored as raw dictionaries within the `StudentManagement` class. Creating a dedicated `Student` class would encapsulate student-specific logic and attributes, improving modularity and maintainability.",
+          "suggestion": "Define a `Student` class with attributes like `name`, `roll`, `marks`, and a method for `average`. `StudentManagement` would then manage a list of `Student` objects."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "code.py",
+          "line": 45,
+          "message": "The `display_all` method prints raw dictionary objects, which is not very user-friendly or readable.",
+          "suggestion": "If a `Student` class is introduced, implement a `__str__` method for formatted output. Otherwise, format the print statement in `display_all` to show student details clearly."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Medium",
+          "file": "index.html",
+          "line": 12,
+          "message": "The HTML tag on this line is malformed: `<p> change number 1 <p>`.",
+          "suggestion": "The closing tag is incorrect. It should be corrected to `<p> change number 1 </p>`."
+        },
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "sol.py",
+          "line": 52,
+          "message": "The `float(input(...))` calls for deposit and withdraw amounts do not handle non-numeric input, which will cause a `ValueError` and crash the application.",
+          "suggestion": "Implement a `try-except ValueError` block around `float(input(...))` to re-prompt the user or provide a default value for invalid input."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "sol.py",
+          "line": 49,
+          "message": "There is repetitive code for getting an account and checking if it exists (`acc = bank.get_account(name); if acc:`).",
+          "suggestion": "Consider refactoring this into a small helper function or method within `Bank` that handles account retrieval and displays a 'not found' message if necessary, reducing repetition in `main`."
+        }
+      ]
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 22,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "This review covers new Python applications for Student Management, Weather Simulation, Order Processing, and Bank Account Management, along with a minor HTML file update. The Python code demonstrates a shift from simple scripts to more structured, object-oriented designs. Key areas for improvement include robustness through better error handling, input validation, and efficiency for potential scalability.",
+      "recommendation": "Request Changes",
+      "linter": [],
+      "security": [
+        {
+          "category": "Security",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 0,
+          "message": "Sensitive student data (names, roll numbers, marks) is stored in a plain text JSON file ('students.json') without any form of encryption or access control. While it's a local file, this is a general security concern for data at rest.",
+          "suggestion": "For real-world applications, consider encrypting sensitive fields or using a secure database with proper access controls. For this simple application, add a clear disclaimer about data storage."
+        },
+        {
+          "category": "Security",
+          "severity": "Low",
+          "file": "code.py",
+          "line": 53,
+          "message": "User inputs for 'name' and 'roll' are taken directly via `input()` without any sanitization. While this is a console application, in a web context, this could lead to injection attacks (e.g., XSS).",
+          "suggestion": "Although less critical for a console app, it's good practice to sanitize or validate user inputs, especially if data might ever be displayed in a different context or used in queries. For 'roll' numbers, enforce a specific format or type (e.g., integer if applicable)."
+        },
+        {
+          "category": "Security",
+          "severity": "Medium",
+          "file": "sol.py",
+          "line": 0,
+          "message": "The banking system lacks any form of authentication or authorization. Any user can perform operations on any account if they know the account name.",
+          "suggestion": "For a real banking system, robust authentication and authorization mechanisms are critical. For this simple in-memory simulation, add a disclaimer about the lack of security features."
+        }
+      ],
+      "performance": [
+        {
+          "category": "Performance",
+          "severity": "High",
+          "file": "code.py",
+          "line": 23,
+          "message": "Every `add_student` and `remove_student` operation involves reading the entire JSON file, modifying the in-memory list, and then writing the entire list back to the file. This becomes highly inefficient (O(N) file I/O per operation) for a large number of students.",
+          "suggestion": "For better performance with larger datasets, consider buffering changes and saving periodically, or implementing a more robust persistence layer (e.g., a simple database or a file format that allows incremental updates) instead of full file rewrites on every change."
+        },
+        {
+          "category": "Performance",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 40,
+          "message": "The `get_student` method performs a linear search (O(N)) through the list of students to find a specific roll number. For a large number of students, this will be slow.",
+          "suggestion": "To improve lookup performance, especially if 'roll' is unique and used frequently for retrieval, consider storing students in a dictionary where the keys are roll numbers (e.g., `self.data = {s['roll']: s for s in self.load_data()}`) for O(1) average time complexity."
+        }
+      ],
+      "issues": [
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "code.py",
+          "line": 30,
+          "message": "The calculation for 'average' in `add_student` will raise a `ZeroDivisionError` if the `marks` dictionary is empty.",
+          "suggestion": "Add a check to ensure `len(marks)` is not zero before performing the division, or handle the case where no marks are provided gracefully (e.g., set average to 0 or leave it null)."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 19,
+          "message": "The `load_data` method does not handle potential `json.JSONDecodeError` if the 'students.json' file exists but contains malformed JSON.",
+          "suggestion": "Wrap `json.load(f)` in a `try-except json.JSONDecodeError` block to handle corrupted data files, returning an empty list or logging an error."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 56,
+          "message": "Input for marks uses `int(input())` directly without a `try-except` block, which will cause the program to crash if non-numeric input is provided.",
+          "suggestion": "Implement `try-except ValueError` around `int(input(...))` to handle invalid non-integer inputs gracefully, perhaps by prompting the user to re-enter or assigning a default value."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 44,
+          "message": "The `display_all` method prints raw dictionary representations, which is not user-friendly. Users would prefer a formatted output.",
+          "suggestion": "Override the `__str__` method in a `Student` class (if one were created) or format the output in `display_all` to present student information more clearly (e.g., 'Name: [name], Roll: [roll], Avg Marks: [avg]')."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "code.py",
+          "line": 0,
+          "message": "Several parts of the code, especially in the `main` function and class methods, lack type hints, reducing readability and maintainability for future developers.",
+          "suggestion": "Add type hints to function parameters and return values (e.g., `def add_student(self, name: str, roll: str, marks: dict) -> None:`) to improve code clarity and enable static analysis."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "code.py",
+          "line": 54,
+          "message": "The subject names ('Math', 'Science', 'English') are magic strings. If subjects need to change or be extended, they are hardcoded.",
+          "suggestion": "Define these subjects as a class-level constant (e.g., `SUBJECTS = ['Math', 'Science', 'English']`) within the `StudentManagement` class."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "sol.py",
+          "line": 54,
+          "message": "Input for amount uses `float(input())` directly without a `try-except` block, which will cause the program to crash if non-numeric input is provided.",
+          "suggestion": "Implement `try-except ValueError` around `float(input(...))` to handle invalid non-numeric inputs gracefully, perhaps by prompting the user to re-enter."
+        },
+        {
+          "category": "Logic",
+          "severity": "Low",
+          "file": "sol.py",
+          "line": 53,
+          "message": "When an account is not found in `main`, `bank.get_account(name)` returns `None`, and the subsequent `if acc:` check simply bypasses the operation without informing the user that the account doesn't exist.",
+          "suggestion": "Add an `else` block after `if acc:` to print a user-friendly message like 'Account not found.'."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Medium",
+          "file": "sol.py",
+          "line": 40,
+          "message": "The `main` function is quite long and contains repetitive blocks of code for getting account names and objects. This could be refactored.",
+          "suggestion": "Create a helper function (e.g., `_get_account_from_user(bank)`) that prompts for the account name, retrieves the account, and returns it (or `None` with a message), reducing duplication and improving `main`'s readability."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "sol.py",
+          "line": 0,
+          "message": "The `Account` and `Bank` classes, along with their methods, lack type hints.",
+          "suggestion": "Add type hints to function parameters and return values to improve code clarity and aid in static analysis."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "High",
+          "file": "index.html",
+          "line": 9,
+          "message": "The newly added HTML tag is malformed: `<p> change number 1 <p>`.",
+          "suggestion": "Correct the closing tag to `</p>`: `<p> change number 1 </p>`."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "index.html",
+          "line": 10,
+          "message": "The indentation for the new `<p>` tag is inconsistent with the surrounding HTML.",
+          "suggestion": "Ensure consistent indentation (e.g., 4 spaces or 2 spaces) across the HTML file for better readability."
+        }
+      ]
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 21,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "The pull request introduces several new Python features, including a student management system, a weather simulation, an order processing system, and a bank account system, alongside a minor HTML update. Overall, the Python code demonstrates good object-oriented design principles. However, crucial improvements are needed in input validation, error handling, persistence strategy for data-intensive operations, and a critical security vulnerability in financial transactions. The HTML change contains a syntax error.",
+      "recommendation": "Request Changes",
+      "linter": [],
+      "security": [
+        {
+          "category": "Security",
+          "severity": "High",
+          "file": "sol.py",
+          "line": 22,
+          "message": "The `withdraw` method does not explicitly validate that the withdrawal amount (`amt`) is positive. A negative `amt` could be passed, which would incorrectly increase the account balance (e.g., `self.balance - (-100)` becomes `self.balance + 100`).",
+          "suggestion": "Add a check at the beginning of the `withdraw` method to ensure `amt > 0`. Example: `if amt <= 0: print('Invalid amount'); return`."
+        }
+      ],
+      "performance": [
+        {
+          "category": "Performance",
+          "severity": "High",
+          "file": "code.py",
+          "line": 34,
+          "message": "The `save_data()` method is called after every `add_student` and `remove_student` operation, which involves rewriting the entire `students.json` file. For frequent updates or a large number of students, this can be inefficient and cause I/O bottlenecks.",
+          "suggestion": "Consider implementing a mechanism to save data less frequently, e.g., on application exit, after a batch of operations, or introduce an explicit 'Save' command. For larger-scale applications, a database would be more suitable."
+        },
+        {
+          "category": "Performance",
+          "severity": "Low",
+          "file": "code.py",
+          "line": 40,
+          "message": "The `get_student` method uses a linear search (`O(N)`) to find a student by roll number. For a very large number of students, this could become inefficient.",
+          "suggestion": "For datasets where quick lookups by roll number are crucial, consider storing student data in a dictionary (hash map) where roll numbers are keys, allowing for `O(1)` average time complexity for retrieval."
+        }
+      ],
+      "issues": [
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "code.py",
+          "line": 31,
+          "message": "The 'average' calculation in `add_student` can lead to a `ZeroDivisionError` if the 'marks' dictionary is empty. This could happen if no subjects are configured or if marks input fails.",
+          "suggestion": "Add a check to ensure `len(marks)` is not zero before performing the division, e.g., `sum(marks.values()) / len(marks) if len(marks) > 0 else 0`."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 30,
+          "message": "The `add_student` method does not check for duplicate 'roll' numbers. This can lead to multiple students with the same roll number in the system, potentially causing data integrity issues.",
+          "suggestion": "Before appending a new student, check if a student with the given roll number already exists using `self.get_student(roll)`. If it does, inform the user and do not add the duplicate."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 16,
+          "message": "The `load_data` method does not handle potential `json.JSONDecodeError` if the `students.json` file exists but is empty or contains malformed JSON. This could crash the application on startup.",
+          "suggestion": "Wrap the `json.load(f)` call in a `try-except json.JSONDecodeError` block to gracefully handle corrupted or empty JSON files, returning an empty list in such cases."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 57,
+          "message": "User input for marks (`int(input(...))`) is not validated. Entering non-integer text will cause a `ValueError` and crash the application.",
+          "suggestion": "Implement a `try-except ValueError` loop for user inputs where integer conversion is expected, prompting the user to re-enter valid data."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 46,
+          "message": "The `display_all` method prints raw dictionary representations of students, which is not very user-friendly or readable.",
+          "suggestion": "Format the output for better readability, e.g., `print(f\"Name: {s['name']}, Roll: {s['roll']}, Avg Marks: {s['average']:.2f}\")`."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "code.py",
+          "line": 8,
+          "message": "Classes and methods lack docstrings, which makes it harder for other developers to understand their purpose, arguments, and return values without reading the implementation.",
+          "suggestion": "Add comprehensive docstrings to the `StudentManagement` class and all its methods, as well as the `main` function."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Medium",
+          "file": "index.html",
+          "line": 12,
+          "message": "HTML syntax error: The `<p>` tag is incorrectly closed as `<p>` instead of `</p>`.",
+          "suggestion": "Correct the closing tag from `<p>` to `</p>` for proper HTML structure: `<p> change number 1 </p>`."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "main.py",
+          "line": 8,
+          "message": "Classes and methods lack docstrings, which makes it harder for other developers to understand their purpose, arguments, and return values without reading the implementation.",
+          "suggestion": "Add comprehensive docstrings to the `WeatherEngine` class and all its methods, as well as the `main` function."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "main.py",
+          "line": 18,
+          "message": "Magic numbers are used for min/max temperature, humidity, and wind speed limits within the `simulate_change` method. These values are not immediately clear in their context and can be difficult to change.",
+          "suggestion": "Define these limits as class constants (e.g., `MAX_TEMPERATURE = 50`) at the top of the `WeatherEngine` class for better readability and maintainability."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "new.py",
+          "line": 28,
+          "message": "The `update_status` method assumes that `order.status` will always be a valid status present in `self.STATUSES`. If an invalid status is set, `self.STATUSES.index(order.status)` will raise a `ValueError`.",
+          "suggestion": "Add error handling (e.g., `try-except ValueError`) or a check (`if order.status in self.STATUSES`) to ensure the status is valid before attempting to find its index."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "new.py",
+          "line": 12,
+          "message": "Classes and methods lack docstrings, which makes it harder for other developers to understand their purpose, arguments, and return values without reading the implementation.",
+          "suggestion": "Add comprehensive docstrings to the `Order` and `OrderProcessor` classes and all their methods, as well as the `main` function."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "sol.py",
+          "line": 57,
+          "message": "User input for amounts (`float(input(...))`) is not validated. Entering non-numeric text will cause a `ValueError` and crash the application.",
+          "suggestion": "Implement a `try-except ValueError` loop for user inputs where float conversion is expected, prompting the user to re-enter valid data."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "sol.py",
+          "line": 1,
+          "message": "Classes and methods lack docstrings, which makes it harder for other developers to understand their purpose, arguments, and return values without reading the implementation.",
+          "suggestion": "Add comprehensive docstrings to the `Account` and `Bank` classes and all their methods, as well as the `main` function."
+        }
+      ]
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 21,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "This review covers significant changes across multiple Python files introducing object-oriented designs for student management, weather simulation, order processing, and a bank system, along with a minor HTML update. The Python code generally follows good structure but presents areas for improvement in error handling, efficiency, security, and minor clean code practices. A critical security vulnerability in the banking system simulation and several potential runtime errors or inefficiencies were identified.",
+      "recommendation": "Request Changes",
+      "linter": [],
+      "security": [
+        {
+          "category": "Security",
+          "severity": "High",
+          "file": "sol.py",
+          "line": 0,
+          "message": "The 'Bank' system lacks any form of authentication or authorization. Any user interacting with the application can access and modify any account by simply providing the account holder's name. This is a critical security flaw for any system managing financial accounts.",
+          "suggestion": "Implement robust authentication for users and authorization checks to ensure users can only access or modify accounts they are permitted to. For example, by associating accounts with specific user credentials."
+        }
+      ],
+      "performance": [
+        {
+          "category": "Performance",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 17,
+          "message": "The 'save_data' method is called after every 'add_student' and 'remove_student' operation. This design involves reading and rewriting the entire JSON file for each small modification, which can become a significant performance bottleneck and resource drain for larger datasets or frequent operations.",
+          "suggestion": "Consider implementing a 'dirty' flag to track changes and only call 'save_data' when explicitly needed (e.g., upon application exit), or implement a batching mechanism for updates to reduce file I/O overhead."
+        },
+        {
+          "category": "Performance",
+          "severity": "Low",
+          "file": "code.py",
+          "line": 34,
+          "message": "The `get_student` method performs a linear search (O(N)) through the list of students to find a matching roll number. For a very large number of students, this could become inefficient.",
+          "suggestion": "Consider maintaining an in-memory dictionary (hash map) where roll numbers are keys and student objects are values. This would allow for O(1) average-case lookup time, updating the dictionary on 'add' and 'remove' operations."
+        }
+      ],
+      "issues": [
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "code.py",
+          "line": 24,
+          "message": "The 'average' calculation in 'add_student' (sum(marks.values()) / len(marks)) will result in a ZeroDivisionError if the 'marks' dictionary is empty, leading to a program crash.",
+          "suggestion": "Add a check to ensure 'marks' is not empty before attempting to calculate the average. For example: `\"average\": sum(marks.values()) / len(marks) if marks else 0`"
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 13,
+          "message": "The 'load_data' method does not explicitly handle potential 'json.JSONDecodeError' if the 'students.json' file exists but contains malformed or corrupted JSON data. This could cause the application to crash.",
+          "suggestion": "Wrap the `json.load(f)` call in a `try-except json.JSONDecodeError` block to gracefully handle corrupted files, perhaps by logging the error and returning an empty list as a fallback."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 60,
+          "message": "User input for student marks is directly converted to an integer (`int(input(...))`) without error handling. Entering non-numeric text will raise a `ValueError`, crashing the program.",
+          "suggestion": "Implement a `try-except ValueError` block around the `int(input(...))` call to prompt the user for valid integer input, improving user experience and application robustness."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "sol.py",
+          "line": 58,
+          "message": "User input for deposit/withdraw amounts in `main` is directly converted to a float (`float(input(...))`) without error handling. Entering non-numeric text will raise a `ValueError`, crashing the program.",
+          "suggestion": "Implement a `try-except ValueError` block around the `float(input(...))` call to prompt the user for valid numeric input."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "index.html",
+          "line": 13,
+          "message": "The HTML snippet contains a malformed paragraph tag: `<p> change number 1 <p>`. The second `<p>` should be a closing `</p>` tag.",
+          "suggestion": "Correct the closing tag to `</p>` for proper HTML structure: `<p> change number 1 </p>`."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "code.py",
+          "line": 59,
+          "message": "The list of subjects ('Math', 'Science', 'English') for which marks are entered is hardcoded within the `main` function. This reduces flexibility and maintainability if the subjects need to change.",
+          "suggestion": "Define the subjects as a configurable constant (e.g., a class attribute in `StudentManagement` or a module-level constant) to make them easily modifiable and centralize their definition."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "main.py",
+          "line": 15,
+          "message": "The min/max bounds for temperature, humidity, and wind speed are hardcoded directly within the `simulate_change` method. This makes the code less readable and harder to modify or configure.",
+          "suggestion": "Define these bounds as class attributes (e.g., `_MIN_TEMP`, `_MAX_TEMP`) in the `WeatherEngine` class to improve readability and maintainability."
+        }
+      ]
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 20,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "The proposed changes significantly refactor previous simple scripts into structured, object-oriented applications, and include a minor HTML update. While the new architecture improves organization, there are several logical errors, input validation issues, and performance concerns across the Python files. The HTML change also contains a minor syntax error.",
+      "recommendation": "Request Changes",
+      "linter": [],
+      "security": [
+        {
+          "category": "Security",
+          "severity": "Low",
+          "file": "code.py",
+          "line": 58,
+          "message": "User inputs (name, roll, marks) are used directly without any sanitization. While this is a local console application, if the data were ever persisted or displayed in another context (e.g., a web interface), unsanitized input could lead to vulnerabilities like XSS or data corruption.",
+          "suggestion": "Implement input sanitization or validation routines for all user inputs, ensuring they conform to expected formats and do not contain malicious content."
+        },
+        {
+          "category": "Security",
+          "severity": "Medium",
+          "file": "sol.py",
+          "line": 5,
+          "message": "The bank system lacks any form of authentication or authorization. Any user knowing an account name can perform deposit, withdraw, or display operations on that account.",
+          "suggestion": "For a real-world application, implement user authentication (e.g., username/password) and authorization checks to ensure only authorized users can access or modify specific accounts. For a simple console app, this might be out of scope, but it's a critical security consideration."
+        }
+      ],
+      "performance": [
+        {
+          "category": "Performance",
+          "severity": "High",
+          "file": "code.py",
+          "line": 15,
+          "message": "The `load_data()` and `save_data()` methods are called on every `add_student` and `remove_student` operation. This results in frequent and inefficient disk I/O, especially as the student list grows.",
+          "suggestion": "Implement a strategy to load data once at startup, perform modifications in memory, and save data either on application exit or periodically, rather than on every single modification. Consider using a dictionary keyed by roll number for faster lookups/removals (`O(1)` average time) instead of a list (`O(N)`)."
+        },
+        {
+          "category": "Performance",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 37,
+          "message": "The `get_student` method performs a linear search (O(N)) through the list of students. For a large number of students, this will be inefficient.",
+          "suggestion": "Refactor `self.data` to be a dictionary where the keys are student roll numbers, allowing for O(1) average time complexity for lookups."
+        }
+      ],
+      "issues": [
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "code.py",
+          "line": 28,
+          "message": "The calculation for 'average' in `add_student` can lead to a `ZeroDivisionError` if the 'marks' dictionary is empty. This is not handled.",
+          "suggestion": "Add a check to ensure `len(marks)` is not zero before performing the division, or handle the exception. E.g., `average = sum(marks.values()) / len(marks) if marks else 0`."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 64,
+          "message": "In `main`, `int(input(f\"Enter marks for {subject}: \"))` will crash the application if the user enters non-integer input. This lacks robust error handling.",
+          "suggestion": "Wrap input conversion in a `try-except ValueError` block to gracefully handle invalid input, prompting the user to re-enter."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 40,
+          "message": "The `add_student` method does not enforce uniqueness for the 'roll' number. Adding the same roll number multiple times will create duplicate student entries.",
+          "suggestion": "Before appending a new student, check if a student with the given 'roll' number already exists in `self.data` and provide feedback or prevent addition if it does."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 7,
+          "message": "Classes and methods lack docstrings, making the code harder to understand and maintain for future developers.",
+          "suggestion": "Add clear docstrings for the `StudentManagement` class and all its methods, as well as the `main` function."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "code.py",
+          "line": 52,
+          "message": "The `main` function is quite long and directly handles all user interaction, input parsing, and calling business logic. This reduces readability and makes it harder to test or modify parts of the UI.",
+          "suggestion": "Break down the `main` function into smaller, more focused helper functions, e.g., `_handle_add_student()`, `_get_valid_marks_input()`, etc."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "code.py",
+          "line": 43,
+          "message": "The `display_all` method simply prints the raw dictionary representation of each student, which might not be user-friendly.",
+          "suggestion": "Format the output in `display_all` to present student information in a more readable and structured manner."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Critical",
+          "file": "index.html",
+          "line": 9,
+          "message": "The newly added HTML paragraph tag is malformed: `<p> change number 1 <p>` should be `</p>` for the closing tag.",
+          "suggestion": "Correct the closing tag to `</p>`: `<p> change number 1 </p>`."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "main.py",
+          "line": 7,
+          "message": "The `WeatherEngine` class and its methods lack docstrings.",
+          "suggestion": "Add docstrings to explain the purpose of the `WeatherEngine` class and its methods."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "main.py",
+          "line": 15,
+          "message": "Magic numbers are used for min/max temperature, humidity, and wind speed bounds in `simulate_change`.",
+          "suggestion": "Define these bounds as class constants (e.g., `MAX_TEMP = 50`) to improve readability and maintainability."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "new.py",
+          "line": 28,
+          "message": "The `OrderProcessor` continuously appends new orders to `self.orders` but never removes or archives delivered orders. This could lead to unbounded memory growth over time in a long-running application.",
+          "suggestion": "Implement a mechanism to clear or archive delivered orders from the active `self.orders` list, possibly moving them to a 'completed_orders' list or discarding them based on application requirements."
+        },
+        {
+          "category": "Logic",
+          "severity": "Low",
+          "file": "new.py",
+          "line": 29,
+          "message": "The `update_status` method uses `self.STATUSES.index(order.status)`. If, due to a bug or external modification, `order.status` is not in `STATUSES`, this would raise a `ValueError`.",
+          "suggestion": "Add a `try-except ValueError` block around the `index` call, or ensure `order.status` is always a valid status before calling `update_status`."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "new.py",
+          "line": 9,
+          "message": "The `Order` and `OrderProcessor` classes and their methods lack docstrings.",
+          "suggestion": "Add docstrings to explain the purpose of these classes and their methods."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "new.py",
+          "line": 25,
+          "message": "Direct `print` statements are used for status updates and logging within business logic methods (`create_order`, `process_orders`). This tightly couples the logic with its presentation/logging.",
+          "suggestion": "Consider using a dedicated logging framework or returning status messages to the caller for external handling, rather than printing directly within core logic."
+        },
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "sol.py",
+          "line": 59,
+          "message": "In `main`, `float(input(\"Amount: \"))` will crash the program if the user enters non-numeric input for the amount.",
+          "suggestion": "Wrap the input conversion in a `try-except ValueError` block to robustly handle invalid numerical input, prompting the user for a valid amount."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "sol.py",
+          "line": 10,
+          "message": "While `deposit` and `withdraw` methods correctly validate the amount, the `main` function could preemptively validate that the amount is positive before even calling these methods for `deposit`, improving user feedback.",
+          "suggestion": "In `main`, after getting the amount input, add a check `if amt <= 0:` for deposits and `if amt <= 0:` for withdrawals to provide more immediate user feedback for invalid amounts."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "sol.py",
+          "line": 5,
+          "message": "The `Account` and `Bank` classes and their methods lack docstrings.",
+          "suggestion": "Add docstrings to explain the purpose of these classes and their methods."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "sol.py",
+          "line": 13,
+          "message": "Direct `print` statements are used within the `Account` and `Bank` methods for feedback (e.g., 'Invalid amount', 'Account created'). This mixes business logic with presentation concerns.",
+          "suggestion": "Consider returning status codes, boolean values, or raising custom exceptions from these methods, allowing the `main` function (or a dedicated UI layer) to handle feedback display."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "sol.py",
+          "line": 49,
+          "message": "The input handling logic in `main` (getting account name and amount) is repetitive across different choices.",
+          "suggestion": "Extract common input patterns into helper functions (e.g., `_get_account_name()`, `_get_float_input(prompt)`) to improve readability and reduce duplication."
+        }
+      ]
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 20,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "This review covers significant new features across multiple Python files and an HTML update. Key areas of concern include potential logic errors like division by zero, missing input validation, and performance bottlenecks from inefficient data handling. There are also several opportunities to improve code quality and maintainability through better error handling, consistent styling, and docstrings.",
+      "recommendation": "Request Changes",
+      "linter": [],
+      "security": [],
+      "performance": [
+        {
+          "category": "Performance",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 13,
+          "message": "The `load_data` and `save_data` methods read and write the entire `students.json` file for every single operation (add, remove). This will become a performance bottleneck for larger datasets and frequent operations due to repeated I/O.",
+          "suggestion": "For a simple local JSON store, consider a 'save on exit' strategy or a periodic background save. For larger-scale applications, an actual database or more efficient serialization/deserialization of deltas would be required."
+        },
+        {
+          "category": "Performance",
+          "severity": "Low",
+          "file": "code.py",
+          "line": 31,
+          "message": "The `get_student` method performs a linear search (O(N)) through the list of students. For a large number of students, this could become slow.",
+          "suggestion": "If frequent lookups by roll number are expected, consider storing students in a dictionary keyed by roll number within the `StudentManagement` class for O(1) average time complexity. This would require adjusting `remove_student` as well."
+        }
+      ],
+      "issues": [
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "code.py",
+          "line": 24,
+          "message": "The `add_student` method calculates an average using `len(marks)`. If the `marks` dictionary is empty for a student, this will result in a `ZeroDivisionError`.",
+          "suggestion": "Add a check for an empty `marks` dictionary before calculating the average. For example: `\"average\": sum(marks.values()) / len(marks) if marks else 0`."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 53,
+          "message": "The `int(input(...))` calls for marks do not handle non-integer input gracefully, leading to a `ValueError` if the user enters text.",
+          "suggestion": "Wrap input conversion in a `try-except ValueError` block to prompt the user for valid integer input, or provide a default value."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 0,
+          "message": "The `add_student` method does not enforce unique roll numbers, allowing multiple students with the same roll number to be added. `get_student` would return only the first match, and `remove_student` would remove all matches.",
+          "suggestion": "Implement a check in `add_student` to ensure roll numbers are unique before adding a new student. Modify `get_student` to handle potential multiple entries or ensure uniqueness at entry."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "code.py",
+          "line": 34,
+          "message": "The `display_all` method prints raw dictionary representations of students, which is not user-friendly. There's also no `__str__` method for the student dictionaries.",
+          "suggestion": "Implement a `__str__` method for the student dictionary (or a dedicated Student class if created) or format the output within `display_all` to present student information more readably."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "code.py",
+          "line": 0,
+          "message": "The code lacks docstrings for classes and methods, making it harder to understand their purpose and usage without reading the implementation.",
+          "suggestion": "Add clear docstrings for the `StudentManagement` class and all its methods, as well as the `main` function."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "code.py",
+          "line": 52,
+          "message": "The subject names (\"Math\", \"Science\", \"English\") are hardcoded strings in a loop, making them 'magic strings'.",
+          "suggestion": "Define these subjects as a class-level constant list within `StudentManagement` or in the `main` function to improve maintainability and readability."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "new.py",
+          "line": 26,
+          "message": "The `update_status` method uses `self.STATUSES.index(order.status)`. If `order.status` somehow gets set to a value not present in `STATUSES`, this will raise a `ValueError`, crashing the process.",
+          "suggestion": "Add error handling (e.g., a `try-except ValueError` block) or a check (`if order.status in self.STATUSES`) to ensure the status is valid before attempting to find its index."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "new.py",
+          "line": 0,
+          "message": "The `Order` and `OrderProcessor` classes and their methods lack docstrings, reducing code clarity and maintainability.",
+          "suggestion": "Add comprehensive docstrings explaining the purpose of each class, method, and their parameters."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "main.py",
+          "line": 0,
+          "message": "The `WeatherEngine` class and its methods lack docstrings, which makes it harder to quickly grasp their functionality.",
+          "suggestion": "Add docstrings to explain the purpose of the `WeatherEngine` class and its methods, including initial state and behavior."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "main.py",
+          "line": 16,
+          "message": "Magic numbers are used for temperature, humidity, and wind speed bounds (e.g., 50, -10, 100, 0).",
+          "suggestion": "Define these bounds as class-level constants in `WeatherEngine` for better readability and easier modification."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "sol.py",
+          "line": 60,
+          "message": "The `float(input(...))` calls for deposit/withdraw amounts do not handle non-numeric input gracefully, leading to a `ValueError`.",
+          "suggestion": "Wrap the input conversion in a `try-except ValueError` block to handle invalid numerical input, providing a user-friendly error message."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "sol.py",
+          "line": 0,
+          "message": "The `Account` and `Bank` classes and their methods lack docstrings, hindering understanding of their functionality.",
+          "suggestion": "Add docstrings to clearly explain the purpose of the `Account` and `Bank` classes and their respective methods."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Critical",
+          "file": "index.html",
+          "line": 13,
+          "message": "The HTML tag `<p> change number 1 <p>` is malformed. The closing tag is incorrect.",
+          "suggestion": "Change `<p>` to `</p>` for the closing tag: `<p> change number 1 </p>`."
+        }
+      ]
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 19,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "The code review covers five changed files, primarily new Python scripts for simple applications and minor HTML updates. While functionally sound for their stated 'simple' purposes, the Python scripts consistently lack robust input validation, which can lead to runtime errors. There are also minor logic and clean code improvements identified across the Python files and a styling issue in the HTML.",
+      "recommendation": "Request Changes",
+      "linter": [],
+      "security": [],
+      "performance": [
+        {
+          "category": "Performance",
+          "severity": "Low",
+          "file": "new.py",
+          "line": 26,
+          "message": "For very large lists of books, operations like `in` and `remove` on a Python list have O(N) time complexity, which can become inefficient.",
+          "suggestion": "If the number of books is expected to grow significantly, consider using a `set` for faster O(1) average time complexity for lookups and removals, or a dictionary if more metadata per book is needed."
+        }
+      ],
+      "issues": [
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 9,
+          "message": "User input for marks (Math, Science, English) is directly cast to float without error handling. Non-numeric input will cause a ValueError and crash the program.",
+          "suggestion": "Wrap input operations in a try-except block to handle ValueError gracefully, prompting the user to re-enter valid numeric data."
+        },
+        {
+          "category": "Clean Code Reviewer",
+          "severity": "Low",
+          "file": "code.py",
+          "line": 26,
+          "message": "Output statements could leverage f-strings for improved readability and conciseness.",
+          "suggestion": "Refactor print statements like `print('Name:', name)` to `print(f'Name: {name}')`."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "main.py",
+          "line": 12,
+          "message": "User input for 'choice' and 'amount' is directly cast to int/float. Non-numeric input will cause a ValueError and crash the program.",
+          "suggestion": "Implement a try-except block around `int(input())` and `float(input())` calls to handle invalid input gracefully, asking the user to retry."
+        },
+        {
+          "category": "Clean Code Reviewer",
+          "severity": "Low",
+          "file": "main.py",
+          "line": 15,
+          "message": "Output statements could leverage f-strings for improved readability and consistency.",
+          "suggestion": "Use f-strings for print statements, e.g., `print(f'Your Balance: {balance}')`."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "new.py",
+          "line": 12,
+          "message": "User input for 'choice' is directly cast to int without error handling. Non-numeric input will cause a ValueError and crash the program.",
+          "suggestion": "Wrap `int(input())` in a try-except block to catch ValueError and guide the user to enter a valid number."
+        },
+        {
+          "category": "Logic",
+          "severity": "Low",
+          "file": "new.py",
+          "line": 20,
+          "message": "The 'Add Book' functionality does not check for duplicate book entries, allowing the same book title to be added multiple times.",
+          "suggestion": "Before appending, check `if new_book not in books:` to prevent duplicates, or prompt the user if duplicates are allowed."
+        },
+        {
+          "category": "Logic",
+          "severity": "Low",
+          "file": "new.py",
+          "line": 26,
+          "message": "Book search, add, and remove operations are case-sensitive. Users might expect 'python basics' to match 'Python Basics'.",
+          "suggestion": "Convert user input and potentially stored book names to a consistent case (e.g., `lower()`) for comparison to improve user experience. Example: `if remove_book.lower() in [b.lower() for b in books]:`."
+        },
+        {
+          "category": "Clean Code Reviewer",
+          "severity": "Low",
+          "file": "new.py",
+          "line": 17,
+          "message": "Output statements could leverage f-strings for improved readability.",
+          "suggestion": "Use f-strings for print statements, e.g., `print(f'Available Books: {b}')`."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "sol.py",
+          "line": 12,
+          "message": "User input for 'guess' is directly cast to int without error handling. Non-numeric input will cause a ValueError and crash the program.",
+          "suggestion": "Implement a try-except block around `int(input())` to handle invalid input, allowing the user to try again."
+        },
+        {
+          "category": "Clean Code Reviewer",
+          "severity": "Low",
+          "file": "sol.py",
+          "line": 15,
+          "message": "Output statements could leverage f-strings for improved readability and conciseness.",
+          "suggestion": "Refactor print statements like `print('Correct! You guessed the number in', attempts, 'attempts')` to `print(f'Correct! You guessed the number in {attempts} attempts')`."
+        },
+        {
+          "category": "Clean Code Reviewer",
+          "severity": "Low",
+          "file": "index.html",
+          "line": 0,
+          "message": "The file `index.html` lacks a newline character at the end of the file.",
+          "suggestion": "Add a blank line at the end of the file to conform to common coding standards and prevent potential issues with some tools."
+        }
+      ]
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 18,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "This code review covers several new Python scripts and an HTML file. The `main.py` ATM simulation is well-implemented with robust error handling and financial precision. However, `code.py`, `new.py`, and `sol.py` all lack crucial input validation, leading to potential crashes and data quality issues. The `index.html` file uses a generic title and contains placeholder content.",
+      "recommendation": "Request Changes",
+      "linter": [],
+      "security": [],
+      "performance": [
+        {
+          "category": "Performance",
+          "severity": "Low",
+          "file": "new.py",
+          "line": 25,
+          "message": "List operations like `remove_book in books` (for search and removal checks) and `books.remove(remove_book)` have a time complexity of O(N), where N is the number of books. For a simple system with few books this is fine, but it could become a performance bottleneck if the list grows very large.",
+          "suggestion": "For a system that might scale to thousands of books, consider using a data structure optimized for faster lookups and deletions, such as a hash set (`set` in Python) or a dictionary, depending on future requirements."
+        }
+      ],
+      "issues": [
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 7,
+          "message": "The student marks (Math, Science, English) are taken as float inputs but lack validation for acceptable ranges (e.g., 0-100 or non-negative values). Providing invalid marks could lead to incorrect grade calculations or unexpected behavior.",
+          "suggestion": "Add `if` conditions immediately after input for each mark to check if it's within a valid range (e.g., `0 <= mark <= 100`). If invalid, prompt the user to re-enter or handle the error appropriately."
+        },
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "new.py",
+          "line": 12,
+          "message": "The menu `choice` is directly converted to an integer using `int(input(...))` without any error handling. Entering non-integer input will cause the program to crash with a `ValueError`.",
+          "suggestion": "Implement a `try-except ValueError` block around the `int(input(...))` call and use a loop to repeatedly prompt the user until valid integer input is provided, similar to the robust handling in `main.py`."
+        },
+        {
+          "category": "Logic",
+          "severity": "Low",
+          "file": "new.py",
+          "line": 20,
+          "message": "The 'Add Book' functionality does not check if a book with the same name already exists in the `books` list, leading to potential duplicate entries.",
+          "suggestion": "Before appending `new_book` to the list, add a check: `if new_book not in books:`. If it exists, inform the user; otherwise, add the book."
+        },
+        {
+          "category": "Logic",
+          "severity": "Low",
+          "file": "new.py",
+          "line": 20,
+          "message": "Input fields for adding, removing, and searching books do not validate against empty strings. Users could add an empty book name or search for nothing, leading to unclear behavior.",
+          "suggestion": "For `new_book`, `remove_book`, and `search` inputs, add a check like `if new_book.strip() == '':` to ensure meaningful input is provided."
+        },
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "sol.py",
+          "line": 14,
+          "message": "The user's `guess` is directly converted to an integer using `int(input(...))` without any error handling. Entering non-integer input will cause the program to crash with a `ValueError`.",
+          "suggestion": "Implement a `try-except ValueError` block around the `int(input(...))` call and use a loop to repeatedly prompt the user until valid integer input is provided, similar to the robust handling in `main.py`."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "index.html",
+          "line": 6,
+          "message": "The `<title>` tag is set to the generic 'Document', which is not descriptive for a user. Additionally, the `<body>` contains several lines of what appears to be temporary test content (e.g., 'qwedqwd', 'changes new').",
+          "suggestion": "Update the `<title>` to be meaningful and descriptive of the page's content (e.g., 'Student Grade Calculator Home'). Replace the test content in the `<body>` with actual, intended page content."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Medium",
+          "file": "new.py",
+          "line": 12,
+          "message": "The lack of robust input validation (e.g., missing `try-except` for `int()` conversion, no duplicate book check, no empty string checks) detracts from the overall robustness and user-friendliness of the `new.py` script, violating clean code principles that emphasize reliability and ease of use.",
+          "suggestion": "Refer to the suggestions in the 'Logic' category for `new.py` to implement proper input validation, error handling, and logical checks to enhance the code's quality and user experience."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Medium",
+          "file": "sol.py",
+          "line": 14,
+          "message": "Similar to `new.py`, the lack of `try-except` for `int()` conversion for the user's `guess` makes the `sol.py` program prone to crashing with invalid input, which negatively impacts user experience and the overall robustness of the code.",
+          "suggestion": "Refer to the suggestion in the 'Logic' category for `sol.py` to implement proper error handling for user input, ensuring the program is resilient to non-integer entries."
+        }
+      ]
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 19,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "The code changes introduce five new applications in Python and a minor HTML update. While the core logic of the Python scripts is mostly functional, there are recurring issues related to input validation, error handling, and potential logical vulnerabilities. The HTML update also includes a syntax error.",
+      "recommendation": "Request Changes",
+      "linter": [],
+      "security": [
+        {
+          "category": "Security",
+          "severity": "Critical",
+          "file": "main.py",
+          "line": 28,
+          "message": "The ATM simulation is vulnerable to negative deposit/withdrawal amounts. A negative deposit amount effectively acts as a withdrawal, and a negative withdrawal amount increases the balance. This is a critical logical flaw that can be exploited to manipulate the balance.",
+          "suggestion": "Add strict validation to ensure all deposit and withdrawal `amount` values are positive (`amount > 0`). If a non-positive amount is entered, display an error message and do not process the transaction."
+        }
+      ],
+      "performance": [
+        {
+          "category": "Performance",
+          "severity": "Low",
+          "file": "new.py",
+          "line": 27,
+          "message": "Operations like `books.remove(item)` and `item in books` on Python lists have an average time complexity of O(N) where N is the number of books. For a 'simple' system, this is acceptable, but for a very large number of books, these operations could become a performance bottleneck.",
+          "suggestion": "If the number of books is expected to grow significantly and lookup/removal performance becomes critical, consider using a data structure like a `dict` (for book details) or `set` (for unique book titles) which offer O(1) average time complexity for these operations. For this current scope, it's a minor consideration."
+        }
+      ],
+      "issues": [
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "code.py",
+          "line": 10,
+          "message": "The grade calculator does not validate input marks for negative values. Entering negative marks (e.g., -10) can lead to incorrect average calculations and potentially an 'A' grade for a student with negative marks.",
+          "suggestion": "Implement a validation check to ensure entered marks are non-negative. For example, add `if math < 0 or science < 0 or english < 0: print('Marks cannot be negative. Please enter valid marks.'); continue` after inputs, or loop until valid input is received."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 8,
+          "message": "Inputs for marks (`float(input(...))`) are not robustly handled. If a user enters non-numeric data (e.g., text instead of numbers), the program will crash with a `ValueError`.",
+          "suggestion": "Wrap input conversions in `try-except` blocks to gracefully handle `ValueError` and prompt the user to re-enter valid numeric input. A helper function for validated input could also improve code readability."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Medium",
+          "file": "main.py",
+          "line": 15,
+          "message": "User choices (`int(input(...))`) and transaction amounts (`float(input(...))`) are not handled for non-numeric input. Entering non-numeric data will cause a `ValueError` and crash the program.",
+          "suggestion": "Implement `try-except` blocks for `ValueError` around all `int()` and `float()` conversions for user inputs. Provide a clear message for invalid input and allow the user to try again."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "High",
+          "file": "index.html",
+          "line": 14,
+          "message": "The newly added paragraph tag is malformed. It uses an opening tag `<p>` instead of a closing tag `</p>` at the end, leading to invalid HTML structure.",
+          "suggestion": "Correct the HTML syntax: change `<p> change number 1 <p>` to `<p> change number 1 </p>`."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Medium",
+          "file": "sol.py",
+          "line": 16,
+          "message": "The number guessing game does not handle non-integer input for guesses. Entering anything other than an integer will cause the program to crash due to a `ValueError`.",
+          "suggestion": "Wrap `int(input('Enter your guess: '))` in a `try-except` block to catch `ValueError`, inform the user about the invalid input, and allow them to make another guess."
+        },
+        {
+          "category": "Logic",
+          "severity": "Low",
+          "file": "sol.py",
+          "line": 16,
+          "message": "While the game is stated to be for numbers between 1 and 50, there's no explicit input validation to enforce this range. Users can guess numbers outside this range, potentially leading to confusing 'Too high/low' messages without clarifying the expected range.",
+          "suggestion": "Add an `if` condition to check if the `guess` is within the 1-50 range. If not, inform the user they are outside the range before providing 'Too high/low' feedback, or ask them to re-enter."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Medium",
+          "file": "new.py",
+          "line": 17,
+          "message": "User choices (`int(input(...))`) are not handled for non-numeric input. Entering non-numeric data will result in a `ValueError` and crash the application.",
+          "suggestion": "Implement a `try-except` block for `ValueError` around the `int(input(...))` for choice selection to make the application more robust against invalid user input."
+        }
+      ]
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 19,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "The review covers several Python console applications and an HTML snippet. Key issues include missing input validation for numerical inputs across all Python scripts, which can lead to crashes, and a critical logic/security flaw in the ATM simulation allowing negative transactions. The HTML also contains a malformed tag.",
+      "recommendation": "Request Changes",
+      "linter": [],
+      "security": [
+        {
+          "category": "Security",
+          "severity": "High",
+          "file": "main.py",
+          "line": 20,
+          "message": "The ATM simulation allows negative amounts for both deposits and withdrawals. A negative deposit acts as a withdrawal, and a negative withdrawal acts as a deposit, effectively bypassing the `amount <= balance` check for withdrawals. This is a critical vulnerability for an ATM system, even in a simulation.",
+          "suggestion": "Add a check to ensure that the `amount` entered for both deposit and withdrawal is strictly positive (`amount > 0`).\n\nExample for deposit:\n```python\nif amount > 0:\n    balance += amount\n    print(\"Deposit successful. New Balance:\", balance)\nelse:\n    print(\"Deposit amount must be positive.\")\n```"
+        }
+      ],
+      "performance": [],
+      "issues": [
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 10,
+          "message": "The input for student marks (Math, Science, English) does not handle non-numeric values, which will cause a ValueError and crash the application if invalid input is provided.",
+          "suggestion": "Implement a try-except block around the float(input(...)) calls to gracefully handle ValueError. Prompt the user to re-enter valid numeric input until it's provided."
+        },
+        {
+          "category": "Clean Code Reviewer",
+          "severity": "Low",
+          "file": "index.html",
+          "line": 12,
+          "message": "The closing HTML tag for the paragraph element is malformed. It's written as `<p>` instead of `</p>`.",
+          "suggestion": "Correct the closing tag on line 12 to `</p>` to ensure valid HTML structure."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "main.py",
+          "line": 15,
+          "message": "Inputs for menu choice and transaction amounts do not handle non-numeric values, leading to a `ValueError` and application crash if invalid input is provided.",
+          "suggestion": "Wrap `int(input(...))` and `float(input(...))` calls in try-except blocks to catch `ValueError` and guide the user to provide valid input, possibly using a loop."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "new.py",
+          "line": 25,
+          "message": "The book search and removal functionalities are case-sensitive. This can lead to a poor user experience, as a user might expect 'python basics' to find 'Python Basics'.",
+          "suggestion": "To improve user experience, convert both the user's input and the book names in the list to a consistent case (e.g., lowercase) before performing comparisons for searching and removing books.\n\nExample:\n```python\nremove_book_lower = remove_book.lower()\nif remove_book_lower in [b.lower() for b in books]:\n    # Find and remove the original cased book\n    for book in books:\n        if book.lower() == remove_book_lower:\n            books.remove(book)\n            break\n    print(\"Book removed.\")\n```"
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "new.py",
+          "line": 15,
+          "message": "The input for the menu choice does not handle non-numeric values, which will cause a `ValueError` and crash the application if invalid input is provided.",
+          "suggestion": "Implement a try-except block around the `int(input(...))` call to gracefully handle `ValueError`. Prompt the user to re-enter valid numeric input until it's provided."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "sol.py",
+          "line": 15,
+          "message": "The input for the user's guess does not handle non-numeric values, which will cause a `ValueError` and crash the application if invalid input is provided.",
+          "suggestion": "Implement a try-except block around the `int(input(...))` call to gracefully handle `ValueError`. Prompt the user to re-enter valid numeric input until it's provided."
+        }
+      ]
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 18,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "The code review covers several new Python scripts for common applications (grade calculator, ATM, library, guessing game) and an HTML file. While the ATM simulation (`main.py`) demonstrates good practices for financial calculations using `Decimal` and robust input validation, the other Python scripts (`code.py`, `new.py`, `sol.py`) currently lack essential error handling for user inputs, which could lead to program crashes. Additionally, several minor clean code and maintainability improvements are recommended across all files.",
+      "recommendation": "Request Changes",
+      "linter": [],
+      "security": [],
+      "performance": [
+        {
+          "category": "Performance",
+          "severity": "Low",
+          "file": "new.py",
+          "line": 4,
+          "message": "Using a Python list for `books` means that operations like `remove` and `search` (using `in` operator) have a time complexity of O(n), where n is the number of books. For a very large number of books, this could become inefficient.",
+          "suggestion": "For a 'simple' system, this is acceptable. However, for future scalability, consider using a `set` for faster lookups (O(1) on average) if only book names are stored, or a dictionary if unique identifiers or additional book details are needed (e.g., `{'title': 'Python Basics', 'id': 1}`)."
+        }
+      ],
+      "issues": [
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "code.py",
+          "line": 8,
+          "message": "The `float(input())` calls are not wrapped in a `try-except` block, making the program vulnerable to `ValueError` if the user enters non-numeric input for marks, leading to a crash.",
+          "suggestion": "Implement `try-except ValueError` blocks around all `float(input())` calls to handle invalid numerical inputs gracefully. For example:\n```python\nwhile True:\n    try:\n        math = float(input(\"Enter Math marks: \"))\n        break\n    except ValueError:\n        print(\"Invalid input. Please enter a numerical value for marks.\")\n```"
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 8,
+          "message": "The system allows entry of negative marks, which can lead to incorrect total and average calculations, and subsequently, an inaccurate grade.",
+          "suggestion": "Add validation to ensure that entered marks are non-negative. For example:\n```python\nwhile True:\n    try:\n        math = float(input(\"Enter Math marks: \"))\n        if math < 0:\n            print(\"Marks cannot be negative. Please enter a valid value.\")\n        else:\n            break\n    except ValueError:\n        print(\"Invalid input. Please enter a numerical value for marks.\")\n```"
+        },
+        {
+          "category": "Clean Code Reviewer",
+          "severity": "Low",
+          "file": "code.py",
+          "line": 0,
+          "message": "The file is missing a newline character at the end.",
+          "suggestion": "Add a newline character at the end of the file to comply with common coding standards and tools."
+        },
+        {
+          "category": "Clean Code Reviewer",
+          "severity": "Low",
+          "file": "index.html",
+          "line": 6,
+          "message": "The document title `<title>Document</title>` is a default placeholder. It should be updated to be more descriptive and relevant to the page's content.",
+          "suggestion": "Change `<title>Document</title>` to a more meaningful title, e.g., `<title>My Webhook Test Page</title>`."
+        },
+        {
+          "category": "Clean Code Reviewer",
+          "severity": "Low",
+          "file": "index.html",
+          "line": 15,
+          "message": "There are redundant empty paragraph tags (`<p></p>`) or lines with only whitespace, which can make the HTML structure less clean.",
+          "suggestion": "Remove unnecessary empty lines or empty tags if they do not serve a specific layout purpose. Consolidate consecutive text into single paragraph tags if semantically appropriate."
+        },
+        {
+          "category": "Clean Code Reviewer",
+          "severity": "Low",
+          "file": "index.html",
+          "line": 0,
+          "message": "The file is missing a newline character at the end.",
+          "suggestion": "Add a newline character at the end of the file to comply with common coding standards and tools."
+        },
+        {
+          "category": "Clean Code Reviewer",
+          "severity": "Medium",
+          "file": "main.py",
+          "line": 8,
+          "message": "Magic numbers are used for the initial balance and transaction limits (e.g., `Decimal('5000.00')`, `Decimal('100000.00')`, `Decimal('10000.00')`). These should ideally be defined as named constants for better readability and maintainability.",
+          "suggestion": "Define these values as constants at the top of the file. For example:\n```python\nINITIAL_BALANCE = Decimal('5000.00')\nMAX_DEPOSIT_AMOUNT = Decimal('100000.00')\nMAX_WITHDRAWAL_AMOUNT = Decimal('10000.00')\nbalance = INITIAL_BALANCE\n```"
+        },
+        {
+          "category": "Clean Code Reviewer",
+          "severity": "Low",
+          "file": "main.py",
+          "line": 8,
+          "message": "The 'FIX:' comments are useful during development but should be removed or rephrased as standard code comments once the issues are considered resolved to keep the code clean.",
+          "suggestion": "Review and remove or rephrase the 'FIX:' comments to standard documentation comments as appropriate."
+        },
+        {
+          "category": "Clean Code Reviewer",
+          "severity": "Low",
+          "file": "main.py",
+          "line": 37,
+          "message": "There is some repetition in the input validation logic for deposit and withdrawal amounts (e.g., `while not deposit_amount_valid`, `try-except` blocks). This could be refactored into a reusable helper function.",
+          "suggestion": "Create a helper function, e.g., `get_valid_decimal_input(prompt, min_val=None, max_val=None)`, to encapsulate the input, conversion to Decimal, and validation logic, reducing code duplication."
+        },
+        {
+          "category": "Clean Code Reviewer",
+          "severity": "Low",
+          "file": "main.py",
+          "line": 0,
+          "message": "The file is missing a newline character at the end.",
+          "suggestion": "Add a newline character at the end of the file to comply with common coding standards and tools."
+        },
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "new.py",
+          "line": 14,
+          "message": "The `int(input())` call for menu choice is not within a `try-except` block, which means entering non-integer input will raise a `ValueError` and crash the program.",
+          "suggestion": "Wrap the `int(input())` call in a `try-except ValueError` block to handle invalid menu choices gracefully, similar to `main.py`'s choice handling. For example:\n```python\nwhile True:\n    try:\n        choice = int(input(\"Enter your choice: \"))\n        break\n    except ValueError:\n        print(\"Invalid input. Please enter a number (1-5).\")\n```"
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "new.py",
+          "line": 27,
+          "message": "The `books.remove(remove_book)` method only removes the first occurrence of a book if there are duplicate titles in the list. This could lead to unexpected behavior if the system were to allow duplicate book entries.",
+          "suggestion": "If duplicate book titles are intended to be supported, consider using a different data structure (e.g., a list of dictionaries with unique IDs) or modify the removal logic to specify which instance of the book to remove (e.g., by index or unique identifier)."
+        },
+        {
+          "category": "Clean Code Reviewer",
+          "severity": "Low",
+          "file": "new.py",
+          "line": 0,
+          "message": "The file is missing a newline character at the end.",
+          "suggestion": "Add a newline character at the end of the file to comply with common coding standards and tools."
+        },
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "sol.py",
+          "line": 14,
+          "message": "The `int(input())` call for the user's guess is not wrapped in a `try-except` block, making the program vulnerable to `ValueError` if the user enters non-numeric input, leading to a crash.",
+          "suggestion": "Implement a `try-except ValueError` block around the `int(input())` call to handle invalid numerical inputs gracefully. For example:\n```python\nwhile True:\n    try:\n        guess_input = input(\"Enter your guess: \")\n        guess = int(guess_input)\n        break\n    except ValueError:\n        print(\"Invalid input. Please enter a numerical guess.\")\n```"
+        },
+        {
+          "category": "Clean Code Reviewer",
+          "severity": "Low",
+          "file": "sol.py",
+          "line": 0,
+          "message": "The file is missing a newline character at the end.",
+          "suggestion": "Add a newline character at the end of the file to comply with common coding standards and tools."
+        }
+      ]
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 18,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "This review covers updates across several Python scripts and one HTML file. The `main.py` ATM simulation shows significant improvements in robustness and financial precision using the `decimal` module and comprehensive input validation. However, other Python scripts (`code.py`, `new.py`, `sol.py`) still lack robust error handling for user inputs and exhibit minor logic issues. The `index.html` file contains placeholder content.",
+      "recommendation": "Request Changes",
+      "linter": [],
+      "security": [],
+      "performance": [
+        {
+          "category": "Performance",
+          "severity": "Low",
+          "file": "new.py",
+          "line": 1,
+          "message": "For 'View Books', 'Remove Book', and 'Search Book' operations, using a Python list (`books`) for storage leads to O(N) complexity for searches and removals. While acceptable for a 'simple' system, performance will degrade linearly if the number of books becomes very large (thousands or millions).",
+          "suggestion": "For larger scale applications, consider using a dictionary (hash map) for faster O(1) average time complexity for lookups and removals, or a proper database system."
+        }
+      ],
+      "issues": [
+        {
+          "category": "Clean Code Reviewer",
+          "severity": "Low",
+          "file": "index.html",
+          "line": 6,
+          "message": "The HTML document title is a generic placeholder 'Document'.",
+          "suggestion": "Update the `<title>` tag to be more descriptive of the page's content, e.g., 'Student Grades Overview' or 'Project Homepage'."
+        },
+        {
+          "category": "Clean Code Reviewer",
+          "severity": "Low",
+          "file": "index.html",
+          "line": 10,
+          "message": "The body content (`<h2>qwedqwd </h2>`, `<p> changes new</p>`, etc.) appears to be scratchpad text and is not meaningful for a production-ready page.",
+          "suggestion": "Replace the placeholder content with actual, descriptive content for the webpage."
+        },
+        {
+          "category": "Clean Code Reviewer",
+          "severity": "Low",
+          "file": "main.py",
+          "line": 1,
+          "message": "Redundant import of the `decimal` module. `from decimal import Decimal` is sufficient if only `Decimal` type is used.",
+          "suggestion": "Remove the line `import decimal`."
+        },
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "code.py",
+          "line": 8,
+          "message": "User input for Math, Science, and English marks is not validated for non-numeric input. A `ValueError` will occur if the user enters text, crashing the program.",
+          "suggestion": "Wrap `float(input(...))` calls in a `try-except ValueError` block to handle invalid input gracefully, similar to how `main.py` handles input."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 8,
+          "message": "The current logic allows for negative marks, which is usually not a valid scenario for student grades.",
+          "suggestion": "Add a check after input to ensure marks are non-negative (e.g., `if mark < 0: print('Marks cannot be negative. Please re-enter.')`)."
+        },
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "new.py",
+          "line": 11,
+          "message": "User input for menu choice is not validated for non-integer input. A `ValueError` will occur if the user enters text, crashing the program.",
+          "suggestion": "Wrap `int(input(...))` in a `try-except ValueError` block and implement a loop to re-prompt until valid input is received, similar to `main.py`."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "new.py",
+          "line": 20,
+          "message": "The system allows adding duplicate book names without any warning or mechanism to prevent it. This could lead to data inconsistency or confusion.",
+          "suggestion": "Before appending a new book, check `if new_book not in books:` to prevent duplicates or prompt the user for confirmation if duplicates are intentionally allowed."
+        },
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "new.py",
+          "line": 26,
+          "message": "The `books.remove(remove_book)` method only removes the first occurrence of a book if there are duplicates. If duplicate book names are allowed, this behavior might not be desired.",
+          "suggestion": "Consider the implications of duplicate book names. If duplicates should be unique, enforce this during the 'Add Book' operation. If multiple copies can exist, decide on the intended removal behavior (e.g., remove one, remove all, or remove by specific ID)."
+        },
+        {
+          "category": "Logic",
+          "severity": "High",
+          "file": "sol.py",
+          "line": 15,
+          "message": "User input for the guess is not validated for non-integer input. A `ValueError` will occur if the user enters text, crashing the program.",
+          "suggestion": "Wrap `int(input(...))` in a `try-except ValueError` block and implement a loop to re-prompt until valid integer input is received, similar to `main.py`."
+        }
+      ]
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
     "pr_number": 18,
     "changed_files_count": 5,
     "analysis": {
@@ -2737,775 +4582,6 @@
           "line": 18,
           "message": "The file `index.html` is missing a newline character at the end of the file. This can cause issues with some tools (e.g., `git diff`) and linting configurations.",
           "suggestion": "Ensure the file ends with a newline character. Most IDEs can be configured to automatically add one on save."
-        }
-      ],
-      "recommendation": "Request Changes"
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 17,
-    "changed_files_count": 1,
-    "analysis": {
-      "summary": "This review covers the addition of a standard HTML5 boilerplate structure to an existing HTML fragment. While improving basic document structure and metadata, the changes introduce placeholder content and a generic page title, which require further refinement. A minor code style issue regarding the absence of a trailing newline character is also noted.",
-      "issues": [
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "index.html",
-          "line": 8,
-          "message": "The page title is set to the default 'Document'. This should be updated to a descriptive title that accurately reflects the page's content for better SEO and user experience.",
-          "suggestion": "Change `<title>Document</title>` to a specific and descriptive title, e.g., `<title>My Application Dashboard</title>`."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "index.html",
-          "line": 10,
-          "message": "The content within the `<body>` (e.g., 'qwedqwd', 'changes new', 'Webhook pr', 'new cjanhes', 'sample t5est') appears to be placeholder text. This should be replaced with meaningful content relevant to the page's purpose.",
-          "suggestion": "Replace placeholder text with actual, descriptive content for the page. If this is a template, consider using a templating engine or clearer variable indicators."
-        },
-        {
-          "category": "Security",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "No immediate security vulnerabilities detected. The changes are purely structural HTML, with no dynamic inputs or scripts that could introduce common web exploits.",
-          "suggestion": "Continue to ensure all future dynamic content or script additions are thoroughly reviewed for potential security risks, such as XSS or sensitive data exposure."
-        },
-        {
-          "category": "Performance",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "The changes primarily involve adding standard HTML boilerplate, which has negligible impact on performance. The inclusion of `<meta name=\"viewport\">` is beneficial for responsive rendering.",
-          "suggestion": "No specific performance issues identified with these changes. For future enhancements, consider optimizing asset loading (e.g., images, scripts, stylesheets) and server-side rendering performance if dynamic content is introduced."
-        },
-        {
-          "category": "Clean Code",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 20,
-          "message": "The file `index.html` does not end with a newline character. This is a common convention and can sometimes cause minor inconsistencies with certain build tools, linters, or version control systems when diffing.",
-          "suggestion": "Ensure the file ends with a newline character for better compatibility and adherence to common file format standards. Add a blank line at the end of the file."
-        }
-      ],
-      "recommendation": "Request Changes"
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 17,
-    "changed_files_count": 1,
-    "analysis": {
-      "summary": "This code review covers an HTML file where basic boilerplate structure has been added. The changes primarily involve setting up the document structure and including placeholder content. No critical logic, security, or performance issues were identified, but several clean code and readability concerns related to content and file formatting require attention.",
-      "issues": [
-        {
-          "category": "Logic",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "The page content appears to be placeholder text ('qwedqwd', 'changes new', 'Webhook pr', etc.). While not a logic error, it suggests the page is not yet functional or contains temporary data.",
-          "suggestion": "Replace all placeholder text with actual, meaningful content that reflects the intended purpose of the page."
-        },
-        {
-          "category": "Security",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "As a static HTML file, there are no immediate security vulnerabilities introduced. However, ensure that any future dynamic content or user input is properly sanitized and validated to prevent XSS or other injection attacks.",
-          "suggestion": "N/A for current diff. Future development should incorporate robust input validation and output encoding for dynamic content."
-        },
-        {
-          "category": "Performance",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "The changes introduce minimal static HTML, posing no immediate performance concerns. No scripts or heavy resources were added that would impact load times or rendering performance.",
-          "suggestion": "N/A for current diff. If external resources (CSS/JS) are added in the future, consider optimizing their delivery (e.g., minification, lazy loading)."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 7,
-          "message": "The document title '<title>Document</title>' is generic. A descriptive title is crucial for user experience and SEO.",
-          "suggestion": "Update the `<title>` tag with a title that accurately describes the content or purpose of the page, e.g., '<title>Application Dashboard</title>'."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 10,
-          "message": "The content like 'qwedqwd', 'changes new', 'Webhook pr', 'sample t5est' appears to be placeholder or test content. This makes the code less readable and maintainable if it's meant for production.",
-          "suggestion": "Replace all placeholder text with final, meaningful content that serves the actual purpose of the page."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "The file is missing a newline character at the end (`\\ No newline at end of file`). This is a common best practice for file formatting and compatibility with various tools and version control systems.",
-          "suggestion": "Add a newline character at the end of the `index.html` file."
-        }
-      ],
-      "recommendation": "Request Changes"
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 17,
-    "changed_files_count": 1,
-    "analysis": {
-      "summary": "The code changes correctly introduce a basic HTML5 boilerplate to `index.html`, improving the structural integrity of the document. However, there are minor issues related to content clarity and adherence to standard file formatting practices.",
-      "issues": [
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 7,
-          "message": "The page title `<title>Document</title>` is too generic and does not provide a meaningful description of the page's content, which can impact SEO and user experience.",
-          "suggestion": "Update the `<title>` tag with a descriptive and specific title that reflects the page's purpose, e.g., `<title>Project Webhook Integration</title>`."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 18,
-          "message": "The file `index.html` lacks a trailing newline character at the end. This is a common practice for most text files and can prevent issues with some tools and version control systems.",
-          "suggestion": "Add a newline character at the very end of the file."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 11,
-          "message": "The content within the `<h2>` tags, such as 'qwedqwd' and 'Webhook pr', appears to be placeholder or non-descriptive text. While not a functional error, it reduces the readability and semantic meaning of the page structure.",
-          "suggestion": "Replace placeholder text with meaningful and descriptive headings that accurately represent the content of the respective sections."
-        }
-      ],
-      "recommendation": "Request Changes"
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 17,
-    "changed_files_count": 1,
-    "analysis": {
-      "summary": "The pull request primarily adds the standard HTML5 boilerplate to the `index.html` file, correctly structuring the existing content within the `<body>` tags. This significantly improves the document's fundamental validity and adherence to web standards. Minor best practice considerations related to the page title and file formatting are noted.",
-      "issues": [
-        {
-          "category": "Logic",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "No specific logic issues were identified within the scope of this HTML structure change.",
-          "suggestion": "N/A"
-        },
-        {
-          "category": "Security",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "No direct security vulnerabilities (e.g., XSS, sensitive data exposure) were introduced or found in the added HTML boilerplate. The inclusion of `charset='UTF-8'` is a good practice.",
-          "suggestion": "N/A"
-        },
-        {
-          "category": "Performance",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "The added HTML boilerplate is standard and minimal, posing no performance concerns. The `viewport` meta tag is beneficial for responsive performance.",
-          "suggestion": "N/A"
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 8,
-          "message": "The page title `<title>Document</title>` is a generic placeholder. It should be updated to a more descriptive title that accurately reflects the content or purpose of the page for better SEO and user experience.",
-          "suggestion": "Replace `<title>Document</title>` with a meaningful title, for example, `<title>Webhook PR Overview</title>` or `<title>Sample Test Page</title>`."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 20,
-          "message": "The file ends without a newline character (`\\n`). While not critical, it is a common best practice for text files to end with a newline for better compatibility with various tools, editors, and version control systems.",
-          "suggestion": "Ensure the file ends with a single newline character on the last line."
-        }
-      ],
-      "recommendation": "Request Changes"
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 17,
-    "changed_files_count": 1,
-    "analysis": {
-      "summary": "This review covers the addition of a basic HTML boilerplate to `index.html`. While the changes introduce a fundamental document structure, the content appears to be placeholder text and the overall structure lacks semantic best practices, requiring further refinement.",
-      "issues": [
-        {
-          "category": "Logic",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "The changes are purely structural HTML additions. There is no executable logic, business rules, or complex conditions introduced in this diff to review for correctness or edge cases.",
-          "suggestion": "No specific action required based on the current diff from a logic perspective."
-        },
-        {
-          "category": "Security",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "The changes introduce static HTML content without any user input fields, server-side interactions, or embedded scripts. Therefore, no immediate security vulnerabilities like XSS or SQL injection are apparent in this specific diff.",
-          "suggestion": "Ensure that if any dynamic content is later integrated into these elements, proper input validation and output encoding are applied to prevent injection attacks."
-        },
-        {
-          "category": "Performance",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "The added HTML boilerplate is minimal and static. It will have a negligible impact on page load times, rendering performance, or resource consumption.",
-          "suggestion": "No performance optimizations are necessary for this simple HTML structure. Future additions of heavy assets, complex scripts, or large DOM elements should be reviewed for potential performance bottlenecks."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Medium",
-          "file": "index.html",
-          "line": 8,
-          "message": "The `title` tag is set to 'Document', which is a generic default value. This should be updated to a more descriptive and meaningful title relevant to the page's content or purpose for better SEO and user experience.",
-          "suggestion": "Change `<title>Document</title>` to a more descriptive title, e.g., `<title>Webhook PR Status</title>` or ` <title>Application Dashboard</title>`."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Medium",
-          "file": "index.html",
-          "line": 11,
-          "message": "The text content such as 'qwedqwd', 'changes new', 'smthing changed', 'new cjanhes', and 'sample t5est' appears to be placeholder or test content. This makes the code less readable and suggests incomplete development.",
-          "suggestion": "Replace all placeholder text with actual, meaningful content that reflects the purpose of the page. If these are temporary, consider adding comments or using more explicit 'TODO' markers."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 19,
-          "message": "The file ends with `\\ No newline at end of file`. It's a best practice in many coding standards to ensure that all text files end with a newline character.",
-          "suggestion": "Add a newline character at the very end of the `index.html` file."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 11,
-          "message": "While valid, the current HTML uses only basic `h2` and `p` tags without employing semantic HTML5 elements like `header`, `main`, `section`, `article`, `footer`, etc. Using semantic tags improves accessibility, SEO, and code maintainability.",
-          "suggestion": "Consider structuring the page with appropriate semantic HTML5 elements to better define the content areas and their purpose. For instance, the 'Webhook pr' section could be an `<article>` or `<section>`."
-        }
-      ],
-      "recommendation": "Request Changes"
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 17,
-    "changed_files_count": 1,
-    "analysis": {
-      "summary": "This review covers changes that establish a basic HTML document structure and add some static content. No critical issues related to logic, security, or performance were identified. However, several minor clean code and stylistic improvements are recommended.",
-      "issues": [
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 7,
-          "message": "The document title '<title>Document</title>' is generic. A more descriptive title would improve SEO and user experience.",
-          "suggestion": "Update the <title> tag with a meaningful title that reflects the page's content or purpose, e.g., '<title>Project Webhook Demo Page</title>'."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 12,
-          "message": "Content like 'qwedqwd', 'cjanhes', and 't5est' appears to be placeholder text or contains typos, which reduces readability and professionalism.",
-          "suggestion": "Replace placeholder or typo-ridden content with clear, meaningful text that is relevant to the page's intent."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 20,
-          "message": "The file is missing a newline character at the end, which is a common best practice and can prevent issues with some tools and version control systems.",
-          "suggestion": "Add a newline character at the very end of the 'index.html' file."
-        }
-      ],
-      "recommendation": "Request Changes"
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 17,
-    "changed_files_count": 1,
-    "analysis": {
-      "summary": "The code changes primarily introduce a basic HTML5 document structure to an existing content fragment, along with an additional paragraph. This improves the validity of the HTML document. However, the title remains generic and the file still lacks a newline at the end.",
-      "issues": [
-        {
-          "category": "Logic",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "No specific logic issues were identified as the changes are purely structural HTML with no interactive elements or complex logic.",
-          "suggestion": "N/A"
-        },
-        {
-          "category": "Security",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "The changes introduce basic static HTML elements. No new security vulnerabilities like XSS, SQL injection, or sensitive data exposure were introduced or observed.",
-          "suggestion": "N/A"
-        },
-        {
-          "category": "Performance",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "The addition of standard HTML boilerplate and a new paragraph has negligible impact on performance. No resource-intensive operations or unoptimized patterns were observed.",
-          "suggestion": "N/A"
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Medium",
-          "file": "index.html",
-          "line": 8,
-          "message": "The document title 'Document' is generic and should be updated to a more descriptive and relevant title for the page's content.",
-          "suggestion": "Update the `<title>` tag content to reflect the actual purpose or content of the page, e.g., `<title>My Awesome Webhook Page</title>`."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "The commit message indicates 'No newline at end of file'. It is a common best practice to ensure all text files end with a newline character.",
-          "suggestion": "Add a newline character at the very end of the `index.html` file."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 11,
-          "message": "The content within the `h2` and `p` tags (e.g., 'qwedqwd', 'changes new', 'new cjanhes', 'sample t5est') appears to be placeholder or test content. For production, these should be replaced with meaningful and final content.",
-          "suggestion": "Replace placeholder text with final, user-facing content."
-        }
-      ],
-      "recommendation": "Request Changes"
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 17,
-    "changed_files_count": 1,
-    "analysis": {
-      "summary": "This review covers a crucial update where an HTML fragment has been converted into a fully structured HTML5 document, including DOCTYPE, head, and body elements. This significantly improves adherence to web standards and browser compatibility. The content largely remains placeholder, and the title is generic.",
-      "issues": [
-        {
-          "category": "Logic",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "No specific logical issues were identified. The added HTML structure is correct and follows standard practices.",
-          "suggestion": "N/A"
-        },
-        {
-          "category": "Security",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "The changes primarily involve static HTML structure; no immediate security vulnerabilities like XSS or data exposure were introduced by this diff. If any of the content were dynamically generated, further review would be needed.",
-          "suggestion": "N/A"
-        },
-        {
-          "category": "Performance",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "The addition of standard HTML boilerplate (DOCTYPE, meta tags) is a best practice and does not negatively impact performance. In fact, `meta viewport` and `charset` can improve initial rendering and compatibility.",
-          "suggestion": "N/A"
-        },
-        {
-          "category": "Clean Code",
-          "severity": "Medium",
-          "file": "index.html",
-          "line": 8,
-          "message": "The document title '<title>Document</title>' is a generic placeholder. A descriptive title is crucial for SEO, accessibility, and user experience.",
-          "suggestion": "Replace '<title>Document</title>' with a title that accurately reflects the page's content or purpose, e.g., '<title>My Application Dashboard</title>'."
-        },
-        {
-          "category": "Clean Code",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 10,
-          "message": "The content within the `<body>` tags (e.g., 'qwedqwd', 'changes new', 'Webhook pr', 'sample t5est') appears to be placeholder or test data. For a production environment, this content should be replaced with meaningful and final copy.",
-          "suggestion": "Replace all placeholder text with actual, descriptive content relevant to the page's function and target audience."
-        }
-      ],
-      "recommendation": "Approve"
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 17,
-    "changed_files_count": 1,
-    "analysis": {
-      "summary": "The proposed changes establish a basic HTML5 document structure, properly encapsulating existing content within `head` and `body` tags. While this is a positive step for document validity, there are minor issues concerning a generic page title, potentially unclear content, and a missing newline at the end of the file that should be addressed.",
-      "issues": [
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 8,
-          "message": "The page title 'Document' is generic and should be replaced with a more descriptive title relevant to the page's content for better SEO and user experience.",
-          "suggestion": "Update the `<title>` tag to reflect the actual purpose or content of the page, e.g., `<title>My Awesome Webhook Page</title>`."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 13,
-          "message": "The `<h2>qwedqwd</h2>` content appears to be placeholder or unmeaningful text. Ensure that all visible content is intentional and clearly conveys information to the user.",
-          "suggestion": "Replace 'qwedqwd' with a meaningful and descriptive header that accurately represents the section's content."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "The file is missing a newline character at the end (`\\ No newline at end of file`). This is a common best practice for tooling compatibility and easier diffing in version control systems.",
-          "suggestion": "Add a single newline character at the very end of the `index.html` file."
-        }
-      ],
-      "recommendation": "Comment"
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 17,
-    "changed_files_count": 1,
-    "analysis": {
-      "summary": "This review covers basic structural changes to an HTML file. While the addition of standard boilerplate is positive, there are minor clean code issues related to generic content and file formatting that should be addressed for better maintainability and professional practice.",
-      "issues": [
-        {
-          "category": "Logic",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "No significant business logic or functional issues found, as the changes are purely structural HTML additions with placeholder content. The placeholder content itself is not a logic error but a content quality issue.",
-          "suggestion": "Ensure any future additions involving dynamic content or scripting are thoroughly reviewed for correctness and edge cases."
-        },
-        {
-          "category": "Security",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "The changes introduce standard HTML structure and static content. There are no inputs, scripts, or sensitive data involved in this diff that would introduce immediate security vulnerabilities like XSS or data exposure.",
-          "suggestion": "If dynamic content or user input is ever introduced into this page, implement proper input sanitization and output encoding to prevent vulnerabilities."
-        },
-        {
-          "category": "Performance",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "The changes only add basic HTML structure and a few lines of static text. This has a negligible impact on file size, page load time, or any other performance metric.",
-          "suggestion": "No performance-related actions are required based on this specific change. Continue to monitor for larger assets or complex scripts in future updates."
-        },
-        {
-          "category": "Clean Code",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 8,
-          "message": "The document title '<title>Document</title>' is generic. A descriptive title is crucial for SEO, accessibility, and user experience.",
-          "suggestion": "Replace 'Document' with a meaningful title that accurately describes the content or purpose of the page, e.g., '<title>Welcome to Our Application</title>'."
-        },
-        {
-          "category": "Clean Code",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 12,
-          "message": "The content like 'qwedqwd', 'changes new', 'smthing changed', 'Webhook pr', etc., appears to be placeholder or test content. Production code should have finalized, meaningful text.",
-          "suggestion": "Update all placeholder text within `<h2>` and `<p>` tags with the actual, descriptive content intended for the final user interface. If this is a temporary change for testing, ensure it is clearly marked or reverted before merging to a main branch."
-        },
-        {
-          "category": "Clean Code",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 22,
-          "message": "The file is missing a newline character at the end (`\\ No newline at end of file`). This is a common coding style best practice and can prevent issues with some build tools, linters, or version control systems.",
-          "suggestion": "Add a single newline character at the very end of the `index.html` file."
-        }
-      ],
-      "recommendation": "Request Changes"
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 17,
-    "changed_files_count": 1,
-    "analysis": {
-      "summary": "This review covers the addition of basic HTML boilerplate to `index.html`. The changes introduce fundamental web page structure, but several clean code and best practice issues have been identified. Specifically, concerns regarding inconsistent formatting, placeholder content, and a generic page title need to be addressed before approval.",
-      "issues": [
-        {
-          "category": "Clean Code",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 2,
-          "message": "Inconsistent indentation for the main HTML structure. Tags like `<html>`, `<head>`, and `<body>` are not consistently indented to reflect their hierarchical relationship.",
-          "suggestion": "Apply consistent and conventional indentation. For example, `<html>` should be at level 0, `<head>` and `<body>` at level 1, and their direct children at level 2, etc."
-        },
-        {
-          "category": "Clean Code",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 6,
-          "message": "The page title 'Document' is generic and provides no specific information about the page's content or purpose.",
-          "suggestion": "Update the `<title>` tag with a descriptive and meaningful title relevant to the page's content, e.g., `<title>Product List Page</title>`."
-        },
-        {
-          "category": "Clean Code",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 9,
-          "message": "The page contains placeholder or test content such as 'qwedqwd', 'new cjanhes', 'smthing changed', and 'sample t5est'. This indicates incomplete work.",
-          "suggestion": "Replace all placeholder text with the actual, final content intended for production."
-        },
-        {
-          "category": "Clean Code",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 11,
-          "message": "The file is indicated to be missing a trailing newline character at the end. While not a functional error, this is a common best practice for source code files and can cause issues with some version control systems (like Git) or build tools.",
-          "suggestion": "Ensure the file ends with a newline character for better compatibility and adherence to common file format standards."
-        }
-      ],
-      "recommendation": "Request Changes"
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 17,
-    "changed_files_count": 1,
-    "analysis": {
-      "summary": "This pull request introduces a basic HTML boilerplate structure to `index.html`. While it correctly establishes the fundamental document layout, there are minor issues concerning content clarity, a placeholder title, and adherence to file formatting best practices.",
-      "issues": [
-        {
-          "category": "Logic",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "The HTML content 'qwedqwd' and 'Webhook pr' in the <h2> tags appear to be placeholder text or typos. If this content is meant to convey specific information, it should be clarified and corrected for accuracy.",
-          "suggestion": "Update the content of the <h2> tags to be meaningful and typo-free, reflecting the actual purpose of the sections."
-        },
-        {
-          "category": "Security",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 8,
-          "message": "The <title> tag is set to 'Document', which is a generic placeholder. While not a direct vulnerability, it could reveal default configurations and reduces the page's usability and searchability. If this page eventually processes or displays sensitive information, a generic title provides less context in browser history or logs.",
-          "suggestion": "Update the <title> tag to a descriptive and unique title relevant to the page's content and purpose. E.g., '<title>My Application - Home</title>'."
-        },
-        {
-          "category": "Performance",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "The added HTML boilerplate for `<!DOCTYPE>`, `<html>`, `<head>`, `<body>`, and meta tags are standard and have negligible performance impact. No performance-critical elements like large scripts or excessive DOM elements were introduced.",
-          "suggestion": "No specific performance optimizations are needed for these changes, as they align with standard web practices."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 8,
-          "message": "The <title> tag is set to a default placeholder 'Document'. Best practices suggest a descriptive and unique title for better maintainability, SEO, and user experience.",
-          "suggestion": "Change '<title>Document</title>' to a meaningful title that accurately describes the page's content or purpose."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "The file ends without a newline character ('\\ No newline at end of file'). While not critical for HTML parsing, it's a common best practice in many development environments (e.g., Git diffs, some linters) to end files with a newline for consistency and easier tool processing.",
-          "suggestion": "Add a newline character at the end of the file."
-        }
-      ],
-      "recommendation": "Request Changes"
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 17,
-    "changed_files_count": 1,
-    "analysis": {
-      "summary": "The changes introduce a basic HTML5 document structure with essential meta tags for character encoding and responsiveness. However, the page title is generic, and the body contains placeholder-like content with potential typos, indicating unfinished work. A minor style issue concerning the lack of a trailing newline at the end of the file is also noted.",
-      "issues": [
-        {
-          "category": "Clean Code",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 6,
-          "message": "The page title '<title>Document</title>' is a generic placeholder. This impacts SEO, user experience, and the overall clarity of the page's purpose.",
-          "suggestion": "Update the title tag to accurately reflect the content and purpose of the page, e.g., '<title>My Application Dashboard</title>'."
-        },
-        {
-          "category": "Clean Code",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 10,
-          "message": "The content within the `<body>` tag, such as 'qwedqwd', 'changes new', 'smthing changed', and 'new cjanhes', appears to be placeholder text or contains typos. This reduces readability and maintainability, and suggests the content is not yet finalized.",
-          "suggestion": "Replace all placeholder or typo-ridden text with meaningful, final content relevant to the page's function. Ensure all text is clear and correctly spelled."
-        },
-        {
-          "category": "Clean Code",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 20,
-          "message": "The file ends without a trailing newline character. While not critical for HTML rendering, this is a common stylistic preference and can cause issues with some linters, build tools, or version control systems.",
-          "suggestion": "Add a newline character at the very end of the `index.html` file."
-        }
-      ],
-      "recommendation": "Request Changes"
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 17,
-    "changed_files_count": 1,
-    "analysis": {
-      "summary": "The proposed changes introduce fundamental HTML boilerplate, including `<!DOCTYPE html>`, `<html>`, `<head>`, and `<body>` tags, along with essential meta tags for character set and viewport, and a title. This significantly improves the structural integrity and browser compatibility of the `index.html` file.",
-      "issues": [
-        {
-          "category": "Logic",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "No specific logical errors or business logic issues were identified in these structural HTML changes.",
-          "suggestion": "N/A"
-        },
-        {
-          "category": "Security",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "The changes primarily involve basic HTML structure. The inclusion of `<meta charset=\"UTF-8\">` is a good security practice for character encoding. No immediate security vulnerabilities were introduced.",
-          "suggestion": "N/A"
-        },
-        {
-          "category": "Performance",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "These are structural HTML changes that do not introduce any performance bottlenecks, expensive operations, or resource inefficiencies. The impact on page load or rendering is negligible.",
-          "suggestion": "N/A"
-        },
-        {
-          "category": "Clean Code",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 16,
-          "message": "The file is missing a trailing newline character at the end of the file (EOF). This is a common best practice for text files and can prevent issues when concatenating files or with certain build tools/version control systems.",
-          "suggestion": "Add a newline character at the very end of the `index.html` file to conform to common Unix and coding standards. For example, ensure the last `</html>` tag is followed by a newline."
-        }
-      ],
-      "recommendation": "Request Changes"
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 17,
-    "changed_files_count": 1,
-    "analysis": {
-      "summary": "This review covers a basic HTML file change, adding standard boilerplate and some new paragraph tags. The core structure is improved, but minor issues related to code cleanliness and best practices were identified.",
-      "issues": [
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Medium",
-          "file": "index.html",
-          "line": 7,
-          "message": "The <title> tag is set to 'Document', which is the default and not descriptive. This should be updated to reflect the actual content or purpose of the page for better SEO and user experience.",
-          "suggestion": "Change `<title>Document</title>` to something more meaningful, e.g., `<title>My Application Name - Home</title>`."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 16,
-          "message": "The file ends without a newline character. This is generally considered a bad practice as it can cause issues with some build tools, linters, or version control systems when concatenating files or processing differences.",
-          "suggestion": "Ensure the file ends with a newline character. Most IDEs can be configured to do this automatically."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 10,
-          "message": "The content 'qwedqwd', 'changes new', 'smthing changed', 'new cjanhes', 'sample t5est', and 'change number 1' appears to be placeholder or test content. If this is for a production-facing page, it should be replaced with meaningful information.",
-          "suggestion": "Replace placeholder text with relevant, descriptive content for the webpage."
         }
       ],
       "recommendation": "Request Changes"
