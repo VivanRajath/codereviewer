@@ -5,50 +5,17 @@ import subprocess
 import logging
 from typing import List, Dict, Any
 import requests
-import google.generativeai as genai
-import time
-import random
-from functools import wraps
-from google.api_core import exceptions as google_exceptions
+
+# Import AI Orchestrator for multi-model support
+from app.ai_orchestrator import generate_content
 
 # Logging Setup
-
 logger = logging.getLogger("ReviewEngine")
 logger.setLevel(logging.DEBUG)
 
 handler = logging.StreamHandler()
 handler.setFormatter(logging.Formatter("[%(levelname)s] %(message)s"))
 logger.addHandler(handler)
-
-
-# Gemini API 
-GENAI_API_KEY = os.getenv("GEMINI_API_KEY")
-if GENAI_API_KEY:
-    genai.configure(api_key=GENAI_API_KEY)
-
-
-def retry_with_backoff(retries=3, initial_delay=1.0, backoff_factor=2.0):
-    def decorator(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            delay = initial_delay
-            for i in range(retries + 1):
-                try:
-                    return func(*args, **kwargs)
-                except google_exceptions.ResourceExhausted as e:
-                    if i == retries:
-                        logger.error(f"Quota exceeded after {retries} retries: {e}")
-                        raise e
-                    
-                    sleep_time = delay + random.uniform(0, 0.1) 
-                    logger.warning(f"Quota exceeded. Retrying in {sleep_time:.2f}s (Attempt {i+1}/{retries})...")
-                    time.sleep(sleep_time)
-                    delay *= backoff_factor
-                except Exception as e:
-                   
-                    raise e
-        return wrapper
-    return decorator
 
 
 # GitHub Raw Content Fetcher
@@ -165,18 +132,11 @@ def run_linter(file_content: str, filename: str) -> List[Dict[str, Any]]:
 
 # Multi-Agent AI Review
 
-@retry_with_backoff(retries=3, initial_delay=2.0)
 def run_multi_agent_review(files: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
     Complete pipeline: reconstruct files, run lint, run AI review.
+    Uses AI orchestrator with automatic Grok->Gemini failover.
     """
-
-    if not GENAI_API_KEY:
-        return {
-            "summary": "Missing API Key",
-            "issues": [{"category": "System", "severity": "High", "message": "Gemini API key missing."}],
-            "recommendation": "Manual Review Required"
-        }
 
     diff_context = ""
     all_issues = []
@@ -252,15 +212,11 @@ IMPORTANT: Do not include markdown formatting (like ```json). Just the raw JSON.
 """
 
     try:
-        print("DEBUG: Initializing Gemini Model: gemini-2.5-flash")
-        model = genai.GenerativeModel("gemini-2.5-flash")
-
-        response = model.generate_content(
-            prompt,
-            generation_config={"response_mime_type": "application/json"}
-        )
-
-        result = json.loads(response.text)
+        logger.info("🤖 Running multi-agent code review")
+        
+        # Use orchestrator with JSON response format
+        response_text = generate_content(prompt, response_format="json")
+        result = json.loads(response_text)
 
       
         all_issues.extend(result.get("issues", []))
@@ -299,56 +255,263 @@ IMPORTANT: Do not include markdown formatting (like ```json). Just the raw JSON.
 
 
 
-# Chat Engine
+# Enhanced Chat Engine with Code Modification Detection
 
-@retry_with_backoff(retries=3, initial_delay=2.0)
 def chat_with_agent(message: str, context: Dict[str, Any], history: List[Dict[str, str]]):
     """
-    A conversational helper for discussing PR analysis.
+    Enhanced conversational helper with intelligent code modification detection.
+    
+    Features:
+    - Detects when user wants code changes
+    - Detects when user wants to push/commit code
+    - Automatically applies requested modifications
+    - Returns both explanation and modified code
+    
+    Returns:
+        dict: {
+            "response": str (explanation),
+            "code_modified": bool,
+            "modified_code": str (if applicable),
+            "filename": str (if applicable),
+            "push_requested": bool (if user wants to commit/push),
+            "commit_message": str (suggested commit message)
+        }
     """
-
-    if not GENAI_API_KEY:
-        return "API key missing."
-
-    sys_prompt = f"""
+    
+    # Step 1: Check if user wants to push/commit code
+    if _detect_push_intent(message):
+        logger.info("📤 Push/commit request detected")
+        
+        current_file = context.get("current_file", {})
+        filename = current_file.get("filename", "")
+        code = current_file.get("content", "")
+        
+        if not code or not filename:
+            return {
+                "response": "⚠️ No code to push. Please make sure you have a file open with changes.",
+                "push_requested": False
+            }
+        
+        # Generate a smart commit message based on the user's request
+        commit_msg = _generate_commit_message(message, filename, context)
+        
+        return {
+            "response": f"🚀 **Ready to Push**\n\nI'll commit `{filename}` to the branch.\n\n**Suggested commit message:**\n```\n{commit_msg}\n```\n\nInitiating push...",
+            "push_requested": True,
+            "commit_message": commit_msg,
+            "code_modified": False
+        }
+    
+    # Step 2: Detect if this is a code modification request
+    current_file = context.get("current_file", {})
+    filename = current_file.get("filename", "")
+    original_code = current_file.get("content", "")
+    
+    is_code_change_request = _detect_code_change_intent(message)
+    
+    if is_code_change_request and original_code:
+        logger.info("🔧 Code modification request detected")
+        # Generate the modified code
+        result = _apply_user_requested_changes(message, original_code, filename, context, history)
+        return result
+    else:
+        # Regular chat response (no code modification)
+        logger.info("💬 Regular chat response")
+        sys_prompt = f"""
 You are an AI coding assistant helping with PR review.
 Here is the PR analysis context:
 
 {json.dumps(context, indent=2)}
 
-You have access to the code in the 'context' field.
-If the user asks to modify code (e.g., "add an h1 tag", "fix this bug"), you should:
-1. Generate the corrected code snippet or the full file content if appropriate.
-2. Wrap the code in markdown code blocks (e.g., ```html ... ```).
-3. Explain your changes briefly.
+IMPORTANT INSTRUCTIONS:
+1. Provide helpful explanations and suggestions.
+2. Be concise and professional.
+3. If discussing code, use markdown code blocks.
+4. DO NOT wrap your response in JSON format.
 
-Respond concisely and professionally.
+Respond directly to the user's question or request.
 """
 
-    full_prompt = sys_prompt + "\nConversation:\n"
+        full_prompt = sys_prompt + "\nConversation:\n"
+        
+        for msg in history:
+            full_prompt += f"{msg['role'].upper()}: {msg['content']}\n"
+        
+        full_prompt += f"USER: {message}\nAI:"
+        
+        try:
+            response_text = generate_content(full_prompt)
+            return {
+                "response": response_text,
+                "code_modified": False,
+                "push_requested": False
+            }
+        except Exception as e:
+            return {
+                "response": f"Error: {str(e)}",
+                "code_modified": False,
+                "push_requested": False
+            }
 
-    for msg in history:
-        full_prompt += f"{msg['role'].upper()}: {msg['content']}\n"
 
-    full_prompt += f"USER: {message}\nAI:"    
+def _detect_code_change_intent(message: str) -> bool:
+    """
+    Detect if user message is requesting code changes.
+    Uses keywords and patterns to identify modification requests.
+    """
+    message_lower = message.lower()
+    
+    # Keywords that indicate code modification intent
+    change_keywords = [
+        "change", "modify", "update", "fix", "add", "remove", "delete",
+        "replace", "refactor", "improve", "optimize", "correct",
+        "make it", "can you", "please", "edit", "adjust", "tweak",
+        "insert", "append", "prepend", "rename"
+    ]
+    
+    code_keywords = [
+        "code", "function", "class", "variable", "line", "file",
+        "h1", "h2", "div", "button", "import", "def", "const", "let"
+    ]
+    
+    # Check if message contains both action and code keywords
+    has_change_keyword = any(keyword in message_lower for keyword in change_keywords)
+    has_code_keyword = any(keyword in message_lower for keyword in code_keywords)
+    
+    return has_change_keyword or has_code_keyword
 
+
+def _detect_push_intent(message: str) -> bool:
+    """
+    Detect if user wants to push/commit code to the branch.
+    """
+    message_lower = message.lower()
+    
+    push_keywords = [
+        "push", "commit", "save", "deploy", "publish",
+        "push it", "commit it", "commit this", "push this",
+        "save to branch", "save changes", "push to branch",
+        "commit to branch", "push code", "commit code"
+    ]
+    
+    return any(keyword in message_lower for keyword in push_keywords)
+
+
+def _generate_commit_message(user_message: str, filename: str, context: Dict[str, Any]) -> str:
+    """
+    Generate an intelligent commit message based on user's request.
+    """
+    # Try to extract intent from user message
+    message_lower = user_message.lower()
+    
+    # Common patterns
+    if "fix" in message_lower:
+        return f"fix: Updates to {filename}"
+    elif "add" in message_lower or "new" in message_lower:
+        return f"feat: Add changes to {filename}"
+    elif "update" in message_lower or "improve" in message_lower:
+        return f"chore: Update {filename}"
+    elif "refactor" in message_lower:
+        return f"refactor: Refactor {filename}"
+    elif "remove" in message_lower or "delete" in message_lower:
+        return f"chore: Remove code from {filename}"
+    else:
+        # Default commit message
+        return f"chore: AI-assisted changes to {filename}"
+
+
+
+def _apply_user_requested_changes(
+    user_request: str,
+    original_code: str,
+    filename: str,
+    context: Dict[str, Any],
+    history: List[Dict[str, str]]
+) -> Dict[str, Any]:
+    """
+    Apply user-requested changes to code using AI.
+    
+    Returns:
+        dict with response, modified code, and metadata
+    """
+    
+    prompt = f"""
+You are a Senior Software Engineer helping a developer make specific code changes.
+
+CURRENT FILE: {filename}
+
+ORIGINAL CODE:
+```
+{original_code}
+```
+
+USER REQUEST: {user_request}
+
+CONTEXT (if relevant):
+{json.dumps(context, indent=2)}
+
+TASK:
+1. Understand the user's specific request
+2. Apply ONLY the changes they requested (be surgical, don't rewrite everything)
+3. Maintain code style and existing patterns
+4. Ensure the code remains functional
+
+OUTPUT FORMAT (IMPORTANT - You must output valid JSON):
+{{
+    "explanation": "Brief explanation of what you changed (2-3 sentences)",
+    "modified_code": "The complete modified code file",
+    "changes_summary": "List of specific changes made (bullet points)"
+}}
+
+IMPORTANT: Return ONLY valid JSON. No markdown, no extra text.
+"""
+    
     try:
-        print("DEBUG: Initializing Gemini Model: gemini-2.5-flash")
-        model = genai.GenerativeModel("gemini-2.5-flash")
-        response = model.generate_content(full_prompt)
-        return response.text
-
+        logger.info(f"🤖 Applying changes to {filename}")
+        response_text = generate_content(prompt, response_format="json")
+        
+        # Parse the JSON response
+        result = json.loads(response_text)
+        
+        return {
+            "response": f"✅ **Changes Applied**\n\n{result.get('explanation', '')}\n\n**Changes:**\n{result.get('changes_summary', '')}",
+            "code_modified": True,
+            "modified_code": result.get("modified_code", original_code),
+            "filename": filename
+        }
+        
+    except json.JSONDecodeError as e:
+        logger.error(f"Failed to parse AI response as JSON: {e}")
+        # Fallback: try to extract code from markdown blocks
+        import re
+        code_blocks = re.findall(r'```(?:\w+)?\n(.*?)```', response_text, re.DOTALL)
+        
+        if code_blocks:
+            return {
+                "response": "✅ **Changes Applied** (extracted from response)",
+                "code_modified": True,
+                "modified_code": code_blocks[0].strip(),
+                "filename": filename
+            }
+        else:
+            return {
+                "response": f"⚠️ Could not parse the AI response. Here's what I got:\n\n{response_text}",
+                "code_modified": False
+            }
+            
     except Exception as e:
-        return f"Error: {str(e)}"
+        logger.error(f"Error applying changes: {str(e)}")
+        return {
+            "response": f"❌ Error applying changes: {str(e)}",
+            "code_modified": False
+        }
 
 
 
 # Full File Deep Review
 
-@retry_with_backoff(retries=3, initial_delay=2.0)
 def analyze_full_code(code: str, filename: str) -> Dict[str, Any]:
-    if not GENAI_API_KEY:
-        return {"summary": "Missing key", "issues": [], "recommendation": "Error"}
+    """Analyze code using AI orchestrator with automatic failover"""
 
     prompt = f"""
 Deep full-file code review.
@@ -357,6 +520,8 @@ File: {filename}
 
 Code:
 {code}
+
+IMPORTANT: You MUST respond with valid JSON only. No markdown, no explanations outside JSON.
 
 Output JSON:
 {{
@@ -375,23 +540,46 @@ Output JSON:
 """
 
     try:
-        model = genai.GenerativeModel("gemini-2.5-flash")
-        response = model.generate_content(
-            prompt,
-            generation_config={"response_mime_type": "application/json"}
-        )
-        return json.loads(response.text)
+        logger.info(f"🔍 Analyzing {filename}")
+        response_text = generate_content(prompt, response_format="json")
+        
+        # Try to parse JSON
+        try:
+            return json.loads(response_text)
+        except json.JSONDecodeError:
+            # If JSON parsing fails, try to extract JSON from the response
+            import re
+            json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+            if json_match:
+                return json.loads(json_match.group())
+            else:
+                # Fallback: return the text as a single issue
+                return {
+                    "summary": "Analysis completed (non-JSON response)",
+                    "issues": [{
+                        "category": "AI Response",
+                        "severity": "Medium",
+                        "line": 0,
+                        "message": response_text[:500],  # First 500 chars
+                        "suggestion": "Review the full AI response"
+                    }],
+                    "recommendation": "Review"
+                }
 
     except Exception as e:
+        logger.error(f"Analysis error: {str(e)}")
         return {
             "summary": "AI Error",
-            "issues": [{"category": "System", "severity": "High", "message": str(e)}],
+            "issues": [{
+                "category": "System", 
+                "severity": "High", 
+                "message": str(e)
+            }],
             "recommendation": "Error"
         }
 
 
 # Auto-Fix & Push Agent
-@retry_with_backoff(retries=3, initial_delay=2.0)
 def auto_fix_and_push(
     owner: str, 
     repo: str, 
@@ -404,8 +592,7 @@ def auto_fix_and_push(
     """
     Uses AI to fix the code based on issues and pushes it to the branch.
     """
-    if not GENAI_API_KEY:
-        return {"ok": False, "error": "Missing Gemini API Key"}
+
 
 
     prompt = f"""
@@ -426,10 +613,9 @@ Task:
 """
 
     try:
-        print("DEBUG: Initializing Gemini Model (Fix): gemini-2.5-flash")
-        model = genai.GenerativeModel("gemini-2.5-flash")
-        response = model.generate_content(prompt)
-        fixed_code = response.text.replace("```python", "").replace("```", "").strip()
+        logger.info("🔧 Generating auto-fix")
+        response_text = generate_content(prompt)
+        fixed_code = response_text.replace("```python", "").replace("```", "").strip()
         
         if not fixed_code:
              return {"ok": False, "error": "AI generated empty code"}
@@ -478,14 +664,12 @@ Task:
 
 # Single Issue Fix Generator
 
-@retry_with_backoff(retries=3, initial_delay=2.0)
 def generate_fix_for_issue(code: str, issue: Dict[str, Any]) -> Dict[str, Any]:
     """
     Generates a fix for a specific issue without pushing.
     Returns the full modified code.
+    Uses AI orchestrator with automatic failover.
     """
-    if not GENAI_API_KEY:
-        return {"ok": False, "error": "Missing Gemini API Key"}
 
     prompt = f"""
 You are a Senior Software Engineer.
@@ -503,10 +687,9 @@ Task:
 """
 
     try:
-        print("DEBUG: Initializing Gemini Model (Single Fix): gemini-2.5-flash")
-        model = genai.GenerativeModel("gemini-2.5-flash")
-        response = model.generate_content(prompt)
-        fixed_code = response.text.replace("```python", "").replace("```", "").strip()
+        logger.info("🔧 Generating single issue fix")
+        response_text = generate_content(prompt)
+        fixed_code = response_text.replace("```python", "").replace("```", "").strip()
         
         if not fixed_code:
              return {"ok": False, "error": "AI generated empty code"}
@@ -531,6 +714,7 @@ async def push_file_to_branch(
 ) -> Dict[str, Any]:
     """
     Pushing Agent: Commits a file to a GitHub branch.
+    Automatically fetches the latest SHA from the branch to prevent SHA mismatch errors.
     """
     import httpx
     import base64
@@ -540,19 +724,43 @@ async def push_file_to_branch(
         "Authorization": f"token {github_token}",
         "Accept": "application/vnd.github+json"
     }
-
-    content_bytes = content.encode('utf-8')
-    base64_content = base64.b64encode(content_bytes).decode('utf-8')
-    
-    data = {
-        "message": message,
-        "content": base64_content,
-        "sha": sha,
-        "branch": branch
-    }
     
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
+            # Step 1: Fetch the latest SHA from the branch
+            logger.info(f"📥 Fetching latest SHA for {path} from branch {branch}")
+            get_response = await client.get(url, headers=headers, params={"ref": branch})
+            
+            current_sha = None
+            if get_response.status_code == 200:
+                current_sha = get_response.json().get("sha")
+                logger.info(f"✓ Found current SHA: {current_sha}")
+            elif get_response.status_code == 404:
+                # File doesn't exist yet (new file)
+                logger.info(f"⚠️ File {path} doesn't exist on branch {branch}, creating new file")
+            else:
+                logger.warning(f"⚠️ Failed to fetch current SHA (status {get_response.status_code}), attempting with provided SHA")
+                current_sha = sha
+            
+            # Use fetched SHA if available, otherwise fall back to provided SHA
+            final_sha = current_sha if current_sha else sha
+            
+            # Step 2: Prepare the file content
+            content_bytes = content.encode('utf-8')
+            base64_content = base64.b64encode(content_bytes).decode('utf-8')
+            
+            # Step 3: Push the file
+            data = {
+                "message": message,
+                "content": base64_content,
+                "branch": branch
+            }
+            
+            # Only include SHA if we have one (for updates, not new files)
+            if final_sha:
+                data["sha"] = final_sha
+            
+            logger.info(f"📤 Pushing {path} to branch {branch}")
             r = await client.put(url, headers=headers, json=data)
             
             if r.status_code in [200, 201]:

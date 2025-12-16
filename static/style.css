@@ -522,14 +522,19 @@ select:focus {
 }
 
 .modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     background: var(--bg-color);
     border: 2px solid var(--primary-color);
     width: 80%;
     max-width: 800px;
     max-height: 80vh;
-    display: flex;
+    display: none;
     flex-direction: column;
     box-shadow: 0 0 50px var(--primary-dim);
+    z-index: 10000;
 }
 
 .modal.show {
@@ -904,5 +909,26 @@ pre {
 
     .chat-panel {
         max-height: 250px;
+    }
+}
+
+/* Typing Indicator Animation */
+.typing-indicator {
+    display: inline-block;
+    animation: typingPulse 1.4s infinite;
+    color: var(--secondary-color);
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+}
+
+@keyframes typingPulse {
+
+    0%,
+    100% {
+        opacity: 0.3;
+    }
+
+    50% {
+        opacity: 1;
     }
 }

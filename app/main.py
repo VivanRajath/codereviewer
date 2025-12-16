@@ -520,15 +520,40 @@ async def analyze_pr_endpoint(owner: str, repo: str, pr_number: int, payload: di
 
 @app.post("/api/chat")
 async def chat_endpoint(payload: dict):
+    """
+    Enhanced chat endpoint with intelligent code modification support.
+    
+    Expects payload:
+    {
+        "message": str,
+        "context": {
+            "current_file": {
+                "filename": str,
+                "content": str
+            },
+            "analysis": {...},
+            ...
+        },
+        "history": [...]
+    }
+    
+    Returns:
+    {
+        "response": str,
+        "code_modified": bool,
+        "modified_code": str (if code was modified),
+        "filename": str (if code was modified)
+    }
+    """
     message = payload.get("message")
-    context = payload.get("context") # Previous analysis or code snippets
+    context = payload.get("context", {})
     history = payload.get("history", [])
     
     if not message:
         raise HTTPException(status_code=400, detail="Message required")
 
-    response = chat_with_agent(message, context, history)
-    return {"response": response}
+    result = chat_with_agent(message, context, history)
+    return result
 
 
 # NEW: Save as Branch

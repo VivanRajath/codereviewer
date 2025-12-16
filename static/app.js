@@ -272,7 +272,7 @@ window.handleChatInput = function (event) {
     }
 };
 
-// Send Chat Message
+// Send Chat Message (Enhanced with Code Modification Support)
 window.sendChatMessage = async function () {
     const input = document.getElementById('chatInput');
     const messagesDiv = document.getElementById('chatMessages');
@@ -293,7 +293,7 @@ window.sendChatMessage = async function () {
     const loadingId = 'loading-' + Date.now();
     messagesDiv.innerHTML += `
         <div id="${loadingId}" class="chat-message ai">
-            ...
+            <span class="typing-indicator">●●●</span>
         </div>
     `;
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -306,7 +306,13 @@ window.sendChatMessage = async function () {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 message: message,
-                context: `Current File: ${currentFilePath}\nCode:\n${code}`,
+                context: {
+                    current_file: {
+                        filename: currentFilePath || 'unknown',
+                        content: code
+                    },
+                    analysis: currentAnalysis
+                },
                 history: chatHistory
             })
         });
@@ -317,12 +323,46 @@ window.sendChatMessage = async function () {
         const loadingEl = document.getElementById(loadingId);
         if (loadingEl) loadingEl.remove();
 
-        // Add AI Response
-        messagesDiv.innerHTML += `
-            <div class="chat-message ai">
-                ${data.response}
-            </div>
-        `;
+        // Check if push/commit was requested
+        if (data.push_requested) {
+            // Show AI response first
+            messagesDiv.innerHTML += `
+                <div class="chat-message ai" style="border-left: 3px solid var(--secondary-color);">
+                    <div style="white-space: pre-wrap;">${data.response}</div>
+                </div>
+            `;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            // Execute the push
+            await executePushToBranch(data.commit_message || 'AI-assisted changes');
+        }
+        // Check if code was modified
+        else if (data.code_modified && data.modified_code) {
+            // Update Monaco editor with modified code
+            if (monacoWorkingModel) {
+                monacoWorkingModel.setValue(data.modified_code);
+            }
+
+            // Show special response for code modifications
+            messagesDiv.innerHTML += `
+                <div class="chat-message ai" style="border-left: 3px solid var(--success-color);">
+                    <div style="color: var(--success-color); font-weight: bold; margin-bottom: 0.5rem;">
+                        🔧 CODE MODIFIED
+                    </div>
+                    <div style="white-space: pre-wrap;">${data.response}</div>
+                    <div style="margin-top: 0.5rem; padding: 0.5rem; background: rgba(0,255,0,0.1); border-radius: 4px; font-size: 0.85rem;">
+                        ✓ Changes applied to editor
+                    </div>
+                </div>
+            `;
+        } else {
+            // Regular chat response (no code modification)
+            messagesDiv.innerHTML += `
+                <div class="chat-message ai">
+                    <div style="white-space: pre-wrap;">${data.response}</div>
+                </div>
+            `;
+        }
 
         // Update History
         chatHistory.push({ role: 'user', content: message });
@@ -331,11 +371,118 @@ window.sendChatMessage = async function () {
     } catch (err) {
         console.error(err);
         const loadingEl = document.getElementById(loadingId);
-        if (loadingEl) loadingEl.textContent = "ERROR: FAILED_TO_SEND_MESSAGE";
+        if (loadingEl) {
+            loadingEl.innerHTML = `<span style="color: var(--danger-color);">ERROR: FAILED_TO_SEND_MESSAGE</span>`;
+        }
     }
 
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 };
+
+// Execute Push to Branch (called from chat when push is requested)
+async function executePushToBranch(commitMessage) {
+    const messagesDiv = document.getElementById('chatMessages');
+
+    if (!currentPR || !currentFilePath || !currentFileSha || !monacoWorkingModel) {
+        messagesDiv.innerHTML += `
+            <div class="chat-message ai" style="color: var(--danger-color);">
+                ❌ Cannot push: Missing PR, file, or editor context.
+            </div>
+        `;
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        return;
+    }
+
+    // Create pushing status message
+    const pushingId = 'pushing-' + Date.now();
+    messagesDiv.innerHTML += `
+        <div id="${pushingId}" class="chat-message ai" style="border-left: 3px solid var(--warning-color);">
+            <div style="color: var(--warning-color); font-weight: bold;">
+                📤 PUSHING AGENT ACTIVATED
+            </div>
+            <div style="margin-top: 0.5rem;">
+                <span class="typing-indicator">●●●</span> Pushing code to branch...
+            </div>
+        </div>
+    `;
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    try {
+        const code = monacoWorkingModel.getValue();
+        const branch = currentPR.head.ref; // PR branch
+
+        const result = await fetch('/api/push-to-branch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                owner: currentRepo.owner,
+                repo: currentRepo.name,
+                path: currentFilePath,
+                content: code,
+                message: commitMessage,
+                sha: currentFileSha,
+                branch: branch,
+                github_token: getToken()
+            })
+        });
+
+        const data = await result.json();
+
+        // Remove pushing message
+        const pushingEl = document.getElementById(pushingId);
+        if (pushingEl) pushingEl.remove();
+
+        if (data.ok) {
+            // Success!
+            messagesDiv.innerHTML += `
+                <div class="chat-message ai" style="border-left: 3px solid var(--success-color);">
+                    <div style="color: var(--success-color); font-weight: bold; margin-bottom: 0.5rem;">
+                        ✅ CODE PUSHED SUCCESSFULLY
+                    </div>
+                    <div style="margin-top: 0.5rem;">
+                        <div><strong>File:</strong> ${currentFilePath}</div>
+                        <div><strong>Branch:</strong> ${branch}</div>
+                        <div><strong>Commit:</strong> ${commitMessage}</div>
+                        ${data.new_sha ? `<div><strong>SHA:</strong> <code>${data.new_sha.substring(0, 7)}</code></div>` : ''}
+                        ${data.commit_url ? `<div style="margin-top: 0.5rem;"><a href="${data.commit_url}" target="_blank" style="color: var(--primary-color);">View Commit →</a></div>` : ''}
+                    </div>
+                </div>
+            `;
+
+            // Update current SHA for next push
+            if (data.new_sha) {
+                currentFileSha = data.new_sha;
+            }
+        } else {
+            // Error
+            messagesDiv.innerHTML += `
+                <div class="chat-message ai" style="border-left: 3px solid var(--danger-color);">
+                    <div style="color: var(--danger-color); font-weight: bold;">
+                        ❌ PUSH FAILED
+                    </div>
+                    <div style="margin-top: 0.5rem;">
+                        ${data.error || 'Unknown error occurred'}
+                    </div>
+                </div>
+            `;
+        }
+
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    } catch (err) {
+        // Remove pushing message
+        const pushingEl = document.getElementById(pushingId);
+        if (pushingEl) pushingEl.remove();
+
+        console.error('Push error:', err);
+        messagesDiv.innerHTML += `
+            <div class="chat-message ai" style="color: var(--danger-color);">
+                ❌ Network error: ${err.message}
+            </div>
+        `;
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+}
 
 // Helper function to extract analysis summary
 function getAnalysisSummary(analysis) {
@@ -669,7 +816,7 @@ window.applyFix = async function (index) {
     }
 };
 
-// Auto-Fix File (analyzes if needed, then fixes)
+// Auto-Fix File (analyzes if needed, then fixes sequentially)
 window.autoFixFile = async function () {
     if (!monacoEditor || !monacoWorkingModel) {
         alert("EDITOR_NOT_READY.");
@@ -687,11 +834,11 @@ window.autoFixFile = async function () {
         btn.disabled = true;
     }
 
-    const code = monacoWorkingModel.getValue();
+    let code = monacoWorkingModel.getValue();
     const chatMessages = document.getElementById('chatMessages');
 
     try {
-        // Step 1: Analyze code first (silently if no issues cached)
+        // Step 1: Analyze code first
         if (!window.currentEditorIssues || window.currentEditorIssues.length === 0) {
             const analyzeRes = await fetch('/api/analyze-code', {
                 method: 'POST',
@@ -715,62 +862,180 @@ window.autoFixFile = async function () {
             window.currentEditorIssues = analyzeData.analysis.issues;
         }
 
-        //Step 2: Auto-fix
+        const totalIssues = window.currentEditorIssues.length;
+
+        // Step 2: Show To-Do List in Chatbot
+        const todoId = 'autofix-todo-' + Date.now();
+        if (chatMessages) {
+            const todoMsg = document.createElement('div');
+            todoMsg.id = todoId;
+            todoMsg.className = 'chat-message ai';
+            todoMsg.innerHTML = `
+                <div style="color: var(--secondary-color); font-weight: bold; margin-bottom: 0.5rem;">
+                    🔧 AUTO-FIX IN PROGRESS (${totalIssues} issues)
+                </div>
+                <div id="${todoId}-list" style="font-size: 0.9rem;">
+                    ${window.currentEditorIssues.map((issue, idx) => {
+                const message = issue.message || (typeof issue === 'string' ? issue : 'Unknown Issue');
+                return `
+                            <div id="${todoId}-item-${idx}" style="margin: 0.3rem 0; color: var(--text-dim);">
+                                <span id="${todoId}-status-${idx}">⏳</span> ${message}
+                            </div>
+                        `;
+            }).join('')}
+                </div>
+            `;
+            chatMessages.appendChild(todoMsg);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
         if (btn) btn.textContent = "FIXING...";
 
-        const branch = currentPR ? (currentPR.head.ref || currentPR.head_branch || 'main') : 'main';
+        // Step 3: Fix each issue sequentially
+        let fixedCount = 0;
+        for (let i = 0; i < window.currentEditorIssues.length; i++) {
+            const issue = window.currentEditorIssues[i];
 
-        const res = await fetch('/api/auto-fix', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                owner: currentRepo.owner,
-                repo: currentRepo.name,
-                branch: branch,
-                filename: currentFilePath,
-                code: code,
-                issues: window.currentEditorIssues,
-                github_token: getToken()
-            })
-        });
-        const data = await res.json();
+            // Update status to "fixing"
+            const statusEl = document.getElementById(`${todoId}-status-${i}`);
+            if (statusEl) statusEl.textContent = '🔄';
 
-        if (data.ok) {
-            // Show success in chat
+            try {
+                // Get current code from editor
+                code = monacoWorkingModel.getValue();
+
+                // Generate fix for this specific issue
+                const res = await fetch('/api/generate-fix', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        code: code,
+                        issue: issue
+                    })
+                });
+                const data = await res.json();
+
+                if (data.ok && data.fixed_code) {
+                    // Apply fix to editor
+                    monacoWorkingModel.setValue(data.fixed_code);
+                    code = data.fixed_code;
+
+                    // Update status to "done"
+                    if (statusEl) {
+                        statusEl.textContent = '✅';
+                        statusEl.parentElement.style.color = 'var(--success-color)';
+                    }
+                    fixedCount++;
+                } else {
+                    // Mark as failed
+                    if (statusEl) {
+                        statusEl.textContent = '❌';
+                        statusEl.parentElement.style.color = 'var(--danger-color)';
+                    }
+                }
+            } catch (e) {
+                console.error('Fix failed for issue:', issue, e);
+                if (statusEl) {
+                    statusEl.textContent = '❌';
+                    statusEl.parentElement.style.color = 'var(--danger-color)';
+                }
+            }
+
+            // Small delay between fixes
+            await new Promise(resolve => setTimeout(resolve, 300));
+        }
+
+        // Step 4: Show completion summary (no auto-commit)
+        if (fixedCount > 0) {
+            // Show success summary
             if (chatMessages) {
-                const msg = document.createElement('div');
-                msg.className = 'chat-message ai';
-                msg.style.color = 'var(--primary-color)';
-                msg.innerHTML = `
-                    ✓ AUTO-FIX APPLIED AND PUSHED!
+                const summaryMsg = document.createElement('div');
+                summaryMsg.className = 'chat-message ai';
+                summaryMsg.style.color = 'var(--primary-color)';
+                summaryMsg.innerHTML = `
+                    ✓ AUTO-FIX COMPLETE!
                     <br><br>
-                    <strong>Fixed ${window.currentEditorIssues.length} issues</strong>
+                    <strong>Fixed ${fixedCount} / ${totalIssues} issues in editor</strong>
                     <br>
-                    <code style="background: var(--surface-color); padding: 0.2rem 0.5rem;">${data.new_sha ? data.new_sha.substring(0, 7) : 'commit'}</code>
+                    <span style="color: var(--text-dim); font-size: 0.9rem;">
+                        Review the changes and click "COMMIT & PUSH" when ready.
+                    </span>
                 `;
-                chatMessages.appendChild(msg);
+                chatMessages.appendChild(summaryMsg);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
-
-            // Clear issues cache
-            window.currentEditorIssues = [];
-
-            // Reload file to show changes
-            if (data.new_sha) {
-                currentFileSha = data.new_sha;
-                openEditor(null, currentFilePath, data.new_sha);
-            }
         } else {
-            alert("AUTO_FIX_FAILED: " + (data.error || "UNKNOWN_ERROR"));
+            alert("NO_FIXES_APPLIED");
         }
+
+        // Clear issues cache
+        window.currentEditorIssues = [];
+
     } catch (e) {
         console.error(e);
-        alert("NETWORK_ERROR");
+        alert("NETWORK_ERROR: " + e.message);
     } finally {
         if (btn) {
             btn.textContent = originalText;
             btn.disabled = false;
         }
+    }
+};
+
+// Commit Modal Variables
+let commitResolve = null;
+let commitReject = null;
+
+// Show Commit Modal
+function showCommitModal(defaultMessage) {
+    return new Promise((resolve, reject) => {
+        commitResolve = resolve;
+        commitReject = reject;
+
+        const modal = document.getElementById('commitModal');
+        const input = document.getElementById('commitMessageInput');
+
+        if (modal && input) {
+            input.value = defaultMessage || '';
+            modal.classList.add('show');
+            setTimeout(() => input.focus(), 100);
+        }
+    });
+}
+
+// Close Commit Modal
+window.closeCommitModal = function () {
+    const modal = document.getElementById('commitModal');
+    if (modal) modal.classList.remove('show');
+    if (commitReject) commitReject(new Error('Cancelled'));
+    commitResolve = null;
+    commitReject = null;
+};
+
+// Confirm Commit
+window.confirmCommit = function () {
+    const input = document.getElementById('commitMessageInput');
+    const message = input ? input.value.trim() : '';
+
+    if (!message) {
+        alert('Please enter a commit message');
+        return;
+    }
+
+    const modal = document.getElementById('commitModal');
+    if (modal) modal.classList.remove('show');
+
+    if (commitResolve) commitResolve(message);
+    commitResolve = null;
+    commitReject = null;
+};
+
+// Handle Enter/Esc in commit input
+window.handleCommitInputKeypress = function (event) {
+    if (event.key === 'Enter') {
+        confirmCommit();
+    } else if (event.key === 'Escape') {
+        closeCommitModal();
     }
 };
 
@@ -789,23 +1054,20 @@ window.commitAndPush = async function () {
     const btnText = document.getElementById('commitBtnText');
     const spinner = document.getElementById('commitSpinner');
 
+    const code = monacoWorkingModel.getValue();
+    const message = prompt("Enter commit message:", `Update ${currentFilePath}`);
+
+    if (!message) return;
+
     // Show loading state
     if (btn) btn.disabled = true;
     if (btnText) btnText.classList.add('hidden');
     if (spinner) spinner.classList.remove('hidden');
 
-    const code = monacoWorkingModel.getValue();
-    const message = prompt("ENTER_COMMIT_MESSAGE:", `Update ${currentFilePath}`);
-
-    if (!message) {
-        // Reset button state
-        if (btn) btn.disabled = false;
-        if (btnText) btnText.classList.remove('hidden');
-        if (spinner) spinner.classList.add('hidden');
-        return;
-    }
-
-    const branch = currentPR ? (currentPR.head.ref || currentPR.head_branch || 'main') : 'main';
+    // Get correct branch: PR branch > repo default > master > main
+    const branch = currentPR
+        ? (currentPR.head_branch || currentPR.base?.ref || 'master')
+        : (currentRepo?.default_branch || 'master');
 
     try {
         const res = await fetch('/api/push-to-branch', {
@@ -889,12 +1151,14 @@ window.saveEditorFile = async function () {
     }
 
     const code = monacoWorkingModel.getValue();
-    const message = prompt("ENTER_COMMIT_MESSAGE:", `UPDATE ${currentFilePath}`);
+    const message = prompt("Enter commit message:", `Update ${currentFilePath}`);
 
     if (!message) return;
 
-    // Use the PR branch if available, otherwise default to main (or warn user)
-    const branch = currentPR ? (currentPR.head_branch || 'main') : 'main';
+    // Get correct branch: PR branch > repo default > master
+    const branch = currentPR
+        ? (currentPR.head_branch || currentPR.base?.ref || 'master')
+        : (currentRepo?.default_branch || 'master');
 
     try {
         const res = await fetch('/api/commit-file', {
@@ -907,7 +1171,7 @@ window.saveEditorFile = async function () {
                 content: code,
                 message: message,
                 sha: currentFileSha,
-                branch: branch, // CRITICAL FIX: Send to PR branch
+                branch: branch,
                 github_token: getToken()
             })
         });
@@ -1236,12 +1500,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Shared Logic: Check Login
     if (document.querySelector('.dashboard-container')) {
+        // Declare user variable outside conditional block so it's accessible throughout
+        const user = JSON.parse(localStorage.getItem('gh_user') || '{}');
+
         // specific check: if we are processing a login hash, DO NOT redirect
         if (window.location.hash && window.location.hash.includes('token=')) {
             console.log('Processing OAuth callback, skipping auth check redirect...');
             // let the hash handler (defined above) do its work
         } else {
-            const user = JSON.parse(localStorage.getItem('gh_user') || '{}');
             if (!user.login) {
                 window.location.href = '/login';
                 return;
@@ -1374,7 +1640,7 @@ window.switchTab = function (tabName) {
 };
 
 // Chat Placeholder
-// Chat with Backend
+// Chat with Backend (Enhanced with Code Modification Support)
 window.sendChatMessage = async function () {
     const input = document.getElementById('chatInput');
     const messages = document.getElementById('chatMessages');
@@ -1395,25 +1661,27 @@ window.sendChatMessage = async function () {
     // AI Loading Message
     const aiMsg = document.createElement('div');
     aiMsg.className = 'chat-message ai';
-    aiMsg.textContent = "THINKING...";
+    aiMsg.innerHTML = '<span class="typing-indicator">●●●</span>';
     messages.appendChild(aiMsg);
     messages.scrollTop = messages.scrollHeight;
 
     try {
-        // Prepare context from current editor if available
-        let context = {};
-        if (monacoWorkingModel) {
-            context.code = monacoWorkingModel.getValue();
-            context.filename = currentFilePath;
-            context.issues = window.currentEditorIssues || [];
-        }
+        // Prepare context with current file information
+        const code = monacoWorkingModel ? monacoWorkingModel.getValue() : '';
 
         const res = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 message: text,
-                context: context,
+                context: {
+                    current_file: {
+                        filename: currentFilePath || 'unknown',
+                        content: code
+                    },
+                    analysis: currentAnalysis,
+                    issues: window.currentEditorIssues || []
+                },
                 history: chatHistory
             })
         });
@@ -1422,19 +1690,55 @@ window.sendChatMessage = async function () {
 
         // Update History
         chatHistory.push({ role: 'user', content: text });
-        chatHistory.push({ role: 'ai', content: data.response });
+        chatHistory.push({ role: 'assistant', content: data.response });
 
-        // Update UI
-        aiMsg.innerHTML = marked.parse(data.response); // Assuming marked is available, otherwise textContent
+        // Check if push/commit was requested
+        if (data.push_requested) {
+            // Show AI response first
+            aiMsg.innerHTML = `
+                <div style="border-left: 3px solid var(--secondary-color); padding-left: 0.5rem;">
+                    <div style="white-space: pre-wrap;">${data.response}</div>
+                </div>
+            `;
+            messages.scrollTop = messages.scrollHeight;
 
-        // Check for code blocks and add "Apply" buttons if needed (advanced)
-        // For now, simple text response is fine.
+            // Execute the push
+            await executePushToBranch(data.commit_message || 'AI-assisted changes');
+        }
+        // Check if code was modified
+        else if (data.code_modified && data.modified_code) {
+            // Update Monaco editor with modified code
+            if (monacoWorkingModel) {
+                monacoWorkingModel.setValue(data.modified_code);
+            }
+
+            // Show special response for code modifications
+            aiMsg.innerHTML = `
+                <div style="border-left: 3px solid var(--success-color); padding-left: 0.5rem;">
+                    <div style="color: var(--success-color); font-weight: bold; margin-bottom: 0.5rem;">
+                        🔧 CODE MODIFIED
+                    </div>
+                    <div style="white-space: pre-wrap;">${data.response}</div>
+                    <div style="margin-top: 0.5rem; padding: 0.5rem; background: rgba(0,255,0,0.1); border-radius: 4px; font-size: 0.85rem;">
+                        ✓ Changes applied to editor
+                    </div>
+                </div>
+            `;
+        } else {
+            // Regular chat response - use marked if available, otherwise plain text
+            if (typeof marked !== 'undefined') {
+                aiMsg.innerHTML = marked.parse(data.response);
+            } else {
+                aiMsg.innerHTML = `<div style="white-space: pre-wrap;">${data.response}</div>`;
+            }
+        }
 
     } catch (err) {
-        console.error(err);
-        aiMsg.textContent = "ERROR: FAILED_TO_CONNECT_TO_BRAIN.";
-        aiMsg.style.color = "var(--danger-color)";
+        console.error('Chat error:', err);
+        aiMsg.innerHTML = `<span style="color: var(--danger-color);">ERROR: ${err.message || 'FAILED_TO_SEND_MESSAGE'}</span>`;
     }
+
+    messages.scrollTop = messages.scrollHeight;
 };
 
 // File rendering has been updated in fetchPRDetails (line 881-888)

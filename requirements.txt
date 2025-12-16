@@ -7,3 +7,6 @@ pylint
 gunicorn
 authlib
 itsdangerous
+langgraph
+langchain-core
+openai

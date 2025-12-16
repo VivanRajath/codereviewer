@@ -173,6 +173,29 @@
             </section>
         </main>
     </div>
+
+    <!-- Commit Message Modal -->
+    <div id="commitModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3 style="margin: 0; color: var(--primary-color);">COMMIT MESSAGE</h3>
+                <button class="btn-icon" onclick="closeCommitModal()" style="font-size: 1.5rem;">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="commitMessageInput" placeholder="Enter commit message..."
+                    style="width: 100%; padding: 0.75rem; background: var(--surface-color); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; color: var(--text-color); font-size: 0.95rem;"
+                    onkeypress="handleCommitInputKeypress(event)">
+                <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-dim);">
+                    Press Enter to commit or Esc to cancel
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                <button class="btn-sm" onclick="closeCommitModal()">CANCEL</button>
+                <button class="btn" onclick="confirmCommit()">COMMIT & PUSH</button>
+            </div>
+        </div>
+    </div>
+
     <script src="/static/app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/loader.min.js"></script>
     <script>
