@@ -7,6 +7,1289 @@
     "pr_number": 23,
     "changed_files_count": 5,
     "analysis": {
+      "summary": "The provided code changes introduce several new features and classes, including a student management system, weather engine, order processor, and bank account system. However, there are some potential issues and improvements that can be made. Overall, the code appears to be well-structured, but some areas require refinement.",
+      "recommendation": "Request Changes",
+      "linter": [
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 1,
+          "message": "missing-module-docstring: Missing module docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 4,
+          "message": "missing-class-docstring: Missing class docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 9,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "warning",
+          "file": "code.py",
+          "line": 12,
+          "message": "unspecified-encoding: Using open without explicitly specifying an encoding",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 15,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "warning",
+          "file": "code.py",
+          "line": 16,
+          "message": "unspecified-encoding: Using open without explicitly specifying an encoding",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 19,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 29,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 33,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 39,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 43,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "main.py",
+          "line": 1,
+          "message": "missing-module-docstring: Missing module docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "main.py",
+          "line": 4,
+          "message": "missing-class-docstring: Missing class docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "main.py",
+          "line": 10,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "main.py",
+          "line": 19,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "main.py",
+          "line": 26,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 1,
+          "message": "missing-module-docstring: Missing module docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 5,
+          "message": "missing-class-docstring: Missing class docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 12,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "refactor",
+          "file": "new.py",
+          "line": 5,
+          "message": "too-few-public-methods: Too few public methods (1/2)",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 15,
+          "message": "missing-class-docstring: Missing class docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 21,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 27,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 32,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 40,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 1,
+          "message": "missing-module-docstring: Missing module docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 1,
+          "message": "missing-class-docstring: Missing class docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 6,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 13,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 20,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 24,
+          "message": "missing-class-docstring: Missing class docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 28,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 35,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 38,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        }
+      ],
+      "security": [
+        {
+          "category": "Security",
+          "severity": "High",
+          "file": "code.py",
+          "line": 0,
+          "message": "The code uses user input directly without any sanitization or validation, making it vulnerable to potential security threats.",
+          "suggestion": "Use a library like `input-validator` to validate and sanitize user input."
+        }
+      ],
+      "performance": [
+        {
+          "category": "Performance",
+          "severity": "Low",
+          "file": "main.py",
+          "line": 24,
+          "message": "The simulate_change method uses random.uniform, which may not be the most efficient way to simulate changes.",
+          "suggestion": "Consider using a more efficient method, such as `random.gauss` or `numpy.random.normal`, to simulate changes."
+        }
+      ],
+      "issues": [
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 28,
+          "message": "The add_student method does not validate if a student with the same roll number already exists.",
+          "suggestion": "Add a check to prevent duplicate roll numbers: `if any(s['roll'] == roll for s in self.data): raise ValueError('Student with same roll number already exists')`"
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Medium",
+          "file": "new.py",
+          "line": 15,
+          "message": "The Order class has a magic string 'Pending' for the initial status.",
+          "suggestion": "Define a constant for the initial status: `INITIAL_STATUS = 'Pending'` and use it in the `__init__` method."
+        },
+        {
+          "category": "Logic",
+          "severity": "Critical",
+          "file": "sol.py",
+          "line": 25,
+          "message": "The withdraw method does not check if the account balance is sufficient before withdrawing the amount.",
+          "suggestion": "Add a check to ensure the account balance is sufficient: `if amt > self.balance: raise ValueError('Insufficient funds')`"
+        }
+      ]
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 23,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "The provided code changes introduce several new features and improvements across multiple files, including student management, weather simulation, order processing, and banking systems. However, there are various issues related to logic, security, performance, and code quality that need to be addressed. The review highlights these issues and provides suggestions for improvement.",
+      "recommendation": "Request Changes",
+      "linter": [
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 1,
+          "message": "missing-module-docstring: Missing module docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 4,
+          "message": "missing-class-docstring: Missing class docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 9,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "warning",
+          "file": "code.py",
+          "line": 12,
+          "message": "unspecified-encoding: Using open without explicitly specifying an encoding",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 15,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "warning",
+          "file": "code.py",
+          "line": 16,
+          "message": "unspecified-encoding: Using open without explicitly specifying an encoding",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 19,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 29,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 33,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 39,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 43,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "main.py",
+          "line": 1,
+          "message": "missing-module-docstring: Missing module docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "main.py",
+          "line": 4,
+          "message": "missing-class-docstring: Missing class docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "main.py",
+          "line": 10,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "main.py",
+          "line": 19,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "main.py",
+          "line": 26,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 1,
+          "message": "missing-module-docstring: Missing module docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 5,
+          "message": "missing-class-docstring: Missing class docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 12,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "refactor",
+          "file": "new.py",
+          "line": 5,
+          "message": "too-few-public-methods: Too few public methods (1/2)",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 15,
+          "message": "missing-class-docstring: Missing class docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 21,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 27,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 32,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 40,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 1,
+          "message": "missing-module-docstring: Missing module docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 1,
+          "message": "missing-class-docstring: Missing class docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 6,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 13,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 20,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 24,
+          "message": "missing-class-docstring: Missing class docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 28,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 35,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 38,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        }
+      ],
+      "security": [
+        {
+          "category": "Security",
+          "severity": "High",
+          "file": "code.py",
+          "line": 15,
+          "message": "The load_data method in the StudentManagement class does not handle potential JSON decoding errors.",
+          "suggestion": "Add try-except blocks to handle JSON decoding errors and provide a secure fallback."
+        },
+        {
+          "category": "Security",
+          "severity": "High",
+          "file": "sol.py",
+          "line": 25,
+          "message": "The create_account method in the Bank class does not validate the account name.",
+          "suggestion": "Add input validation to prevent potential security vulnerabilities."
+        }
+      ],
+      "performance": [
+        {
+          "category": "Performance",
+          "severity": "Medium",
+          "file": "main.py",
+          "line": 20,
+          "message": "The simulate_change method in the WeatherEngine class uses random.uniform, which can be slow for large simulations.",
+          "suggestion": "Consider using NumPy's random functions for better performance."
+        },
+        {
+          "category": "Performance",
+          "severity": "Medium",
+          "file": "new.py",
+          "line": 35,
+          "message": "The process_orders method in the OrderProcessor class uses a while loop with a sleep, which can be inefficient.",
+          "suggestion": "Consider using a more efficient scheduling mechanism, such as a timer or a scheduler library."
+        }
+      ],
+      "issues": [
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 23,
+          "message": "The average calculation in the Student class does not handle the case where the marks dictionary is empty.",
+          "suggestion": "Add a check to ensure the marks dictionary is not empty before calculating the average."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Low",
+          "file": "new.py",
+          "line": 10,
+          "message": "The Order class has a magic string 'Pending' for the initial status.",
+          "suggestion": "Define a constant for the initial status to improve readability and maintainability."
+        },
+        {
+          "category": "Logic",
+          "severity": "Critical",
+          "file": "sol.py",
+          "line": 15,
+          "message": "The withdraw method in the Account class does not check for negative withdrawal amounts.",
+          "suggestion": "Add a check to prevent negative withdrawal amounts and handle the error accordingly."
+        }
+      ]
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 23,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "This code review highlights several issues across multiple files, including logic errors, security vulnerabilities, performance concerns, and code readability problems. The codebase appears to be a collection of unrelated scripts, each with its own set of issues. Overall, significant refactoring is needed to address these concerns and improve the maintainability of the codebase.",
+      "recommendation": "Request Changes",
+      "linter": [
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 1,
+          "message": "missing-module-docstring: Missing module docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 4,
+          "message": "missing-class-docstring: Missing class docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 9,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "warning",
+          "file": "code.py",
+          "line": 12,
+          "message": "unspecified-encoding: Using open without explicitly specifying an encoding",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 15,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "warning",
+          "file": "code.py",
+          "line": 16,
+          "message": "unspecified-encoding: Using open without explicitly specifying an encoding",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 19,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 29,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 33,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 39,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "code.py",
+          "line": 43,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "main.py",
+          "line": 1,
+          "message": "missing-module-docstring: Missing module docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "main.py",
+          "line": 4,
+          "message": "missing-class-docstring: Missing class docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "main.py",
+          "line": 10,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "main.py",
+          "line": 19,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "main.py",
+          "line": 26,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 1,
+          "message": "missing-module-docstring: Missing module docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 5,
+          "message": "missing-class-docstring: Missing class docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 12,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "refactor",
+          "file": "new.py",
+          "line": 5,
+          "message": "too-few-public-methods: Too few public methods (1/2)",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 15,
+          "message": "missing-class-docstring: Missing class docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 21,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 27,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 32,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "new.py",
+          "line": 40,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 1,
+          "message": "missing-module-docstring: Missing module docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 1,
+          "message": "missing-class-docstring: Missing class docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 6,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 13,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 20,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 24,
+          "message": "missing-class-docstring: Missing class docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 28,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 35,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        },
+        {
+          "category": "Linting",
+          "severity": "convention",
+          "file": "sol.py",
+          "line": 38,
+          "message": "missing-function-docstring: Missing function or method docstring",
+          "suggestion": "Fix linting error"
+        }
+      ],
+      "security": [
+        {
+          "category": "Security",
+          "severity": "High",
+          "file": "code.py",
+          "line": 0,
+          "message": "The code uses user input directly without sanitization, making it vulnerable to potential security threats.",
+          "suggestion": "Use a library like input-validator to sanitize user input and prevent security vulnerabilities."
+        },
+        {
+          "category": "Security",
+          "severity": "Medium",
+          "file": "sol.py",
+          "line": 0,
+          "message": "The Bank class stores account information in memory, which is not secure and could lead to data loss in case of a system failure.",
+          "suggestion": "Consider using a secure database to store account information and implement proper data backup and recovery procedures."
+        }
+      ],
+      "performance": [
+        {
+          "category": "Performance",
+          "severity": "Low",
+          "file": "main.py",
+          "line": 20,
+          "message": "The WeatherEngine class uses a simple random number generator to simulate weather changes, which may not be efficient for large-scale simulations.",
+          "suggestion": "Consider using a more advanced random number generator or a dedicated weather simulation library for more realistic and efficient simulations."
+        }
+      ],
+      "issues": [
+        {
+          "category": "Logic",
+          "severity": "Medium",
+          "file": "code.py",
+          "line": 24,
+          "message": "In the StudentManagement class, the add_student method does not validate if a student with the same roll number already exists.",
+          "suggestion": "Add a check to prevent duplicate roll numbers by using a set to store existing roll numbers."
+        },
+        {
+          "category": "Clean Code",
+          "severity": "Medium",
+          "file": "new.py",
+          "line": 10,
+          "message": "The Order class has a calculate_total method that uses a list comprehension to calculate the total cost of an order, but it does not handle cases where the products list is empty.",
+          "suggestion": "Add a check to handle the case where the products list is empty and return a default value or raise an exception as needed."
+        },
+        {
+          "category": "Logic",
+          "severity": "Critical",
+          "file": "sol.py",
+          "line": 15,
+          "message": "The Account class has a withdraw method that does not check if the withdrawal amount is valid (e.g., not negative), which could lead to incorrect account balances.",
+          "suggestion": "Add input validation to the withdraw method to ensure that the withdrawal amount is valid and non-negative."
+        }
+      ]
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 23,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "AI Error",
+      "issues": [
+        {
+          "category": "System",
+          "severity": "High",
+          "message": "Expecting value: line 1 column 1 (char 0)"
+        }
+      ],
+      "recommendation": "Manual Review Required"
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 23,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "AI Error",
+      "issues": [
+        {
+          "category": "System",
+          "severity": "High",
+          "message": "Expecting value: line 1 column 1 (char 0)"
+        }
+      ],
+      "recommendation": "Manual Review Required"
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 23,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "AI Error",
+      "issues": [
+        {
+          "category": "System",
+          "severity": "High",
+          "message": "Expecting value: line 1 column 1 (char 0)"
+        }
+      ],
+      "recommendation": "Manual Review Required"
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 23,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "AI Error",
+      "issues": [
+        {
+          "category": "System",
+          "severity": "High",
+          "message": "Expecting value: line 1 column 1 (char 0)"
+        }
+      ],
+      "recommendation": "Manual Review Required"
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 23,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "AI Error",
+      "issues": [
+        {
+          "category": "System",
+          "severity": "High",
+          "message": "Expecting value: line 1 column 1 (char 0)"
+        }
+      ],
+      "recommendation": "Manual Review Required"
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 23,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "AI Error",
+      "issues": [
+        {
+          "category": "System",
+          "severity": "High",
+          "message": "Expecting value: line 1 column 1 (char 0)"
+        }
+      ],
+      "recommendation": "Manual Review Required"
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 23,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "AI Error",
+      "issues": [
+        {
+          "category": "System",
+          "severity": "High",
+          "message": "Expecting value: line 1 column 1 (char 0)"
+        }
+      ],
+      "recommendation": "Manual Review Required"
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 23,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "AI Error",
+      "issues": [
+        {
+          "category": "System",
+          "severity": "High",
+          "message": "Expecting value: line 1 column 1 (char 0)"
+        }
+      ],
+      "recommendation": "Manual Review Required"
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 23,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "AI Error",
+      "issues": [
+        {
+          "category": "System",
+          "severity": "High",
+          "message": "Expecting value: line 1 column 1 (char 0)"
+        }
+      ],
+      "recommendation": "Manual Review Required"
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 23,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "AI Error",
+      "issues": [
+        {
+          "category": "System",
+          "severity": "High",
+          "message": "Expecting value: line 1 column 1 (char 0)"
+        }
+      ],
+      "recommendation": "Manual Review Required"
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 23,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "AI Error",
+      "issues": [
+        {
+          "category": "System",
+          "severity": "High",
+          "message": "Expecting value: line 1 column 1 (char 0)"
+        }
+      ],
+      "recommendation": "Manual Review Required"
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 23,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "AI Error",
+      "issues": [
+        {
+          "category": "System",
+          "severity": "High",
+          "message": "Expecting value: line 1 column 1 (char 0)"
+        }
+      ],
+      "recommendation": "Manual Review Required"
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 23,
+    "changed_files_count": 5,
+    "analysis": {
+      "summary": "AI Error",
+      "issues": [
+        {
+          "category": "System",
+          "severity": "High",
+          "message": "Expecting value: line 1 column 1 (char 0)"
+        }
+      ],
+      "recommendation": "Manual Review Required"
+    },
+    "timestamp": ""
+  },
+  {
+    "ok": true,
+    "action": "analyzed",
+    "owner": "VivanRajath",
+    "repo": "PR-test",
+    "pr_number": 23,
+    "changed_files_count": 5,
+    "analysis": {
       "summary": "The provided code changes introduce several new features and classes, including a student management system, weather engine, order processor, and bank account management. However, there are some issues with logic, security, and performance that need to be addressed. Overall, the code changes are significant, and a thorough review is necessary to ensure the quality and reliability of the code.",
       "recommendation": "Request Changes",
       "linter": [],
@@ -2468,1785 +3751,6 @@
           "line": 15,
           "message": "The input for the user's guess does not handle non-numeric values, which will cause a `ValueError` and crash the application if invalid input is provided.",
           "suggestion": "Implement a try-except block around the `int(input(...))` call to gracefully handle `ValueError`. Prompt the user to re-enter valid numeric input until it's provided."
-        }
-      ]
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 18,
-    "changed_files_count": 5,
-    "analysis": {
-      "summary": "The code review covers several new Python scripts for common applications (grade calculator, ATM, library, guessing game) and an HTML file. While the ATM simulation (`main.py`) demonstrates good practices for financial calculations using `Decimal` and robust input validation, the other Python scripts (`code.py`, `new.py`, `sol.py`) currently lack essential error handling for user inputs, which could lead to program crashes. Additionally, several minor clean code and maintainability improvements are recommended across all files.",
-      "recommendation": "Request Changes",
-      "linter": [],
-      "security": [],
-      "performance": [
-        {
-          "category": "Performance",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 4,
-          "message": "Using a Python list for `books` means that operations like `remove` and `search` (using `in` operator) have a time complexity of O(n), where n is the number of books. For a very large number of books, this could become inefficient.",
-          "suggestion": "For a 'simple' system, this is acceptable. However, for future scalability, consider using a `set` for faster lookups (O(1) on average) if only book names are stored, or a dictionary if unique identifiers or additional book details are needed (e.g., `{'title': 'Python Basics', 'id': 1}`)."
-        }
-      ],
-      "issues": [
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "code.py",
-          "line": 8,
-          "message": "The `float(input())` calls are not wrapped in a `try-except` block, making the program vulnerable to `ValueError` if the user enters non-numeric input for marks, leading to a crash.",
-          "suggestion": "Implement `try-except ValueError` blocks around all `float(input())` calls to handle invalid numerical inputs gracefully. For example:\n```python\nwhile True:\n    try:\n        math = float(input(\"Enter Math marks: \"))\n        break\n    except ValueError:\n        print(\"Invalid input. Please enter a numerical value for marks.\")\n```"
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "code.py",
-          "line": 8,
-          "message": "The system allows entry of negative marks, which can lead to incorrect total and average calculations, and subsequently, an inaccurate grade.",
-          "suggestion": "Add validation to ensure that entered marks are non-negative. For example:\n```python\nwhile True:\n    try:\n        math = float(input(\"Enter Math marks: \"))\n        if math < 0:\n            print(\"Marks cannot be negative. Please enter a valid value.\")\n        else:\n            break\n    except ValueError:\n        print(\"Invalid input. Please enter a numerical value for marks.\")\n```"
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "code.py",
-          "line": 0,
-          "message": "The file is missing a newline character at the end.",
-          "suggestion": "Add a newline character at the end of the file to comply with common coding standards and tools."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 6,
-          "message": "The document title `<title>Document</title>` is a default placeholder. It should be updated to be more descriptive and relevant to the page's content.",
-          "suggestion": "Change `<title>Document</title>` to a more meaningful title, e.g., `<title>My Webhook Test Page</title>`."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 15,
-          "message": "There are redundant empty paragraph tags (`<p></p>`) or lines with only whitespace, which can make the HTML structure less clean.",
-          "suggestion": "Remove unnecessary empty lines or empty tags if they do not serve a specific layout purpose. Consolidate consecutive text into single paragraph tags if semantically appropriate."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 0,
-          "message": "The file is missing a newline character at the end.",
-          "suggestion": "Add a newline character at the end of the file to comply with common coding standards and tools."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Medium",
-          "file": "main.py",
-          "line": 8,
-          "message": "Magic numbers are used for the initial balance and transaction limits (e.g., `Decimal('5000.00')`, `Decimal('100000.00')`, `Decimal('10000.00')`). These should ideally be defined as named constants for better readability and maintainability.",
-          "suggestion": "Define these values as constants at the top of the file. For example:\n```python\nINITIAL_BALANCE = Decimal('5000.00')\nMAX_DEPOSIT_AMOUNT = Decimal('100000.00')\nMAX_WITHDRAWAL_AMOUNT = Decimal('10000.00')\nbalance = INITIAL_BALANCE\n```"
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "main.py",
-          "line": 8,
-          "message": "The 'FIX:' comments are useful during development but should be removed or rephrased as standard code comments once the issues are considered resolved to keep the code clean.",
-          "suggestion": "Review and remove or rephrase the 'FIX:' comments to standard documentation comments as appropriate."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "main.py",
-          "line": 37,
-          "message": "There is some repetition in the input validation logic for deposit and withdrawal amounts (e.g., `while not deposit_amount_valid`, `try-except` blocks). This could be refactored into a reusable helper function.",
-          "suggestion": "Create a helper function, e.g., `get_valid_decimal_input(prompt, min_val=None, max_val=None)`, to encapsulate the input, conversion to Decimal, and validation logic, reducing code duplication."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "main.py",
-          "line": 0,
-          "message": "The file is missing a newline character at the end.",
-          "suggestion": "Add a newline character at the end of the file to comply with common coding standards and tools."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "new.py",
-          "line": 14,
-          "message": "The `int(input())` call for menu choice is not within a `try-except` block, which means entering non-integer input will raise a `ValueError` and crash the program.",
-          "suggestion": "Wrap the `int(input())` call in a `try-except ValueError` block to handle invalid menu choices gracefully, similar to `main.py`'s choice handling. For example:\n```python\nwhile True:\n    try:\n        choice = int(input(\"Enter your choice: \"))\n        break\n    except ValueError:\n        print(\"Invalid input. Please enter a number (1-5).\")\n```"
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "new.py",
-          "line": 27,
-          "message": "The `books.remove(remove_book)` method only removes the first occurrence of a book if there are duplicate titles in the list. This could lead to unexpected behavior if the system were to allow duplicate book entries.",
-          "suggestion": "If duplicate book titles are intended to be supported, consider using a different data structure (e.g., a list of dictionaries with unique IDs) or modify the removal logic to specify which instance of the book to remove (e.g., by index or unique identifier)."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 0,
-          "message": "The file is missing a newline character at the end.",
-          "suggestion": "Add a newline character at the end of the file to comply with common coding standards and tools."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "sol.py",
-          "line": 14,
-          "message": "The `int(input())` call for the user's guess is not wrapped in a `try-except` block, making the program vulnerable to `ValueError` if the user enters non-numeric input, leading to a crash.",
-          "suggestion": "Implement a `try-except ValueError` block around the `int(input())` call to handle invalid numerical inputs gracefully. For example:\n```python\nwhile True:\n    try:\n        guess_input = input(\"Enter your guess: \")\n        guess = int(guess_input)\n        break\n    except ValueError:\n        print(\"Invalid input. Please enter a numerical guess.\")\n```"
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "sol.py",
-          "line": 0,
-          "message": "The file is missing a newline character at the end.",
-          "suggestion": "Add a newline character at the end of the file to comply with common coding standards and tools."
-        }
-      ]
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 18,
-    "changed_files_count": 5,
-    "analysis": {
-      "summary": "This review covers updates across several Python scripts and one HTML file. The `main.py` ATM simulation shows significant improvements in robustness and financial precision using the `decimal` module and comprehensive input validation. However, other Python scripts (`code.py`, `new.py`, `sol.py`) still lack robust error handling for user inputs and exhibit minor logic issues. The `index.html` file contains placeholder content.",
-      "recommendation": "Request Changes",
-      "linter": [],
-      "security": [],
-      "performance": [
-        {
-          "category": "Performance",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 1,
-          "message": "For 'View Books', 'Remove Book', and 'Search Book' operations, using a Python list (`books`) for storage leads to O(N) complexity for searches and removals. While acceptable for a 'simple' system, performance will degrade linearly if the number of books becomes very large (thousands or millions).",
-          "suggestion": "For larger scale applications, consider using a dictionary (hash map) for faster O(1) average time complexity for lookups and removals, or a proper database system."
-        }
-      ],
-      "issues": [
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 6,
-          "message": "The HTML document title is a generic placeholder 'Document'.",
-          "suggestion": "Update the `<title>` tag to be more descriptive of the page's content, e.g., 'Student Grades Overview' or 'Project Homepage'."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 10,
-          "message": "The body content (`<h2>qwedqwd </h2>`, `<p> changes new</p>`, etc.) appears to be scratchpad text and is not meaningful for a production-ready page.",
-          "suggestion": "Replace the placeholder content with actual, descriptive content for the webpage."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "main.py",
-          "line": 1,
-          "message": "Redundant import of the `decimal` module. `from decimal import Decimal` is sufficient if only `Decimal` type is used.",
-          "suggestion": "Remove the line `import decimal`."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "code.py",
-          "line": 8,
-          "message": "User input for Math, Science, and English marks is not validated for non-numeric input. A `ValueError` will occur if the user enters text, crashing the program.",
-          "suggestion": "Wrap `float(input(...))` calls in a `try-except ValueError` block to handle invalid input gracefully, similar to how `main.py` handles input."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "code.py",
-          "line": 8,
-          "message": "The current logic allows for negative marks, which is usually not a valid scenario for student grades.",
-          "suggestion": "Add a check after input to ensure marks are non-negative (e.g., `if mark < 0: print('Marks cannot be negative. Please re-enter.')`)."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "new.py",
-          "line": 11,
-          "message": "User input for menu choice is not validated for non-integer input. A `ValueError` will occur if the user enters text, crashing the program.",
-          "suggestion": "Wrap `int(input(...))` in a `try-except ValueError` block and implement a loop to re-prompt until valid input is received, similar to `main.py`."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "new.py",
-          "line": 20,
-          "message": "The system allows adding duplicate book names without any warning or mechanism to prevent it. This could lead to data inconsistency or confusion.",
-          "suggestion": "Before appending a new book, check `if new_book not in books:` to prevent duplicates or prompt the user for confirmation if duplicates are intentionally allowed."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "new.py",
-          "line": 26,
-          "message": "The `books.remove(remove_book)` method only removes the first occurrence of a book if there are duplicates. If duplicate book names are allowed, this behavior might not be desired.",
-          "suggestion": "Consider the implications of duplicate book names. If duplicates should be unique, enforce this during the 'Add Book' operation. If multiple copies can exist, decide on the intended removal behavior (e.g., remove one, remove all, or remove by specific ID)."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "sol.py",
-          "line": 15,
-          "message": "User input for the guess is not validated for non-integer input. A `ValueError` will occur if the user enters text, crashing the program.",
-          "suggestion": "Wrap `int(input(...))` in a `try-except ValueError` block and implement a loop to re-prompt until valid integer input is received, similar to `main.py`."
-        }
-      ]
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 18,
-    "changed_files_count": 5,
-    "analysis": {
-      "summary": "This review covers several Python scripts and one HTML file. The Python scripts, designed for simple simulations, consistently lack robust input validation, leading to potential crashes from invalid user input. The HTML file contains a critical syntax error. Overall, the code demonstrates basic functionality but requires improvements in error handling, robustness, and adherence to HTML best practices.",
-      "recommendation": "Request Changes",
-      "linter": [],
-      "security": [
-        {
-          "category": "Security",
-          "severity": "Low",
-          "file": "main.py",
-          "line": 0,
-          "message": "For a real-world ATM, the lack of any user authentication (e.g., PIN) is a critical security flaw, allowing anyone to perform transactions. While acceptable for a simple simulation, it's an important consideration.",
-          "suggestion": "For a production system, implement a robust authentication mechanism. For a simulation, explicitly state this limitation or add a dummy authentication step to illustrate the concept."
-        }
-      ],
-      "performance": [
-        {
-          "category": "Performance",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 23,
-          "message": "For larger numbers of books, `remove_book in books` and `books.remove()` operations involve linear time complexity (O(N)) as they iterate through the list. This could impact performance significantly.",
-          "suggestion": "For a more scalable solution, consider using a data structure optimized for lookup and removal, such as a Python `set` (for unique book titles) or a `dict` (e.g., mapping title to count or object), which offer average O(1) complexity."
-        }
-      ],
-      "issues": [
-        {
-          "category": "Clean Code",
-          "severity": "High",
-          "file": "index.html",
-          "line": 13,
-          "message": "The added paragraph tag is malformed. The closing tag uses `<p>` instead of `</p>`.",
-          "suggestion": "Correct the closing tag from `<p>` to `</p>`: `<p> change number 1 </p>`."
-        },
-        {
-          "category": "Clean Code",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 13,
-          "message": "The new paragraph tag has inconsistent indentation compared to surrounding HTML elements, affecting readability.",
-          "suggestion": "Adjust the indentation of `<p> change number 1 </p>` to align with other `<p>` tags."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "code.py",
-          "line": 7,
-          "message": "The script does not validate user input for marks (Math, Science, English) to ensure they are within a reasonable range (e.g., 0-100) or non-negative. Entering negative or excessively large numbers will result in incorrect averages and grades.",
-          "suggestion": "Implement input validation within a `try-except` block to catch `ValueError` for non-numeric input and additional `if` conditions to check if marks are within an acceptable range (e.g., 0-100). Prompt the user to re-enter valid data."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "main.py",
-          "line": 14,
-          "message": "The `input()` calls for choices and amounts are directly converted to `int` or `float` without error handling. Non-numeric input will cause the program to crash with a `ValueError`.",
-          "suggestion": "Wrap `int(input(...))` and `float(input(...))` calls in a `try-except ValueError` block to handle invalid numeric input gracefully. Prompt the user to re-enter a valid number."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "main.py",
-          "line": 20,
-          "message": "The ATM simulation allows depositing or withdrawing negative amounts, which is illogical for a financial system. Depositing a negative amount effectively reduces the balance.",
-          "suggestion": "Add validation to ensure that the `amount` entered for both deposit and withdrawal is strictly positive (`amount > 0`)."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "new.py",
-          "line": 14,
-          "message": "User input for menu `choice` is converted to `int` without error handling. Providing non-numeric input will crash the program with a `ValueError`.",
-          "suggestion": "Encapsulate the `int(input(...))` call in a `try-except ValueError` block to robustly handle non-numeric input. Advise the user to enter a valid number."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "new.py",
-          "line": 27,
-          "message": "The `books.remove(remove_book)` method only removes the first occurrence of a book from the list. If there are multiple entries for the same book title, subsequent duplicates will remain.",
-          "suggestion": "Clarify the expected behavior for removing duplicate book titles. If all instances should be removed, a loop or list comprehension approach would be necessary. If only a single, specific instance is desired, consider adding unique identifiers to books."
-        },
-        {
-          "category": "Logic",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 23,
-          "message": "Book operations (add, remove, search) are case-sensitive. 'Python Basics' is treated differently from 'python basics', which can lead to a confusing user experience.",
-          "suggestion": "Standardize book names to a consistent case (e.g., all lowercase using `.lower()`) when adding, removing, and searching to enable case-insensitive comparisons and improve usability."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "sol.py",
-          "line": 13,
-          "message": "The `input()` for `guess` is directly converted to `int` without error handling. Non-numeric input will cause the program to crash with a `ValueError`.",
-          "suggestion": "Implement a `try-except ValueError` block around the `int(input(...))` call to gracefully handle non-numeric input. Loop until a valid integer is entered."
-        },
-        {
-          "category": "Logic",
-          "severity": "Low",
-          "file": "sol.py",
-          "line": 13,
-          "message": "The game does not explicitly validate if the user's guess is within the advertised range (1 to 50). While the core logic handles 'too low/high', out-of-range guesses might confuse the user without specific feedback.",
-          "suggestion": "Add an `if` condition to check if the `guess` is within the 1-50 range. If not, inform the user they are out of bounds and prompt for a new guess without incrementing the `attempts` count."
-        }
-      ]
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 18,
-    "changed_files_count": 5,
-    "analysis": {
-      "summary": "The code review covers five modified files, primarily introducing new Python scripts for various simulations (grade calculator, ATM, library, number guessing) and a minor HTML update. Key findings include pervasive issues with input validation and error handling in Python, several logic flaws, and a critical missing security layer for the ATM simulation (if viewed as a real-world model). The HTML change also contains a syntax error.",
-      "recommendation": "Request Changes",
-      "linter": [],
-      "security": [
-        {
-          "category": "Security",
-          "severity": "Critical",
-          "file": "main.py",
-          "line": 0,
-          "message": "As an 'ATM Machine Simulation', the fundamental lack of authentication, authorization, and the direct modification of a global `balance` variable represents a critical security design flaw if this were to evolve beyond a simple console demo or be misinterpreted as a secure design pattern.",
-          "suggestion": "For a simulation, this may be acceptable for brevity. However, for any real-world application, authentication (e.g., PIN), user accounts, and proper encapsulation of financial logic (e.g., within a class with private balance) are essential."
-        }
-      ],
-      "performance": [
-        {
-          "category": "Performance",
-          "severity": "Medium",
-          "file": "new.py",
-          "line": 10,
-          "message": "Using a Python list for book storage combined with `in` and `remove` operations results in O(N) time complexity for searching and removing. For a large number of books, this can significantly degrade performance.",
-          "suggestion": "For better performance, consider using a `set` for O(1) average time complexity for lookups and removals if uniqueness is desired, or a dictionary to map book titles to more complex book objects/counts."
-        }
-      ],
-      "issues": [
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "code.py",
-          "line": 8,
-          "message": "Marks input (Math, Science, English) does not validate for negative values, values exceeding 100, or non-numeric input. This can lead to incorrect grade calculations or runtime errors if invalid data is entered.",
-          "suggestion": "Implement `try-except ValueError` for `float(input())` and add validation checks (e.g., `0 <= marks <= 100`) for each subject mark."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "main.py",
-          "line": 19,
-          "message": "The ATM simulation allows users to input negative amounts for deposits (effectively withdrawals) and withdrawals (effectively deposits) without explicit checks, leading to unintended balance manipulation.",
-          "suggestion": "Add a check `if amount > 0:` after the input for both deposit and withdrawal operations to ensure only positive amounts are processed."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "main.py",
-          "line": 12,
-          "message": "Input conversions (`int(input())`, `float(input())`) across `main.py`, `new.py`, and `sol.py` are not wrapped in `try-except` blocks. Entering non-numeric data will cause the program to crash with a `ValueError`.",
-          "suggestion": "Wrap all `int(input())` and `float(input())` calls in `try-except ValueError` blocks to handle invalid input gracefully and prompt the user to re-enter valid data."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "new.py",
-          "line": 26,
-          "message": "Book search and removal operations are case-sensitive. This can lead to a poor user experience where 'python basics' might not find 'Python Basics', causing frustration or incorrect feedback.",
-          "suggestion": "Convert both the user input and the stored book names to a consistent case (e.g., lowercase) before comparison to ensure case-insensitive matching."
-        },
-        {
-          "category": "Logic",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 22,
-          "message": "The library system allows adding duplicate book titles without any checks or specific handling (e.g., incrementing a quantity or informing the user of a duplicate).",
-          "suggestion": "Before `books.append(new_book)`, check `if new_book in books:` and provide feedback to the user, or implement logic to manage multiple copies of the same book."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Medium",
-          "file": "index.html",
-          "line": 9,
-          "message": "The newly added HTML line `<p> change number 1 <p>` has a malformed closing tag (missing '/') and inconsistent indentation, which can lead to parsing errors and incorrect rendering.",
-          "suggestion": "Correct the tag to `<p> change number 1 </p>` and ensure consistent indentation for improved readability and correct HTML structure."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Medium",
-          "file": "code.py",
-          "line": 0,
-          "message": "All Python scripts (code.py, main.py, new.py, sol.py) are written monolithically, without functions to logically separate different functionalities. This reduces modularity, reusability, and makes testing and maintenance more challenging.",
-          "suggestion": "Refactor the code into well-defined functions (e.g., `calculate_grade()`, `display_menu()`, `handle_deposit()`, `add_book()`, `play_game()`) to improve structure and maintainability."
-        }
-      ]
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 18,
-    "changed_files_count": 5,
-    "analysis": {
-      "summary": "The submitted changes introduce several new Python scripts for console applications (Student Grade Calculator, ATM, Library, Number Guessing) and a minor update to an HTML file. The Python scripts generally implement their logic correctly for their intended simple scope, but consistently lack robust input validation, making them prone to crashing on invalid user input. The HTML file contains a syntax error.",
-      "recommendation": "Request Changes",
-      "linter": [],
-      "security": [],
-      "performance": [
-        {
-          "category": "Performance",
-          "severity": "Low",
-          "file": "main.py",
-          "line": 4,
-          "message": "Using `float` for financial transactions can introduce precision issues due to the nature of floating-point representation. While acceptable for a 'simple simulation', it's a risk for real applications.",
-          "suggestion": "For production-grade financial applications, consider using Python's `Decimal` type from the `decimal` module for accurate monetary calculations."
-        },
-        {
-          "category": "Performance",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 4,
-          "message": "For a very large number of books, linear search (`in` operator) and `list.remove()` operations on a Python list can become inefficient (O(n)).",
-          "suggestion": "If the number of books is expected to grow significantly, consider using a data structure optimized for fast lookups and removals, such as a `set` (if books are unique and order doesn't matter) or a dictionary for more complex book objects indexed by title/ID."
-        }
-      ],
-      "issues": [
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "code.py",
-          "line": 10,
-          "message": "The application crashes if non-numeric input is provided for marks (e.g., text instead of numbers). `float(input(...))` will raise a `ValueError`.",
-          "suggestion": "Wrap the `float(input(...))` calls in a `try-except` block to handle `ValueError` gracefully, prompting the user to re-enter valid numeric input."
-        },
-        {
-          "category": "Logic",
-          "severity": "Low",
-          "file": "code.py",
-          "line": 8,
-          "message": "No validation is performed to ensure marks are within a realistic range (e.g., 0-100). Currently, negative marks are accepted.",
-          "suggestion": "Add a conditional check after converting input to `float` to ensure marks are non-negative and optionally within a maximum possible score range."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "High",
-          "file": "index.html",
-          "line": 13,
-          "message": "HTML syntax error: The line `<p> change number 1 <p>` has an unclosed `<p>` tag and an unnecessary second opening `<p>` tag where a closing `</p>` tag is expected.",
-          "suggestion": "Correct the HTML tag to `&lt;p&gt; change number 1 &lt;/p&gt;`. Also, ensure consistent indentation for HTML elements."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "main.py",
-          "line": 15,
-          "message": "The ATM simulation crashes if non-integer input is provided for the menu choice or non-numeric input for the amount. `int(input(...))` and `float(input(...))` will raise a `ValueError`.",
-          "suggestion": "Implement `try-except` blocks for all `int(input())` and `float(input())` calls to gracefully handle invalid input and allow the user to retry."
-        },
-        {
-          "category": "Logic",
-          "severity": "Low",
-          "file": "main.py",
-          "line": 23,
-          "message": "The system allows depositing or withdrawing negative amounts. 'Depositing -100' would act as a withdrawal, which is not typical behavior for an ATM.",
-          "suggestion": "Add a check to ensure that the `amount` entered for deposit or withdrawal is greater than zero (`amount > 0`)."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "main.py",
-          "line": 8,
-          "message": "Magic numbers are used for menu options (1, 2, 3, 4). This can make the code slightly less readable and harder to maintain if options are reordered or added.",
-          "suggestion": "Define constants for menu choices (e.g., `CHOICE_CHECK_BALANCE = 1`) to improve readability and maintainability."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "new.py",
-          "line": 14,
-          "message": "The Library system crashes if non-integer input is provided for the menu choice. `int(input(...))` will raise a `ValueError`.",
-          "suggestion": "Implement a `try-except` block for `int(input())` to gracefully handle `ValueError` and prompt the user for valid numeric input."
-        },
-        {
-          "category": "Logic",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 26,
-          "message": "Book search and removal operations are case-sensitive. 'Python Basics' will not match 'python basics', which might not be the desired user experience.",
-          "suggestion": "Convert both user input and stored book names to a consistent case (e.g., `.lower()`) before comparison for more user-friendly functionality."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "sol.py",
-          "line": 13,
-          "message": "The Number Guessing Game crashes if non-integer input is provided for the guess. `int(input(...))` will raise a `ValueError`.",
-          "suggestion": "Wrap the `int(input())` call in a `try-except` block to catch `ValueError` and ask the user to input a valid number."
-        },
-        {
-          "category": "Logic",
-          "severity": "Low",
-          "file": "sol.py",
-          "line": 9,
-          "message": "The random number generation range (1-50) is hardcoded. There's no mechanism to easily customize this range, limiting the game's reusability.",
-          "suggestion": "Consider making the minimum and maximum bounds for the guessing game configurable, perhaps by taking them as initial inputs from the user."
-        }
-      ]
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 18,
-    "changed_files_count": 5,
-    "analysis": {
-      "summary": "This multi-agent review identifies several critical and high-priority issues across the new Python scripts and one HTML file. Key concerns include missing input validation, which can lead to program crashes, and logical flaws such as potential for negative financial transactions. The HTML file contains a basic syntax error, and all Python scripts could benefit from improved modularity and comprehensive error handling for better maintainability and robustness.",
-      "recommendation": "Request Changes",
-      "linter": [],
-      "security": [
-        {
-          "category": "Security Auditor",
-          "severity": "Medium",
-          "file": "main.py",
-          "line": 14,
-          "message": "The lack of validation for negative deposit/withdrawal amounts presents a logical flaw that could be exploited to manipulate the account balance, posing a security risk in a real-world financial context.",
-          "suggestion": "Enforce strict positive amount validation for all financial transactions. Reject any non-positive amounts with an appropriate error message."
-        }
-      ],
-      "performance": [],
-      "issues": [
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Medium",
-          "file": "index.html",
-          "line": 13,
-          "message": "The newly added paragraph tag has an incorrect closing tag structure, which results in malformed HTML.",
-          "suggestion": "Change `<p> change number 1 <p>` to `<p> change number 1 </p>` to correctly close the paragraph tag."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "code.py",
-          "line": 9,
-          "message": "The grade calculator does not handle non-numeric input for marks, which will cause a `ValueError` and crash the program if the user enters text instead of numbers.",
-          "suggestion": "Implement a `try-except` block to catch `ValueError` for `float(input(...))` calls, prompting the user to re-enter valid numeric input until successful."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Medium",
-          "file": "code.py",
-          "line": 8,
-          "message": "The script lacks function encapsulation, making it harder to test, reuse, or manage as it grows. Input operations are also directly in the global scope.",
-          "suggestion": "Encapsulate the grade calculation logic within a function, e.g., `def calculate_student_grade():`. Consider a helper function for robust input reading."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "main.py",
-          "line": 14,
-          "message": "The ATM simulation allows users to deposit or withdraw negative amounts, which will incorrectly manipulate the account balance (e.g., depositing -100 decreases balance).",
-          "suggestion": "Add a check to ensure that all `amount` values for deposit and withdrawal are positive numbers (e.g., `if amount > 0:`). For withdrawal, the condition should be `if amount > 0 and amount <= balance:`."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Medium",
-          "file": "main.py",
-          "line": 10,
-          "message": "The `main.py` script contains all logic within a large `while True` loop without function modularization, making it less readable and maintainable. Input handling is also prone to crashes on invalid input.",
-          "suggestion": "Refactor the ATM operations (check balance, deposit, withdraw) into separate functions. Implement a robust integer and float input function to handle `ValueError`."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "new.py",
-          "line": 20,
-          "message": "The library management system allows adding duplicate book entries, which might not be desirable for an accurate inventory.",
-          "suggestion": "Before appending a new book, check if `new_book` already exists in the `books` list. Consider making this check case-insensitive for better user experience."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "new.py",
-          "line": 20,
-          "message": "Book operations (add, remove, search) are case-sensitive, meaning 'python basics' will not match 'Python Basics'. This can lead to user confusion and unexpected behavior.",
-          "suggestion": "Normalize book titles to a consistent case (e.g., lowercase) during input and when comparing with existing entries in the `books` list."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Medium",
-          "file": "new.py",
-          "line": 10,
-          "message": "Similar to other scripts, the library system could benefit from separating concerns into functions for each operation (view, add, remove, search) to improve code organization and readability. Input parsing for choice is also not robust.",
-          "suggestion": "Extract the different menu options into dedicated functions (e.g., `view_books()`, `add_book()`, `remove_book()`, `search_book()`). Implement robust `int(input())` handling."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "sol.py",
-          "line": 14,
-          "message": "The number guessing game crashes with a `ValueError` if the user enters non-numeric input for their guess.",
-          "suggestion": "Wrap the `int(input(...))` call in a `try-except` block to catch `ValueError` and prompt the user to enter a valid integer."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "sol.py",
-          "line": 13,
-          "message": "The core game logic is directly in the global scope within a `while True` loop. Encapsulating the game in a function would improve structure and reusability.",
-          "suggestion": "Place the number guessing game's logic within a function, for example, `def play_guessing_game():`."
-        }
-      ]
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 18,
-    "changed_files_count": 5,
-    "analysis": {
-      "summary": "The reviewed changes introduce several small, self-contained Python scripts and a minor HTML update. Key areas for improvement across the Python files include robust input validation, handling of negative or zero values where appropriate, and some modularization for better maintainability. The HTML change contains a syntax error.",
-      "recommendation": "Request Changes",
-      "linter": [],
-      "security": [],
-      "performance": [
-        {
-          "category": "Performance Engineer",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 25,
-          "message": "Using a Python list (`books`) for `in` and `remove` operations can lead to O(N) performance for search and removal, which may become slow for a very large number of books.",
-          "suggestion": "For a significantly larger collection of books, consider using a `set` for faster O(1) average-case lookups (if only unique titles are needed) or a dictionary for more complex book objects with unique identifiers."
-        }
-      ],
-      "issues": [
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "code.py",
-          "line": 8,
-          "message": "Input for marks (Math, Science, English) does not handle non-numeric input, which will raise a ValueError. Also, negative marks are currently accepted.",
-          "suggestion": "Wrap `float(input(...))` in a `try-except ValueError` block to prompt the user again or provide a default. Add a check `if amount < 0:` to ensure marks are non-negative."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "code.py",
-          "line": 5,
-          "message": "Missing a blank line before the first input statement for better visual grouping and adherence to PEP 8 spacing conventions.",
-          "suggestion": "Add a blank line before `name = input(\"Enter student name: \")`."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Medium",
-          "file": "index.html",
-          "line": 9,
-          "message": "The newly added `<p>` tag is unclosed, leading to invalid HTML structure.",
-          "suggestion": "Change `<p> change number 1 <p>` to `<p> change number 1 </p>`."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "main.py",
-          "line": 13,
-          "message": "Input for 'choice' does not handle non-integer input, leading to a ValueError. Similarly, deposit/withdraw amounts do not handle non-numeric input.",
-          "suggestion": "Wrap `int(input(...))` and `float(input(...))` in `try-except ValueError` blocks to handle invalid input gracefully."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "main.py",
-          "line": 20,
-          "message": "The ATM allows depositing and withdrawing negative amounts, which is a significant logical flaw, potentially allowing users to increase their balance by 'withdrawing' negative money or decreasing it by 'depositing' negative money.",
-          "suggestion": "Add validation `if amount <= 0:` for deposit and withdrawal operations to ensure only positive amounts are processed."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Medium",
-          "file": "main.py",
-          "line": 7,
-          "message": "The ATM logic is implemented as a single monolithic block within a `while` loop. This reduces modularity and reusability.",
-          "suggestion": "Refactor the logic into separate functions (e.g., `check_balance()`, `deposit(amount)`, `withdraw(amount)`) to improve readability and maintainability."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "main.py",
-          "line": 1,
-          "message": "The initial balance is hardcoded, making it inflexible for different scenarios or initial setups.",
-          "suggestion": "Consider passing the initial balance as an argument to a main function or loading it from a configuration for better flexibility."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "new.py",
-          "line": 12,
-          "message": "Input for 'choice' does not handle non-integer input, leading to a ValueError. This could crash the program.",
-          "suggestion": "Wrap `int(input(...))` in a `try-except ValueError` block to handle invalid input gracefully."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "new.py",
-          "line": 19,
-          "message": "The system allows adding duplicate book titles without any checks, which might not be desirable in a library management system.",
-          "suggestion": "Before appending, check if `new_book` is already in `books`. If so, prompt the user or ask for confirmation to add a duplicate."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "new.py",
-          "line": 25,
-          "message": "Book search and removal are case-sensitive, which can lead to a poor user experience (e.g., 'python basics' won't match 'Python Basics').",
-          "suggestion": "Convert both user input and stored book names to a consistent case (e.g., lowercase) before comparison for better user-friendliness."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Medium",
-          "file": "new.py",
-          "line": 6,
-          "message": "The library system logic is implemented as a single monolithic block within a `while` loop, reducing modularity and testability.",
-          "suggestion": "Refactor the operations (view, add, remove, search) into separate functions to improve organization and maintainability."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 1,
-          "message": "The initial list of books is hardcoded, limiting flexibility and persistence.",
-          "suggestion": "Consider loading initial books from a file or database, or making the initial list configurable."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "sol.py",
-          "line": 12,
-          "message": "Input for 'guess' does not handle non-integer input, which will raise a ValueError and crash the game.",
-          "suggestion": "Wrap `int(input(...))` in a `try-except ValueError` block to handle invalid input gracefully."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "sol.py",
-          "line": 9,
-          "message": "The core game logic is not encapsulated within a function, making it less reusable or testable.",
-          "suggestion": "Wrap the game logic in a function, for example, `def play_guessing_game():`, to improve modularity."
-        }
-      ]
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 18,
-    "changed_files_count": 5,
-    "analysis": {
-      "summary": "This review covers several new Python scripts for simple console applications and an HTML snippet. Key findings include multiple unhandled input validation errors (ValueError), potential logical flaws in calculations/operations (e.g., negative amounts in ATM, duplicate book handling), and a syntax error in the HTML file. Additionally, all Python files are missing a newline at the end of the file.",
-      "recommendation": "Request Changes",
-      "linter": [],
-      "security": [
-        {
-          "category": "Security",
-          "severity": "High",
-          "file": "main.py",
-          "line": 15,
-          "message": "Users can deposit negative amounts, effectively withdrawing money without the proper checks. Similarly, withdrawing a negative amount would act as a deposit.",
-          "suggestion": "Add validation to ensure deposit and withdrawal amounts are positive (e.g., `if amount <= 0: print('Amount must be positive.')`)."
-        }
-      ],
-      "performance": [],
-      "issues": [
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "code.py",
-          "line": 6,
-          "message": "The application does not handle non-numeric input for marks, leading to a ValueError crash. It also allows negative marks, which might be outside the expected domain for grades.",
-          "suggestion": "Implement a try-except block around `float(input(...))` to catch `ValueError` and prompt the user again. Add validation to ensure marks are within a reasonable range (e.g., 0-100)."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "code.py",
-          "line": 0,
-          "message": "Missing a newline character at the end of the file, which is a common style preference and can cause issues with some build tools or linters.",
-          "suggestion": "Add a newline at the end of the file."
-        },
-        {
-          "category": "Logic",
-          "severity": "Critical",
-          "file": "index.html",
-          "line": 9,
-          "message": "The newly added HTML tag is malformed: `<p> change number 1 <p>` where the second `<p>` should be `</p>` to correctly close the paragraph.",
-          "suggestion": "Correct the closing tag from `<p>` to `</p>`: `<p> change number 1 </p>`."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 9,
-          "message": "Inconsistent indentation for the new HTML line. It should align with surrounding elements or follow a consistent indent level.",
-          "suggestion": "Adjust the indentation of `<p> change number 1 <p>` to match the existing `<p>` tags, likely with 0 or 2 spaces."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "main.py",
-          "line": 10,
-          "message": "The ATM simulation crashes if non-numeric input is provided for choices or amounts, due to unhandled ValueError from `int(input())` or `float(input())`.",
-          "suggestion": "Wrap `int(input())` and `float(input())` calls in try-except blocks to catch `ValueError` and prompt the user for valid input."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "main.py",
-          "line": 0,
-          "message": "Missing a newline character at the end of the file.",
-          "suggestion": "Add a newline at the end of the file."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "new.py",
-          "line": 9,
-          "message": "The Library Management System crashes if non-numeric input is provided for menu choices due to an unhandled ValueError from `int(input())`.",
-          "suggestion": "Implement a try-except block around `int(input(...))` to catch `ValueError` and inform the user of invalid input."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "new.py",
-          "line": 17,
-          "message": "The system allows adding duplicate book titles without any warning or option to prevent it. This might lead to an inconsistent data representation if unique titles are intended.",
-          "suggestion": "Consider adding a check before `books.append(new_book)` to see if `new_book` is already in `books`. If so, prompt the user or prevent the addition. If duplicates are intended, this can be noted in comments."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "new.py",
-          "line": 22,
-          "message": "When removing a book, `books.remove(remove_book)` only removes the first occurrence if multiple copies of the same title exist. This might not be the desired behavior if the user expects to remove a specific 'copy' or all copies.",
-          "suggestion": "If unique titles are enforced, this is not an issue. If duplicates are allowed, consider how to handle multiple instances of the same book title for removal (e.g., remove all, remove by index, or confirm which instance)."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 0,
-          "message": "Missing a newline character at the end of the file.",
-          "suggestion": "Add a newline at the end of the file."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "sol.py",
-          "line": 14,
-          "message": "The Number Guessing Game crashes if non-numeric input is provided for the guess due to an unhandled ValueError from `int(input())`.",
-          "suggestion": "Add a try-except block around `int(input(...))` to gracefully handle non-integer inputs and prompt the user to try again with a valid number."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "sol.py",
-          "line": 0,
-          "message": "Missing a newline character at the end of the file.",
-          "suggestion": "Add a newline at the end of the file."
-        }
-      ]
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 18,
-    "changed_files_count": 5,
-    "analysis": {
-      "summary": "The code review covers several small Python scripts and a minor HTML change. Key findings include recurring input validation deficiencies in the Python programs that could lead to crashes, and a minor HTML syntax error. Performance and security aspects are generally low-risk given the simplicity of the applications.",
-      "recommendation": "Request Changes",
-      "linter": [],
-      "security": [
-        {
-          "category": "Security",
-          "severity": "Low",
-          "file": "main.py",
-          "line": 20,
-          "message": "Lack of positive amount validation for deposit/withdrawal, while primarily a logic issue, could be seen as a minor security flaw in a real-world scenario by allowing users to circumvent intended transaction flows (e.g., 'depositing' negative money to withdraw without explicit withdrawal intent).",
-          "suggestion": "Enforce that `amount` is a positive value before processing deposits or withdrawals to prevent unintended balance manipulation. (e.g., `if amount <= 0: print('Amount must be positive.'); continue`)."
-        }
-      ],
-      "performance": [
-        {
-          "category": "Performance",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 16,
-          "message": "Using a Python list for operations like searching (`in`) and removing (`remove`) is O(N) in the worst case. For a very large number of books, this could lead to performance degradation.",
-          "suggestion": "For truly scalable library management, consider using more efficient data structures like a `set` (for unique books and O(1) average lookup) or a dictionary (for mapping book titles to objects/details). For this 'Simple' system, it's acceptable but worth noting."
-        }
-      ],
-      "issues": [
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "code.py",
-          "line": 9,
-          "message": "The script attempts to convert user input for marks directly to a float without error handling. Entering non-numeric text will cause a ValueError and crash the program.",
-          "suggestion": "Wrap the `float(input(...))` calls in a `try-except ValueError` block to handle invalid input gracefully. Also, consider validating marks are within a reasonable range (e.g., 0-100)."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 9,
-          "message": "The newly added paragraph tag `<p> change number 1 <p>` is malformed. The closing tag is missing a forward slash.",
-          "suggestion": "Correct the closing tag to `</p>`. Also, ensure consistent indentation for the new line."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "main.py",
-          "line": 13,
-          "message": "The script converts user choices and amounts directly to integers or floats without error handling. Entering non-numeric input for choice or amount will cause a ValueError and crash the program.",
-          "suggestion": "Implement `try-except ValueError` blocks around all `int(input(...))` and `float(input(...))` calls to handle invalid input gracefully."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "main.py",
-          "line": 20,
-          "message": "Negative amounts can be deposited or withdrawn, which could lead to unexpected balance changes (e.g., depositing -100 effectively performs a withdrawal, or withdrawing -100 increases balance).",
-          "suggestion": "Add validation to ensure that deposit and withdrawal amounts are positive numbers (e.g., `if amount <= 0: print('Amount must be positive.')`)."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "new.py",
-          "line": 13,
-          "message": "The script converts user choice directly to an integer without error handling. Entering non-numeric input will cause a ValueError and crash the program.",
-          "suggestion": "Wrap the `int(input(...))` call in a `try-except ValueError` block to handle invalid input gracefully."
-        },
-        {
-          "category": "Logic",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 21,
-          "message": "The 'Add Book' functionality allows adding duplicate book names without any notification or check. While acceptable for a 'simple' system, it might not be the desired behavior in all contexts.",
-          "suggestion": "Consider adding a check before `books.append(new_book)` to see if `new_book` is already `in books`. If so, you could notify the user or prevent the addition."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "sol.py",
-          "line": 13,
-          "message": "The script converts user input for their guess directly to an integer without error handling. Entering non-numeric text will cause a ValueError and crash the program.",
-          "suggestion": "Wrap the `int(input(...))` call in a `try-except ValueError` block to handle invalid input gracefully."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "sol.py",
-          "line": 13,
-          "message": "The game does not validate if the user's guess is within the specified range (1-50). Users can enter numbers outside this range, which might not be ideal for user experience.",
-          "suggestion": "Add a check immediately after `guess = int(input(...))` to ensure the guess is between 1 and 50 (inclusive). If not, provide feedback and prompt again without incrementing `attempts`."
-        }
-      ]
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 18,
-    "changed_files_count": 5,
-    "analysis": {
-      "summary": "The proposed changes introduce several simple Python console applications and a minor HTML update. Key areas for improvement include robust input validation across all Python scripts to prevent crashes, correction of a logical flaw allowing negative withdrawals in the ATM simulation, and fixing a malformed HTML tag. A minor performance consideration exists for the library system if the book count scales.",
-      "recommendation": "Request Changes",
-      "linter": [],
-      "security": [],
-      "performance": [
-        {
-          "category": "Performance",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 1,
-          "message": "The `books` list is used for search (`in` operator) and removal (`remove` method). For a library management system, as the number of books grows, these operations will become inefficient with O(N) time complexity.",
-          "suggestion": "Consider using a `set` for `books` if uniqueness is key, or a dictionary mapping book titles to objects for faster lookups and removals (O(1) on average), which would scale better for larger collections."
-        }
-      ],
-      "issues": [
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "main.py",
-          "line": 24,
-          "message": "The ATM's withdrawal function does not prevent users from entering negative amounts. Entering a negative value for withdrawal would effectively increase the user's balance, which is a critical logical flaw.",
-          "suggestion": "Add a check to ensure the `amount` for withdrawal is a positive number before processing. For example: `if amount <= 0: print('Withdrawal amount must be positive.'); continue`."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "main.py",
-          "line": 15,
-          "message": "All Python scripts (code.py, main.py, new.py, sol.py) use `int(input())` or `float(input())` directly without handling potential `ValueError` exceptions for non-numeric input. This can lead to application crashes, creating a denial of service for the user interaction.",
-          "suggestion": "Wrap all `int(input())` and `float(input())` calls within `try-except ValueError` blocks to gracefully handle invalid input. For example:\n```python\nwhile True:\n    try:\n        choice = int(input(\"Choose an option: \"))\n        break\n    except ValueError:\n        print(\"Invalid input, please enter a number.\")\n```"
-        },
-        {
-          "category": "Clean Code",
-          "severity": "Medium",
-          "file": "index.html",
-          "line": 13,
-          "message": "The newly added paragraph tag is malformed, using `<p>` as a closing tag instead of `</p>`. Additionally, its indentation is inconsistent with the surrounding HTML structure, affecting readability.",
-          "suggestion": "Correct the closing tag to `</p>` and adjust the indentation to match the existing structure. Change `<p> change number 1 <p>` to `<p> change number 1 </p>`."
-        }
-      ]
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 18,
-    "changed_files_count": 5,
-    "analysis": {
-      "summary": "The code review covers multiple new Python console applications and a minor HTML update. While the Python scripts are generally well-structured with clear variable names, they exhibit recurring issues with robust input validation, leading to potential crashes from non-numeric input and logical flaws such as allowing negative values for marks or monetary transactions. The HTML change contains a syntax error.",
-      "recommendation": "Request Changes",
-      "linter": [],
-      "security": [],
-      "performance": [],
-      "issues": [
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "code.py",
-          "line": 7,
-          "message": "The `float(input(...))` calls for Math, Science, and English marks do not handle `ValueError` if the user enters non-numeric input, causing the program to crash. This affects lines 7, 8, and 9.",
-          "suggestion": "Wrap each input conversion in a `try-except` block to catch `ValueError` and prompt the user to re-enter valid data.\n```python\nwhile True:\n    try:\n        math = float(input(\"Enter Math marks: \"))\n        break\n    except ValueError:\n        print(\"Invalid input. Please enter a numeric value for marks.\")\n```"
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "code.py",
-          "line": 7,
-          "message": "The system allows users to enter negative marks for any subject, which can lead to incorrect total, average, and grade calculations. Marks should typically be non-negative.",
-          "suggestion": "Add validation after successful conversion to ensure marks are non-negative (and optionally within a valid range like 0-100).\n```python\nwhile True:\n    try:\n        math = float(input(\"Enter Math marks: \"))\n        if math < 0:\n            print(\"Marks cannot be negative. Please enter a positive value.\")\n        else:\n            break\n    except ValueError:\n        print(\"Invalid input. Please enter a numeric value for marks.\")\n```"
-        },
-        {
-          "category": "Clean Code",
-          "severity": "Medium",
-          "file": "index.html",
-          "line": 12,
-          "message": "The closing tag for the last paragraph is malformed, using `<p>` instead of `</p>`. This is a syntax error and can lead to unexpected rendering in browsers.",
-          "suggestion": "Correct the closing HTML tag from `<p>` to `</p>`.\n```html\n<p> change number 1 </p>\n```"
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "main.py",
-          "line": 13,
-          "message": "The `int(input(\"Choose an option: \"))` call does not handle `ValueError` if the user enters non-integer input for the menu choice, causing the program to crash.",
-          "suggestion": "Implement a `try-except` block to catch `ValueError` for the choice input.\n```python\n    while True:\n        try:\n            choice = int(input(\"Choose an option: \"))\n            break\n        except ValueError:\n            print(\"Invalid input. Please enter a number corresponding to an option.\")\n```"
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "main.py",
-          "line": 19,
-          "message": "The deposit functionality allows users to enter negative amounts. This would effectively withdraw money without proper checks, which is a logical flaw in an ATM simulation.",
-          "suggestion": "Add validation to ensure the deposit amount is positive before adding it to the balance.\n```python\n        amount = float(input(\"Enter amount to deposit: \"))\n        if amount > 0:\n            balance += amount\n            print(\"Deposit successful. New Balance:\", balance)\n        else:\n            print(\"Deposit amount must be positive.\")\n```"
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "main.py",
-          "line": 24,
-          "message": "The withdrawal functionality allows users to enter negative amounts. This would effectively deposit money without proper checks, which is a logical flaw in an ATM simulation.",
-          "suggestion": "Add validation to ensure the withdrawal amount is positive before processing the withdrawal.\n```python\n        amount = float(input(\"Enter amount to withdraw: \"))\n        if amount > 0:\n            if amount <= balance:\n                balance -= amount\n                print(\"Withdrawal successful. Remaining Balance:\", balance)\n            else:\n                print(\"Insufficient balance\")\n        else:\n            print(\"Withdrawal amount must be positive.\")\n```"
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "new.py",
-          "line": 14,
-          "message": "The `int(input(\"Enter your choice: \"))` call does not handle `ValueError` if the user enters non-integer input for the menu choice, leading to a program crash.",
-          "suggestion": "Implement a `try-except` block to catch `ValueError` for the choice input.\n```python\n    while True:\n        try:\n            choice = int(input(\"Enter your choice: \"))\n            break\n        except ValueError:\n            print(\"Invalid input. Please enter a number corresponding to an option.\")\n```"
-        },
-        {
-          "category": "Logic",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 22,
-          "message": "The 'Add Book' feature allows adding multiple copies of the same book title without any check for duplicates. While this might be a design choice, it could lead to data redundancy if unique titles are expected.",
-          "suggestion": "If only unique book titles are desired, add a check before appending a new book.\n```python\n        new_book = input(\"Enter book name to add: \")\n        if new_book not in books:\n            books.append(new_book)\n            print(\"Book added successfully.\")\n        else:\n            print(\"Book already exists.\")\n```"
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "sol.py",
-          "line": 12,
-          "message": "The `int(input(\"Enter your guess: \"))` call does not handle `ValueError` if the user enters non-integer input, causing the program to crash.",
-          "suggestion": "Implement a `try-except` block to catch `ValueError` for the guess input.\n```python\n    while True:\n        try:\n            guess = int(input(\"Enter your guess: \"))\n            break\n        except ValueError:\n            print(\"Invalid input. Please enter an integer.\")\n```"
-        },
-        {
-          "category": "Logic",
-          "severity": "Low",
-          "file": "sol.py",
-          "line": 12,
-          "message": "The game prompts the user to guess a number between 1 and 50, but it does not validate if the user's guess actually falls within this specified range, potentially leading to a confusing user experience.",
-          "suggestion": "Add input validation to ensure the guess is within the advertised range (1-50).\n```python\n    while True:\n        try:\n            guess = int(input(\"Enter your guess (1-50): \"))\n            if 1 <= guess <= 50:\n                break\n            else:\n                print(\"Guess is out of range. Please guess a number between 1 and 50.\")\n        except ValueError:\n            print(\"Invalid input. Please enter an integer.\")\n```"
-        }
-      ]
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 18,
-    "changed_files_count": 5,
-    "analysis": {
-      "summary": "This multi-agent review covers proposed changes across five files, primarily introducing new Python console applications and a minor HTML update. Key findings include critical logical flaws in an ATM simulation, lack of robust input validation across all Python scripts, and a minor HTML syntax error. Performance concerns are minimal for current scale but noted for potential future growth. General code style and maintainability are reasonable for small scripts, but specific style issues like missing newlines are present.",
-      "recommendation": "Request Changes",
-      "linter": [],
-      "security": [
-        {
-          "category": "Security",
-          "severity": "High",
-          "file": "main.py",
-          "line": 22,
-          "message": "The ability to input negative amounts for deposit or withdrawal could lead to financial manipulation or unexpected balance changes, representing a security vulnerability if this system were handling real funds.",
-          "suggestion": "Enforce strict positive-value validation for all monetary transactions to prevent balance manipulation. This is critical for any system simulating financial operations."
-        }
-      ],
-      "performance": [
-        {
-          "category": "Performance Engineer",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 24,
-          "message": "Operations like 'Search Book' (`in` operator) and 'Remove Book' (`remove()` method) on a Python list have an O(n) time complexity, where n is the number of books. For a very large library, this could become inefficient.",
-          "suggestion": "For improved performance with larger datasets, consider using a `set` or a dictionary (if storing more book details) for book titles, which offers O(1) average time complexity for lookups, additions, and removals."
-        }
-      ],
-      "issues": [
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "code.py",
-          "line": 9,
-          "message": "Student marks (Math, Science, English) lack input validation. Negative or excessively high marks (e.g., >100) are currently accepted, which is not realistic for a grading system.",
-          "suggestion": "Implement a check to ensure that entered marks are within a valid range (e.g., between 0 and 100) before performing calculations."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "code.py",
-          "line": 0,
-          "message": "The file is missing a newline character at the end.",
-          "suggestion": "Add a newline character at the end of the file to adhere to common coding standards and prevent issues with some build tools."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 13,
-          "message": "The HTML tag on line 13 has a malformed closing tag: `<p> change number 1 <p>`.",
-          "suggestion": "Correct the closing tag from `<p>` to `</p>` for proper HTML structure: `<p> change number 1 </p>`."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "main.py",
-          "line": 22,
-          "message": "The 'Deposit Money' and 'Withdraw Money' functions allow negative amounts. Depositing a negative amount reduces the balance, and withdrawing a negative amount increases it, which is a significant logical flaw.",
-          "suggestion": "Add explicit validation to ensure that `amount` entered for both deposit and withdrawal is a positive number (e.g., `if amount <= 0: print('Amount must be positive.')`)."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "main.py",
-          "line": 11,
-          "message": "Input conversions for `choice` (int) and `amount` (float) are not handled, leading to a `ValueError` if non-numeric input is provided, crashing the application.",
-          "suggestion": "Wrap `int(input(...))` and `float(input(...))` calls in `try-except ValueError` blocks to gracefully handle invalid input, prompting the user to retry."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "main.py",
-          "line": 0,
-          "message": "The file is missing a newline character at the end.",
-          "suggestion": "Add a newline character at the end of the file to adhere to common coding standards and prevent issues with some build tools."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "new.py",
-          "line": 10,
-          "message": "Input conversion for `choice` (int) is not handled, leading to a `ValueError` if non-numeric input is provided, crashing the application.",
-          "suggestion": "Wrap `int(input(...))` calls in a `try-except ValueError` block to gracefully handle invalid input, prompting the user to retry."
-        },
-        {
-          "category": "Logic",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 20,
-          "message": "The 'Add Book' functionality does not check for duplicate book entries, allowing the same book title to be added multiple times.",
-          "suggestion": "Before appending a `new_book`, check if it already exists in the `books` list. If it does, inform the user instead of adding a duplicate."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 23,
-          "message": "The 'Remove Book' and 'Search Book' operations are case-sensitive. Users might expect these operations to be case-insensitive for better usability.",
-          "suggestion": "Normalize the input (`remove_book`, `search`) and the stored book names (e.g., convert both to lowercase) before performing comparisons to make the search and removal case-insensitive."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 0,
-          "message": "The file is missing a newline character at the end.",
-          "suggestion": "Add a newline character at the end of the file to adhere to common coding standards and prevent issues with some build tools."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "sol.py",
-          "line": 13,
-          "message": "Input conversion for `guess` (int) is not handled, leading to a `ValueError` if non-numeric input is provided, crashing the application.",
-          "suggestion": "Wrap `int(input(...))` calls in a `try-except ValueError` block to gracefully handle invalid input, prompting the user to retry."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "sol.py",
-          "line": 0,
-          "message": "The file is missing a newline character at the end.",
-          "suggestion": "Add a newline character at the end of the file to adhere to common coding standards and prevent issues with some build tools."
-        }
-      ]
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 18,
-    "changed_files_count": 5,
-    "analysis": {
-      "summary": "This review covers new Python scripts for simple simulations and a minor HTML update. While the Python scripts successfully implement their core logic, they consistently lack robust input validation, leading to potential crashes from invalid user input and incorrect business logic for negative values. The HTML file also contains a syntax error.",
-      "recommendation": "Request Changes",
-      "linter": [],
-      "security": [],
-      "performance": [],
-      "issues": [
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "code.py",
-          "line": 10,
-          "message": "The program crashes with a ValueError if the user enters non-numeric input for marks (e.g., 'abc') instead of a float.",
-          "suggestion": "Implement a try-except block around `float(input(...))` to catch `ValueError` and prompt the user to re-enter valid numeric input."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "code.py",
-          "line": 10,
-          "message": "The system allows negative values for student marks, which is usually not desired in a grading system.",
-          "suggestion": "Add a validation check to ensure marks are non-negative, e.g., `while math < 0:` or `if math < 0:` and prompt for correct input."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "index.html",
-          "line": 5,
-          "message": "The closing tag for the new paragraph is malformed, using `<p>` instead of `</p>`.",
-          "suggestion": "Correct the closing HTML tag from `<p>` to `</p>` for the line `change number 1`."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "index.html",
-          "line": 5,
-          "message": "Inconsistent indentation for the newly added HTML paragraph tag.",
-          "suggestion": "Maintain consistent indentation for HTML elements, aligning the new `<p>` tag with previous ones."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "main.py",
-          "line": 14,
-          "message": "The program crashes with a ValueError if the user enters non-numeric input for choice or amount.",
-          "suggestion": "Wrap `int(input(...))` and `float(input(...))` calls in try-except blocks to handle `ValueError` gracefully, providing user-friendly error messages."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "main.py",
-          "line": 20,
-          "message": "The ATM allows depositing negative amounts, which effectively withdraws money, and withdrawing negative amounts, which effectively deposits money, bypassing intended logic.",
-          "suggestion": "Add checks to ensure `amount` is positive for both deposit and withdrawal operations, e.g., `if amount <= 0: print('Amount must be positive.')`."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "new.py",
-          "line": 10,
-          "message": "The program crashes with a ValueError if the user enters non-numeric input for the choice.",
-          "suggestion": "Implement a try-except block around `int(input('Enter your choice: '))` to catch `ValueError` and guide the user to enter a valid number."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "code.py",
-          "line": 0,
-          "message": "The Python file is missing a newline character at the end of the file.",
-          "suggestion": "Ensure all Python files end with a single newline character to conform to common standards."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "main.py",
-          "line": 0,
-          "message": "The Python file is missing a newline character at the end of the file.",
-          "suggestion": "Ensure all Python files end with a single newline character to conform to common standards."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 0,
-          "message": "The Python file is missing a newline character at the end of the file.",
-          "suggestion": "Ensure all Python files end with a single newline character to conform to common standards."
-        },
-        {
-          "category": "Clean Code Reviewer",
-          "severity": "Low",
-          "file": "sol.py",
-          "line": 0,
-          "message": "The Python file is missing a newline character at the end of the file.",
-          "suggestion": "Ensure all Python files end with a single newline character to conform to common standards."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "sol.py",
-          "line": 13,
-          "message": "The program crashes with a ValueError if the user enters non-numeric input for their guess.",
-          "suggestion": "Add a try-except block around `int(input('Enter your guess: '))` to gracefully handle non-integer inputs and prompt the user to retry."
-        }
-      ]
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 18,
-    "changed_files_count": 5,
-    "analysis": {
-      "summary": "The review covers several new Python scripts simulating basic applications (grade calculator, ATM, library, guessing game) and a minor HTML update. Overall, the Python code is readable and generally correct for simple simulations, but lacks robust input validation and has minor logical gaps. The HTML change contains a syntax error.",
-      "recommendation": "Request Changes",
-      "linter": [],
-      "security": [
-        {
-          "category": "Security",
-          "severity": "Medium",
-          "file": "main.py",
-          "line": 0,
-          "message": "The 'Simple ATM Machine Simulation' operates without any user authentication or authorization. While suitable for a simulation, this fundamental security omission would be critical in any real-world application handling financial transactions.",
-          "suggestion": "For a real-world application, implement robust user authentication (e.g., PIN, password) and authorization mechanisms. For this simulation, explicitly state this limitation."
-        },
-        {
-          "category": "Security",
-          "severity": "Medium",
-          "file": "new.py",
-          "line": 0,
-          "message": "The 'Simple Library Management System' lacks user authentication and authorization. In a real library system, access control is crucial to manage who can add, remove, or modify books.",
-          "suggestion": "For a real-world application, implement user authentication and role-based access control. For this simulation, explicitly state this limitation."
-        }
-      ],
-      "performance": [
-        {
-          "category": "Performance",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 15,
-          "message": "Operations like 'View Books' (iteration), 'Remove Book' (search and remove), and 'Search Book' (search) on a Python list have a time complexity of O(N) for linear scans. For a very large number of books, these operations could become slow.",
-          "suggestion": "For systems with a large number of books, consider using data structures that offer faster average-case performance for lookups and deletions, such as a dictionary (e.g., `{'book_name': count}`) or a set, especially if searching and unique elements are critical. For a 'Simple Library System' with a small dataset, the current approach is acceptable."
-        }
-      ],
-      "issues": [
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "code.py",
-          "line": 6,
-          "message": "User input for marks (math, science, english) is directly converted to float without error handling. Non-numeric input will cause the program to crash with a ValueError.",
-          "suggestion": "Implement a try-except block around `float(input(...))` to catch `ValueError` and prompt the user to re-enter valid numeric input until successful."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "main.py",
-          "line": 11,
-          "message": "User input for choice and amount is directly converted to int/float without error handling. Non-numeric input will cause the program to crash with a ValueError.",
-          "suggestion": "Implement try-except blocks around `int(input(...))` and `float(input(...))` to catch `ValueError` and prompt the user to re-enter valid numeric input."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "main.py",
-          "line": 19,
-          "message": "The deposit function allows depositing negative amounts, effectively enabling a withdrawal without the proper checks or 'insufficient balance' message.",
-          "suggestion": "Add a check `if amount > 0:` before processing deposits to ensure only positive amounts can be added to the balance."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "new.py",
-          "line": 11,
-          "message": "User input for menu choice is directly converted to an integer without error handling. Non-numeric input will cause the program to crash with a ValueError.",
-          "suggestion": "Implement a try-except block around `int(input(...))` to catch `ValueError` and prompt the user to re-enter valid numeric input."
-        },
-        {
-          "category": "Logic",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 22,
-          "message": "The 'Add Book' functionality allows adding duplicate book names without any warning or mechanism to prevent them. This might lead to data redundancy or unexpected behavior in the future if unique titles are expected.",
-          "suggestion": "Consider adding a check `if new_book in books:` before appending. If the book already exists, inform the user or ask for confirmation to add a duplicate. For a more robust system, unique identifiers would be better."
-        },
-        {
-          "category": "Logic",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 27,
-          "message": "When removing a book, `books.remove(remove_book)` only removes the first occurrence if duplicate book names are present in the list. If duplicates are allowed and one wants to remove a specific instance, this behavior may be insufficient.",
-          "suggestion": "If duplicates are explicitly allowed and need individual removal, consider a different data structure (e.g., list of dictionaries with unique IDs) or modify the removal logic to handle multiple instances (e.g., remove all, or remove by index)."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "sol.py",
-          "line": 12,
-          "message": "User input for the guess is directly converted to an integer without error handling. Non-numeric input will cause the program to crash with a ValueError.",
-          "suggestion": "Implement a try-except block around `int(input(...))` to catch `ValueError` and prompt the user to re-enter valid numeric input."
-        },
-        {
-          "category": "Clean Code",
-          "severity": "Medium",
-          "file": "index.html",
-          "line": 13,
-          "message": "HTML syntax error: The newly added paragraph tag `<p> change number 1 <p>` is not correctly closed. The second `<p>` should be `</p>`.",
-          "suggestion": "Correct the closing tag to `</p>`: `<p> change number 1 </p>`. Ensure consistent indentation for readability."
-        }
-      ]
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 18,
-    "changed_files_count": 5,
-    "analysis": {
-      "summary": "The proposed changes introduce several new Python scripts for simple console applications (grade calculator, ATM, library, number guessing game) and a minor update to an HTML file. While the Python scripts demonstrate basic functionality well, a common recurring issue is the lack of robust input validation and error handling. The HTML update also contains a syntax error.",
-      "recommendation": "Request Changes",
-      "linter": [],
-      "security": [],
-      "performance": [],
-      "issues": [
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "code.py",
-          "line": 8,
-          "message": "The script does not validate user input for marks. Entering non-numeric values will cause a ValueError and crash the program. Additionally, negative or excessively high (e.g., >100) marks are not handled, which might be outside the intended business logic.",
-          "suggestion": "Implement `try-except ValueError` blocks for `float(input())` calls to handle non-numeric input gracefully. Add `if` conditions to ensure marks are within a valid range (e.g., 0-100) and provide user feedback for invalid entries."
-        },
-        {
-          "category": "Clean Code",
-          "severity": "Medium",
-          "file": "index.html",
-          "line": 13,
-          "message": "HTML syntax error: The newly added paragraph tag `<p> change number 1 <p>` is not correctly closed. It uses an opening tag `<p>` where a closing tag `</p>` is expected.",
-          "suggestion": "Correct the HTML tag to ` <p> change number 1 </p>`."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "main.py",
-          "line": 10,
-          "message": "User input for the menu `choice` is converted directly to an integer. If the user enters a non-integer value (e.g., 'a'), a `ValueError` will occur, crashing the application.",
-          "suggestion": "Wrap the `int(input(...))` call in a `try-except ValueError` block to catch invalid input and prompt the user to try again without crashing."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "main.py",
-          "line": 16,
-          "message": "The script allows depositing or withdrawing negative amounts. While this is a simulation, in a real ATM system, this could lead to illogical balance changes or be exploited.",
-          "suggestion": "Add a check to ensure `amount` is a positive number before processing deposits or withdrawals. For example, `if amount <= 0: print('Amount must be positive.')`."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "new.py",
-          "line": 11,
-          "message": "User input for the menu `choice` is converted directly to an integer. Non-integer input will result in a `ValueError`, crashing the program.",
-          "suggestion": "Implement `try-except ValueError` around `int(input(...))` to handle non-numeric input gracefully and prevent application crashes."
-        },
-        {
-          "category": "Logic",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 18,
-          "message": "The 'Add Book' functionality allows adding duplicate book titles to the `books` list without any warning or validation, potentially leading to redundant entries.",
-          "suggestion": "Consider adding a check to see if `new_book` is already `in books` before appending. If duplicates are explicitly allowed, no change is needed, but this should be a conscious design decision."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "sol.py",
-          "line": 14,
-          "message": "User input for `guess` is converted directly to an integer. If a non-integer value is entered, a `ValueError` will occur, crashing the game.",
-          "suggestion": "Wrap the `int(input(...))` call in a `try-except ValueError` block. Additionally, consider validating the `guess` to be within the expected range (1-50) and providing specific feedback if it's out of bounds."
-        }
-      ]
-    },
-    "timestamp": ""
-  },
-  {
-    "ok": true,
-    "action": "analyzed",
-    "owner": "VivanRajath",
-    "repo": "PR-test",
-    "pr_number": 18,
-    "changed_files_count": 5,
-    "analysis": {
-      "summary": "This code review covers multiple new Python scripts for console applications and a minor HTML update. Key findings include pervasive issues with input validation in all Python scripts, which can lead to application crashes. Additionally, the HTML file contains a syntax error, and several Python scripts could benefit from better code organization and adherence to clean code principles, including performance considerations for data structures in one case.",
-      "recommendation": "Request Changes",
-      "linter": [],
-      "security": [
-        {
-          "category": "Security",
-          "severity": "High",
-          "file": "code.py",
-          "line": 8,
-          "message": "Lack of input type validation on `float(input(...))` could lead to `ValueError` crashes. While not a direct exploit, uncontrolled crashes can be a denial-of-service vector in larger applications.",
-          "suggestion": "Use `try-except ValueError` to catch non-numeric inputs for marks, ensuring the program doesn't crash unexpectedly and prompts the user for valid input."
-        },
-        {
-          "category": "Security",
-          "severity": "High",
-          "file": "main.py",
-          "line": 12,
-          "message": "Lack of input type validation on `int(input(...))` and `float(input(...))` could lead to `ValueError` crashes, making the application susceptible to denial of service by malformed input.",
-          "suggestion": "All user inputs (`choice`, `amount`) should be wrapped in `try-except ValueError` blocks to prevent crashes from non-numeric input and allow for robust error handling."
-        },
-        {
-          "category": "Security",
-          "severity": "High",
-          "file": "new.py",
-          "line": 12,
-          "message": "Lack of input type validation on `int(input(...))` could lead to `ValueError` crashes, making the application susceptible to denial of service by malformed input.",
-          "suggestion": "User input for `choice` should be wrapped in a `try-except ValueError` block to handle non-numeric inputs gracefully."
-        },
-        {
-          "category": "Security",
-          "severity": "High",
-          "file": "sol.py",
-          "line": 12,
-          "message": "Lack of input type validation on `int(input(...))` could lead to `ValueError` crashes, making the application susceptible to denial of service by malformed input.",
-          "suggestion": "User input for `guess` should be wrapped in a `try-except ValueError` block to handle non-numeric inputs gracefully."
-        }
-      ],
-      "performance": [
-        {
-          "category": "Performance",
-          "severity": "Medium",
-          "file": "new.py",
-          "line": 23,
-          "message": "Operations like `remove_book in books` and `books.remove(remove_book)` have a time complexity of O(N) for lists, where N is the number of books. For a very large number of books, this could lead to performance bottlenecks.",
-          "suggestion": "If the number of books is expected to grow significantly and unique titles are desired, consider using a `set` for book titles, which offers O(1) average time complexity for lookup and removal. If managing multiple copies, a dictionary mapping title to count or object could be more efficient."
-        }
-      ],
-      "issues": [
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "code.py",
-          "line": 8,
-          "message": "Marks input (`math`, `science`, `english`) are not validated for a valid range (e.g., 0-100). Users can enter negative or excessively high marks, leading to incorrect grade calculations.",
-          "suggestion": "Add validation to ensure marks are within an acceptable range (e.g., 0 to 100). Wrap input conversions in a `try-except` block to handle `ValueError` if non-numeric input is provided. Example: `try: math = float(input(...)) ... except ValueError: print('Invalid input, please enter a number.')`"
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "index.html",
-          "line": 12,
-          "message": "Malformed HTML tag: The `<p>` tag on line 12 is not correctly closed, leading to invalid HTML structure.",
-          "suggestion": "Change `<p> change number 1 <p>` to `<p> change number 1 </p>` to correctly close the paragraph tag."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "main.py",
-          "line": 12,
-          "message": "Input for 'choice' is not validated for numeric type, allowing a `ValueError` if a non-integer string is entered, causing the program to crash.",
-          "suggestion": "Implement a `try-except` block for `int(input(...))` to handle `ValueError` gracefully, prompting the user for valid input."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "main.py",
-          "line": 19,
-          "message": "Deposit and withdrawal amounts are not validated to be positive numbers. Users can deposit or withdraw zero or negative amounts, which might be an unexpected behavior for an ATM.",
-          "suggestion": "Add a check to ensure that the `amount` for deposit and withdrawal is greater than zero before processing the transaction. Example: `if amount > 0:`"
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "new.py",
-          "line": 12,
-          "message": "Input for 'choice' is not validated for numeric type, allowing a `ValueError` if a non-integer string is entered, causing the program to crash.",
-          "suggestion": "Implement a `try-except` block for `int(input(...))` to handle `ValueError` gracefully, prompting the user for valid input."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "new.py",
-          "line": 18,
-          "message": "Book names are case-sensitive. 'python basics' would be treated as different from 'Python Basics' when adding, removing, or searching, which might not be the desired behavior for a library system.",
-          "suggestion": "Consider normalizing book titles to a consistent case (e.g., `.lower()` or `.title()`) when adding, removing, or searching to ensure case-insensitive operations."
-        },
-        {
-          "category": "Logic",
-          "severity": "Medium",
-          "file": "new.py",
-          "line": 18,
-          "message": "The system allows adding duplicate book titles. For a library management system, you might want to manage unique titles or multiple copies of a title rather than just allowing infinite duplicates in a list.",
-          "suggestion": "Before appending a new book, check if it already exists in the `books` list (after considering case normalization). If unique titles are required, consider using a `set` for `books` or a dictionary for more complex management."
-        },
-        {
-          "category": "Logic",
-          "severity": "High",
-          "file": "sol.py",
-          "line": 12,
-          "message": "Input for 'guess' is not validated for numeric type, allowing a `ValueError` if a non-integer string is entered, causing the program to crash.",
-          "suggestion": "Implement a `try-except` block for `int(input(...))` to handle `ValueError` gracefully, prompting the user for valid input."
-        },
-        {
-          "category": "Clean Code",
-          "severity": "Medium",
-          "file": "code.py",
-          "line": 15,
-          "message": "The magic number '3' is used directly for calculating the average. If the number of subjects changes, this value needs to be manually updated.",
-          "suggestion": "Define a constant (e.g., `NUMBER_OF_SUBJECTS = 3`) to represent the number of subjects, improving readability and maintainability. Or, dynamically calculate `len([math, science, english])` if subjects are in a list."
-        },
-        {
-          "category": "Clean Code",
-          "severity": "Low",
-          "file": "code.py",
-          "line": 7,
-          "message": "The script combines all logic in a single global scope. As the application grows, this can become hard to manage and test.",
-          "suggestion": "Encapsulate the grade calculation logic within a function (e.g., `calculate_grade(name, math, science, english)`) and potentially a `main()` function to organize the program flow."
-        },
-        {
-          "category": "Clean Code",
-          "severity": "Low",
-          "file": "main.py",
-          "line": 10,
-          "message": "The main logic is contained within a large `while True` loop with multiple `if/elif` blocks, making it less modular and harder to read/maintain.",
-          "suggestion": "Refactor the ATM operations (Check Balance, Deposit, Withdraw) into separate functions. The main loop can then call these functions based on user choice, improving modularity and readability."
-        },
-        {
-          "category": "Clean Code",
-          "severity": "Low",
-          "file": "new.py",
-          "line": 10,
-          "message": "The main logic is contained within a large `while True` loop with multiple `if/elif` blocks, making it less modular and harder to read/maintain.",
-          "suggestion": "Refactor the library operations (View, Add, Remove, Search) into separate functions. The main loop can then call these functions based on user choice, improving modularity and readability."
-        },
-        {
-          "category": "Clean Code",
-          "severity": "Low",
-          "file": "sol.py",
-          "line": 10,
-          "message": "The guessing game logic is in the global scope. For better organization and reusability, it should be encapsulated.",
-          "suggestion": "Wrap the game logic in a function, for instance, `play_guessing_game()`, and call it from a main execution block (`if __name__ == '__main__':`)."
         }
       ]
     },

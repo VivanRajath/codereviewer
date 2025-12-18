@@ -11,9 +11,7 @@ import google.generativeai as genai
 logger = logging.getLogger("AIOrchestrator")
 logger.setLevel(logging.INFO)
 
-# ============================================
-# MULTI-KEY CONFIGURATION
-# ============================================
+
 
 class ProviderType(Enum):
     GROK = "grok"
@@ -50,7 +48,7 @@ class KeyRotator:
             return None
         key = self.keys[self.current_index]
         self.current_index = (self.current_index + 1) % len(self.keys)
-        logger.info(f"🔑 Using {self.provider} key #{self.current_index + 1}/{len(self.keys)}")
+        logger.info(f"Using {self.provider} key #{self.current_index + 1}/{len(self.keys)}")
         return key
     
     def reset(self):
@@ -62,9 +60,6 @@ grok_rotator = KeyRotator(GROK_KEYS, "Grok")
 gemini_rotator = KeyRotator(GEMINI_KEYS, "Gemini")
 
 
-# ============================================
-# AI ORCHESTRATOR
-# ============================================
 
 class AIOrchestrator:
     """
@@ -80,7 +75,7 @@ class AIOrchestrator:
         self.grok_enabled = len(GROK_KEYS) > 0
         self.gemini_enabled = len(GEMINI_KEYS) > 0
         
-        logger.info(f"🤖 AI Orchestrator initialized:")
+        logger.info(f"AI Orchestrator initialized:")
         logger.info(f"   Groq keys: {len(GROK_KEYS)}")
         logger.info(f"   Gemini keys: {len(GEMINI_KEYS)}")
     
@@ -93,7 +88,7 @@ class AIOrchestrator:
         for attempt in range(len(GROK_KEYS)):
             api_key = grok_rotator.get_next()
             try:
-                logger.info(f"🤖 Attempting Groq/Llama (attempt {attempt + 1}/{len(GROK_KEYS)})")
+                logger.info(f"Attempting Groq/Llama (attempt {attempt + 1}/{len(GROK_KEYS)})")
                 
                 client = OpenAI(
                     api_key=api_key,
@@ -110,16 +105,16 @@ class AIOrchestrator:
                 )
                 
                 result = response.choices[0].message.content
-                logger.info(f"✅ Groq/Llama succeeded with key #{attempt + 1}")
+                logger.info(f"Groq/Llama succeeded with key #{attempt + 1}")
                 return result
                
             except Exception as e:
                 error_msg = str(e)
-                logger.warning(f"❌ Groq key #{attempt + 1} failed: {error_msg[:150]}")
+                logger.warning(f"Groq key #{attempt + 1} failed: {error_msg[:150]}")
                 logger.debug(f"Full Groq error: {error_msg}")
                 continue
         
-        logger.error(f"❌ All {len(GROK_KEYS)} Groq keys failed")
+        logger.error(f"All {len(GROK_KEYS)} Groq keys failed")
         return None
     
     def _try_gemini(self, prompt: str, response_format: Optional[str] = None) -> Optional[str]:
@@ -131,7 +126,7 @@ class AIOrchestrator:
         for attempt in range(len(GEMINI_KEYS)):
             api_key = gemini_rotator.get_next()
             try:
-                logger.info(f"🤖 Attempting Gemini (attempt {attempt + 1}/{len(GEMINI_KEYS)})")
+                logger.info(f"Attempting Gemini (attempt {attempt + 1}/{len(GEMINI_KEYS)})")
                 
                 genai.configure(api_key=api_key)
                 model = genai.GenerativeModel("gemini-2.0-flash-exp")
@@ -143,14 +138,14 @@ class AIOrchestrator:
                 response = model.generate_content(prompt, generation_config=generation_config)
                 result = response.text
                 
-                logger.info(f"✅ Gemini succeeded with key #{attempt + 1}")
+                logger.info(f"Gemini succeeded with key #{attempt + 1}")
                 return result
                 
             except Exception as e:
-                logger.warning(f"❌ Gemini key #{attempt + 1} failed: {str(e)[:100]}")
+                logger.warning(f"Gemini key #{attempt + 1} failed: {str(e)[:100]}")
                 continue
         
-        logger.error(f"❌ All {len(GEMINI_KEYS)} Gemini keys failed")
+        logger.error(f"All {len(GEMINI_KEYS)} Gemini keys failed")
         return None
     
     def generate(self, prompt: str, response_format: Optional[str] = None, max_retries: int = 1) -> str:
@@ -170,7 +165,7 @@ class AIOrchestrator:
         """
         for retry in range(max_retries):
             if retry > 0:
-                logger.info(f"🔄 Retry {retry + 1}/{max_retries}")
+                logger.info(f"Retry {retry + 1}/{max_retries}")
             
             # Step 1: Try Grok (all keys)
             if self.grok_enabled:
@@ -196,9 +191,6 @@ class AIOrchestrator:
 orchestrator = AIOrchestrator()
 
 
-# ============================================
-# PUBLIC API
-# ============================================
 
 def generate_content(prompt: str, response_format: Optional[str] = None) -> str:
     """

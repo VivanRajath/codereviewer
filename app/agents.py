@@ -44,29 +44,63 @@ def fetch_raw_file(raw_url: str) -> str:
 def apply_patch_to_content(original: str, patch: str) -> str:
     """
     Uses 'git apply' to apply a unified diff to original text.
+    GitHub provides patches that start with @@ hunks (without file headers).
+    We need to add proper headers for git apply to work.
     """
+    if not patch or not patch.strip():
+        logger.warning("Empty or None patch provided")
+        return original
+        
     try:
         with tempfile.TemporaryDirectory() as temp_dir:
-          
+            # Write original content to a file
             src_path = os.path.join(temp_dir, "temp_file")
-            with open(src_path, "w", encoding="utf-8") as f:
+            with open(src_path, "w", encoding="utf-8", newline='\n') as f:
                 f.write(original)
 
-           
+            # Check if patch already has file headers (--- and +++)
+            patch_lines = patch.strip().split('\n')
+            has_headers = any(line.startswith('---') for line in patch_lines[:5])
             
-            patch_header = f"--- a/temp_file\n+++ b/temp_file\n"
-            full_patch = patch_header + patch
+            # Debug: log first few lines to understand format
+            logger.debug(f"Patch first 3 lines: {patch_lines[:3]}")
+            logger.debug(f"Has headers: {has_headers}")
             
+            if has_headers:
+                # Patch already has headers - need to replace filename references
+                full_patch = ""
+                for line in patch_lines:
+                    if line.startswith('---'):
+                        full_patch += "--- a/temp_file\n"
+                    elif line.startswith('+++'):
+                        full_patch += "+++ b/temp_file\n"
+                    else:
+                        full_patch += line + "\n"
+            else:
+                # No headers - add them (GitHub PR patches format)
+                patch_header = "--- a/temp_file\n+++ b/temp_file\n"
+                full_patch = patch_header + patch
+            
+            # Write patch to file
             patch_path = os.path.join(temp_dir, "patch.diff")
-            with open(patch_path, "w", encoding="utf-8") as f:
+            with open(patch_path, "w", encoding="utf-8", newline='\n') as f:
                 f.write(full_patch)
 
-           
-            cmd = ["git", "apply", "--ignore-space-change", "--ignore-whitespace", "patch.diff"]
+            # Apply the patch with --whitespace=nowarn to ignore whitespace warnings
+            cmd = ["git", "apply", "--whitespace=nowarn", "--ignore-space-change", "--ignore-whitespace", "patch.diff"]
             
-            subprocess.run(cmd, cwd=temp_dir, check=True, capture_output=True, text=True)
+            result = subprocess.run(cmd, cwd=temp_dir, capture_output=True, text=True)
+            
+            if result.returncode != 0:
+                # Log more detailed error information
+                logger.error(f"Git apply failed with return code {result.returncode}")
+                logger.error(f"STDERR: {result.stderr}")
+                logger.error(f"STDOUT: {result.stdout}")
+                # Also try to log the patch content for debugging
+                logger.debug(f"Full patch content:\n{full_patch[:500]}")
+                return None
 
-            
+            # Read the patched content
             if os.path.exists(src_path):
                 with open(src_path, "r", encoding="utf-8") as f:
                     return f.read()
@@ -134,8 +168,11 @@ def run_linter(file_content: str, filename: str) -> List[Dict[str, Any]]:
 
 def run_multi_agent_review(files: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
-    Complete pipeline: reconstruct files, run lint, run AI review.
+    Complete pipeline: fetch modified files, run lint, run AI review.
     Uses AI orchestrator with automatic Grok->Gemini failover.
+    
+    Note: raw_url from GitHub API points to the MODIFIED file (post-change),
+    so we don't need to apply patches. The patch is only used for showing diffs to AI.
     """
 
     diff_context = ""
@@ -146,16 +183,17 @@ def run_multi_agent_review(files: List[Dict[str, Any]]) -> Dict[str, Any]:
         patch = f.get("patch", "")
         raw_url = f.get("raw_url", "")
 
-        original_content = fetch_raw_file(raw_url) if raw_url else ""
+       
+        modified_content = fetch_raw_file(raw_url) if raw_url else ""
 
-        reconstructed = apply_patch_to_content(original_content, patch)
-
-        if reconstructed:
-            lint_issues = run_linter(reconstructed, filename)
+        if modified_content and filename.endswith(".py"):
+            # Run linter on the modified file
+            lint_issues = run_linter(modified_content, filename)
             all_issues.extend(lint_issues)
-        else:
-            logger.warning(f"Skipping linter for {filename} due to patch failure.")
+        elif not modified_content:
+            logger.warning(f"Could not fetch content for {filename}")
 
+        # Use the patch for AI review context (showing what changed)
         if len(patch) > 10000:
             patch = patch[:10000] + "\n... (truncated)"
 
@@ -212,12 +250,87 @@ IMPORTANT: Do not include markdown formatting (like ```json). Just the raw JSON.
 """
 
     try:
-        logger.info("🤖 Running multi-agent code review")
+        logger.info(" Running multi-agent code review")
         
         # Use orchestrator with JSON response format
         response_text = generate_content(prompt, response_format="json")
-        result = json.loads(response_text)
+        
+        # Log the raw response for debugging
+        logger.debug(f"Raw AI response (first 500 chars): {response_text[:500]}")
+        
+        # Check if response is empty
+        if not response_text or not response_text.strip():
+            logger.error("AI returned empty response")
+            return {
+                "summary": "AI returned empty response",
+                "issues": [{
+                    "category": "System", 
+                    "severity": "High", 
+                    "message": "The AI model returned an empty response. This might be due to API rate limits or service issues."
+                }],
+                "recommendation": "Manual Review Required",
+                "linter": [],
+                "security": [],
+                "performance": []
+            }
+        
+        # Try to parse JSON with better error handling
+        try:
+            result = json.loads(response_text)
+        except json.JSONDecodeError as json_err:
+            logger.error(f"JSON decode error: {json_err}")
+            logger.error(f"Response text (first 1000 chars): {response_text[:1000]}")
+            
+            # Try to extract JSON from markdown code blocks
+            import re
+            json_match = re.search(r'```(?:json)?\s*\n?(.*?)\n?```', response_text, re.DOTALL)
+            if json_match:
+                try:
+                    result = json.loads(json_match.group(1).strip())
+                    logger.info("Successfully extracted JSON from markdown code block")
+                except:
+                    logger.error("Failed to parse JSON even from code block")
+                    return {
+                        "summary": "JSON Parsing Error",
+                        "issues": [{
+                            "category": "System", 
+                            "severity": "High", 
+                            "message": f"Failed to parse AI response as JSON: {str(json_err)}. Response: {response_text[:200]}"
+                        }],
+                        "recommendation": "Manual Review Required",
+                        "linter": [],
+                        "security": [],
+                        "performance": []
+                    }
+            else:
+                return {
+                    "summary": "JSON Parsing Error",
+                    "issues": [{
+                        "category": "System", 
+                        "severity": "High", 
+                        "message": f"Failed to parse AI response as JSON: {str(json_err)}. Response: {response_text[:200]}"
+                    }],
+                    "recommendation": "Manual Review Required",
+                    "linter": [],
+                    "security": [],
+                    "performance": []
+                }
 
+        # Validate result structure
+        if not isinstance(result, dict):
+            logger.error(f"AI response is not a dictionary: {type(result)}")
+            return {
+                "summary": "Invalid AI Response Format",
+                "issues": [{
+                    "category": "System", 
+                    "severity": "High", 
+                    "message": f"AI returned non-dictionary response: {type(result)}"
+                }],
+                "recommendation": "Manual Review Required",
+                "linter": [],
+                "security": [],
+                "performance": []
+            }
       
         all_issues.extend(result.get("issues", []))
 
@@ -244,13 +357,38 @@ IMPORTANT: Do not include markdown formatting (like ```json). Just the raw JSON.
                 
                 categorized_result["issues"].append(issue)
 
+        logger.info(f"Analysis complete: {len(all_issues)} total issues found")
         return categorized_result
 
+    except json.JSONDecodeError as e:
+        logger.error(f"JSON decode error in outer catch: {str(e)}")
+        return {
+            "summary": "JSON Error",
+            "issues": [{
+                "category": "System", 
+                "severity": "High", 
+                "message": f"JSON parsing failed: {str(e)}"
+            }],
+            "recommendation": "Manual Review Required",
+            "linter": [],
+            "security": [],
+            "performance": []
+        }
     except Exception as e:
+        logger.error(f"Unexpected error in run_multi_agent_review: {str(e)}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
         return {
             "summary": "AI Error",
-            "issues": [{"category": "System", "severity": "High", "message": str(e)}],
-            "recommendation": "Manual Review Required"
+            "issues": [{
+                "category": "System", 
+                "severity": "High", 
+                "message": f"Error: {str(e)}"
+            }],
+            "recommendation": "Manual Review Required",
+            "linter": [],
+            "security": [],
+            "performance": []
         }
 
 
@@ -280,7 +418,7 @@ def chat_with_agent(message: str, context: Dict[str, Any], history: List[Dict[st
     
     # Step 1: Check if user wants to push/commit code
     if _detect_push_intent(message):
-        logger.info("📤 Push/commit request detected")
+        logger.info("Push/commit request detected")
         
         current_file = context.get("current_file", {})
         filename = current_file.get("filename", "")
@@ -288,7 +426,7 @@ def chat_with_agent(message: str, context: Dict[str, Any], history: List[Dict[st
         
         if not code or not filename:
             return {
-                "response": "⚠️ No code to push. Please make sure you have a file open with changes.",
+                "response": " No code to push. Please make sure you have a file open with changes.",
                 "push_requested": False
             }
         
@@ -296,7 +434,7 @@ def chat_with_agent(message: str, context: Dict[str, Any], history: List[Dict[st
         commit_msg = _generate_commit_message(message, filename, context)
         
         return {
-            "response": f"🚀 **Ready to Push**\n\nI'll commit `{filename}` to the branch.\n\n**Suggested commit message:**\n```\n{commit_msg}\n```\n\nInitiating push...",
+            "response": f" **Ready to Push**\n\nI'll commit `{filename}` to the branch.\n\n**Suggested commit message:**\n```\n{commit_msg}\n```\n\nInitiating push...",
             "push_requested": True,
             "commit_message": commit_msg,
             "code_modified": False
@@ -310,13 +448,13 @@ def chat_with_agent(message: str, context: Dict[str, Any], history: List[Dict[st
     is_code_change_request = _detect_code_change_intent(message)
     
     if is_code_change_request and original_code:
-        logger.info("🔧 Code modification request detected")
+        logger.info("Code modification request detected")
         # Generate the modified code
         result = _apply_user_requested_changes(message, original_code, filename, context, history)
         return result
     else:
         # Regular chat response (no code modification)
-        logger.info("💬 Regular chat response")
+        logger.info("Regular chat response")
         sys_prompt = f"""
 You are an AI coding assistant helping with PR review.
 Here is the PR analysis context:
@@ -467,14 +605,14 @@ IMPORTANT: Return ONLY valid JSON. No markdown, no extra text.
 """
     
     try:
-        logger.info(f"🤖 Applying changes to {filename}")
+        logger.info(f"Applying changes to {filename}")
         response_text = generate_content(prompt, response_format="json")
         
         # Parse the JSON response
         result = json.loads(response_text)
         
         return {
-            "response": f"✅ **Changes Applied**\n\n{result.get('explanation', '')}\n\n**Changes:**\n{result.get('changes_summary', '')}",
+            "response": f"**Changes Applied**\n\n{result.get('explanation', '')}\n\n**Changes:**\n{result.get('changes_summary', '')}",
             "code_modified": True,
             "modified_code": result.get("modified_code", original_code),
             "filename": filename
@@ -488,21 +626,21 @@ IMPORTANT: Return ONLY valid JSON. No markdown, no extra text.
         
         if code_blocks:
             return {
-                "response": "✅ **Changes Applied** (extracted from response)",
+                "response": "**Changes Applied** (extracted from response)",
                 "code_modified": True,
                 "modified_code": code_blocks[0].strip(),
                 "filename": filename
             }
         else:
             return {
-                "response": f"⚠️ Could not parse the AI response. Here's what I got:\n\n{response_text}",
+                "response": f"Could not parse the AI response. Here's what I got:\n\n{response_text}",
                 "code_modified": False
             }
             
     except Exception as e:
         logger.error(f"Error applying changes: {str(e)}")
         return {
-            "response": f"❌ Error applying changes: {str(e)}",
+            "response": f"Error applying changes: {str(e)}",
             "code_modified": False
         }
 
@@ -540,7 +678,7 @@ Output JSON:
 """
 
     try:
-        logger.info(f"🔍 Analyzing {filename}")
+        logger.info(f" Analyzing {filename}")
         response_text = generate_content(prompt, response_format="json")
         
         # Try to parse JSON
@@ -613,7 +751,7 @@ Task:
 """
 
     try:
-        logger.info("🔧 Generating auto-fix")
+        logger.info(" Generating auto-fix")
         response_text = generate_content(prompt)
         fixed_code = response_text.replace("```python", "").replace("```", "").strip()
         
@@ -687,7 +825,7 @@ Task:
 """
 
     try:
-        logger.info("🔧 Generating single issue fix")
+        logger.info(" Generating single issue fix")
         response_text = generate_content(prompt)
         fixed_code = response_text.replace("```python", "").replace("```", "").strip()
         
@@ -728,7 +866,7 @@ async def push_file_to_branch(
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
             # Step 1: Fetch the latest SHA from the branch
-            logger.info(f"📥 Fetching latest SHA for {path} from branch {branch}")
+            logger.info(f" Fetching latest SHA for {path} from branch {branch}")
             get_response = await client.get(url, headers=headers, params={"ref": branch})
             
             current_sha = None
@@ -737,9 +875,9 @@ async def push_file_to_branch(
                 logger.info(f"✓ Found current SHA: {current_sha}")
             elif get_response.status_code == 404:
                 # File doesn't exist yet (new file)
-                logger.info(f"⚠️ File {path} doesn't exist on branch {branch}, creating new file")
+                logger.info(f" File {path} doesn't exist on branch {branch}, creating new file")
             else:
-                logger.warning(f"⚠️ Failed to fetch current SHA (status {get_response.status_code}), attempting with provided SHA")
+                logger.warning(f" Failed to fetch current SHA (status {get_response.status_code}), attempting with provided SHA")
                 current_sha = sha
             
             # Use fetched SHA if available, otherwise fall back to provided SHA
@@ -760,7 +898,7 @@ async def push_file_to_branch(
             if final_sha:
                 data["sha"] = final_sha
             
-            logger.info(f"📤 Pushing {path} to branch {branch}")
+            logger.info(f" Pushing {path} to branch {branch}")
             r = await client.put(url, headers=headers, json=data)
             
             if r.status_code in [200, 201]:

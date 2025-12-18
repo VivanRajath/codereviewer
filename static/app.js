@@ -347,11 +347,11 @@ window.sendChatMessage = async function () {
             messagesDiv.innerHTML += `
                 <div class="chat-message ai" style="border-left: 3px solid var(--success-color);">
                     <div style="color: var(--success-color); font-weight: bold; margin-bottom: 0.5rem;">
-                        🔧 CODE MODIFIED
+                        CODE MODIFIED
                     </div>
                     <div style="white-space: pre-wrap;">${data.response}</div>
                     <div style="margin-top: 0.5rem; padding: 0.5rem; background: rgba(0,255,0,0.1); border-radius: 4px; font-size: 0.85rem;">
-                        ✓ Changes applied to editor
+                        Changes applied to editor
                     </div>
                 </div>
             `;
@@ -386,7 +386,7 @@ async function executePushToBranch(commitMessage) {
     if (!currentPR || !currentFilePath || !currentFileSha || !monacoWorkingModel) {
         messagesDiv.innerHTML += `
             <div class="chat-message ai" style="color: var(--danger-color);">
-                ❌ Cannot push: Missing PR, file, or editor context.
+                Cannot push: Missing PR, file, or editor context.
             </div>
         `;
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -398,7 +398,7 @@ async function executePushToBranch(commitMessage) {
     messagesDiv.innerHTML += `
         <div id="${pushingId}" class="chat-message ai" style="border-left: 3px solid var(--warning-color);">
             <div style="color: var(--warning-color); font-weight: bold;">
-                📤 PUSHING AGENT ACTIVATED
+                PUSHING AGENT ACTIVATED
             </div>
             <div style="margin-top: 0.5rem;">
                 <span class="typing-indicator">●●●</span> Pushing code to branch...
@@ -437,7 +437,7 @@ async function executePushToBranch(commitMessage) {
             messagesDiv.innerHTML += `
                 <div class="chat-message ai" style="border-left: 3px solid var(--success-color);">
                     <div style="color: var(--success-color); font-weight: bold; margin-bottom: 0.5rem;">
-                        ✅ CODE PUSHED SUCCESSFULLY
+                        CODE PUSHED SUCCESSFULLY
                     </div>
                     <div style="margin-top: 0.5rem;">
                         <div><strong>File:</strong> ${currentFilePath}</div>
@@ -458,7 +458,7 @@ async function executePushToBranch(commitMessage) {
             messagesDiv.innerHTML += `
                 <div class="chat-message ai" style="border-left: 3px solid var(--danger-color);">
                     <div style="color: var(--danger-color); font-weight: bold;">
-                        ❌ PUSH FAILED
+                        PUSH FAILED
                     </div>
                     <div style="margin-top: 0.5rem;">
                         ${data.error || 'Unknown error occurred'}
@@ -477,7 +477,7 @@ async function executePushToBranch(commitMessage) {
         console.error('Push error:', err);
         messagesDiv.innerHTML += `
             <div class="chat-message ai" style="color: var(--danger-color);">
-                ❌ Network error: ${err.message}
+                Network error: ${err.message}
             </div>
         `;
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -1396,11 +1396,13 @@ window.fetchRepoPRs = async function (owner, repo) {
     }
 };
 
+// Global variable to cache analysis results
+let cachedAnalysis = null;
+
 // Fetch PR Details
 window.fetchPRDetails = async function (owner, repo, prNumber) {
     const title = document.getElementById('prDetailTitle');
     const fileList = document.getElementById('fileListContainer');
-    const reportContainer = document.getElementById('fullAnalysisReport');
 
     if (title) title.textContent = `LOADING #${prNumber}...`;
     if (fileList) fileList.innerHTML = '<div style="padding: 1rem; color: var(--text-dim);">LOADING_FILES...</div>';
@@ -1444,34 +1446,10 @@ window.fetchPRDetails = async function (owner, repo, prNumber) {
             }
         }
 
-        // Render Report
-        if (reportContainer) {
-            const analysis = data.analysis;
-            if (!analysis) {
-                reportContainer.innerHTML = '<div style="text-align: center; color: var(--text-dim);">NO_ANALYSIS_AVAILABLE.</div>';
-            } else {
-                let html = `<div class="analysis-summary-card">
-                    <h3>SUMMARY</h3>
-                    <p>${analysis.summary || 'No summary provided.'}</p>
-                </div>`;
+        // Cache the analysis for later display (don't show yet)
+        cachedAnalysis = data.analysis;
 
-                if (analysis.issues && analysis.issues.length > 0) {
-                    html += `<div class="card-grid">`;
-                    html += analysis.issues.map(issue => `
-                        <div class="issue-card ${issue.severity ? issue.severity.toLowerCase() : 'info'}">
-                            <div class="issue-header">
-                                <span class="issue-title">${issue.category || 'Issue'}</span>
-                                <span class="issue-severity">${issue.severity || 'INFO'}</span>
-                            </div>
-                            <div>${issue.message}</div>
-                            ${issue.file ? `<div style="margin-top:0.5rem; font-size:0.8rem; color:var(--text-dim);">File: ${issue.file}</div>` : ''}
-                        </div>
-                    `).join('');
-                    html += `</div>`;
-                }
-                reportContainer.innerHTML = html;
-            }
-        }
+        // Analysis is cached, will be displayed when user clicks "SHOW ANALYSIS" button
 
     } catch (err) {
         console.error('Failed to fetch PR details', err);
@@ -1716,11 +1694,11 @@ window.sendChatMessage = async function () {
             aiMsg.innerHTML = `
                 <div style="border-left: 3px solid var(--success-color); padding-left: 0.5rem;">
                     <div style="color: var(--success-color); font-weight: bold; margin-bottom: 0.5rem;">
-                        🔧 CODE MODIFIED
+                        CODE MODIFIED
                     </div>
                     <div style="white-space: pre-wrap;">${data.response}</div>
                     <div style="margin-top: 0.5rem; padding: 0.5rem; background: rgba(0,255,0,0.1); border-radius: 4px; font-size: 0.85rem;">
-                        ✓ Changes applied to editor
+                        Changes applied to editor
                     </div>
                 </div>
             `;
@@ -1768,6 +1746,82 @@ window.switchPRTab = function (tabName) {
     // Trigger Monaco resize if switching to files tab
     if (tabName === 'files' && monacoEditor) {
         setTimeout(() => monacoEditor.layout(), 100);
+    }
+};
+
+// Display cached analysis results without re-running analysis
+window.displayCachedAnalysis = function () {
+    if (!cachedAnalysis) {
+        alert("NO ANALYSIS DATA AVAILABLE. PLEASE RELOAD THE PR.");
+        return;
+    }
+
+    const analysis = cachedAnalysis;
+
+    // Helper to render issues
+    const renderIssues = (issues, emptyMsg) => {
+        if (!issues || issues.length === 0) return `<p style="color: var(--text-dim);">${emptyMsg}</p>`;
+
+        return issues.map(issue => `
+            <div style="margin-bottom: 0.75rem; padding: 0.5rem; border-left: 2px solid var(--secondary-color); background: var(--surface-color);">
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--secondary-color); font-weight: bold;">${issue.category || 'ISSUE'}</span>
+                    <span style="color: var(--text-dim); font-size: 0.8rem;">${issue.severity || 'INFO'}</span>
+                </div>
+                <div style="color: var(--text-color); margin-top: 0.25rem;">${issue.message || ''}</div>
+                ${issue.file ? `<div style="color: var(--text-dim); font-size: 0.8rem; margin-top: 0.25rem;">File: ${issue.file} ${issue.line ? `(Line ${issue.line})` : ''}</div>` : ''}
+                ${issue.suggestion ? `<div style="color: var(--text-dim); font-size: 0.8rem; margin-top: 0.25rem; border-top: 1px dashed var(--surface-border); padding-top: 0.25rem;">💡 ${issue.suggestion}</div>` : ''}
+            </div>
+        `).join('');
+    };
+
+    // Update main report content (summary)
+    const reportContent = document.getElementById('reportContent');
+    if (reportContent) {
+        reportContent.innerHTML = `
+            <div style="color: var(--primary-color); margin-bottom: 1rem;">
+                <strong>ANALYSIS COMPLETE</strong>
+            </div>
+            <div style="color: var(--text-color); line-height: 1.6;">
+                ${analysis.summary || 'Analysis completed successfully.'}
+            </div>
+            <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(0,255,0,0.1); border-radius: 4px;">
+                <strong style="color: var(--success-color);">RECOMMENDATION:</strong> ${analysis.recommendation || 'Review'}
+            </div>
+        `;
+    }
+
+    // Update linter results
+    const linterResults = document.getElementById('linterResults');
+    if (linterResults) {
+        linterResults.innerHTML = renderIssues(analysis.linter, 'No linter issues found.');
+    }
+
+    // Update code quality results
+    const codeQualityResults = document.getElementById('codeQualityResults');
+    if (codeQualityResults) {
+        // Use warning color for code quality
+        const issuesHtml = (analysis.issues || []).map(issue => `
+            <div style="margin-bottom: 0.75rem; padding: 0.5rem; border-left: 2px solid var(--warning-color); background: var(--surface-color);">
+                <div style="color: var(--warning-color); font-weight: bold;">${issue.category || 'ISSUE'}</div>
+                <div style="color: var(--text-color); margin-top: 0.25rem;">${issue.message || ''}</div>
+                ${issue.file ? `<div style="color: var(--text-dim); font-size: 0.8rem; margin-top: 0.25rem;">File: ${issue.file} ${issue.line ? `(Line ${issue.line})` : ''}</div>` : ''}
+                ${issue.suggestion ? `<div style="color: var(--text-dim); font-size: 0.8rem; margin-top: 0.25rem; border-top: 1px dashed var(--surface-border); padding-top: 0.25rem;">💡 ${issue.suggestion}</div>` : ''}
+            </div>
+        `).join('');
+        codeQualityResults.innerHTML = issuesHtml || '<p style="color: var(--text-dim);">No code quality issues found.</p>';
+    }
+
+    // Update security results
+    const securityResults = document.getElementById('securityResults');
+    if (securityResults) {
+        securityResults.innerHTML = renderIssues(analysis.security, 'No security vulnerabilities found.');
+    }
+
+    // Update performance results
+    const performanceResults = document.getElementById('performanceResults');
+    if (performanceResults) {
+        performanceResults.innerHTML = renderIssues(analysis.performance, 'No performance issues found.');
     }
 };
 

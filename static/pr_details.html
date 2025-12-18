@@ -123,15 +123,14 @@
                         <div class="report-container">
                             <div class="report-header">
                                 <h3>MULTI-AGENT ANALYSIS REPORT</h3>
-                                <button class="btn-sm" onclick="runMultiAgentAnalysis()">
-                                    <span id="analysisBtnText">RUN ANALYSIS</span>
-                                    <span id="analysisSpinner" class="hidden">⟳</span>
+                                <button class="btn-sm" id="showAnalysisBtn" onclick="displayCachedAnalysis()">
+                                    RUN ANALYSIS
                                 </button>
                             </div>
 
                             <div id="reportContent" class="report-content">
                                 <div style="color: var(--text-dim); text-align: center; padding: 2rem;">
-                                    CLICK "RUN ANALYSIS" TO GENERATE REPORT...
+                                    CLICK "RUN ANALYSIS" TO VIEW RESULTS...
                                 </div>
                             </div>
 
