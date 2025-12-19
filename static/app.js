@@ -108,12 +108,40 @@ document.addEventListener('DOMContentLoaded', () => {
                     errorDiv.classList.remove('hidden');
                 }
                 btn.disabled = false;
-                if (btnText) btnText.classList.remove('hidden');
-                if (spinner) spinner.classList.add('hidden');
             }
         });
     }
+
+    // Initialize sidebar user info and logout on all dashboard pages
+    initializeSidebarUser();
+    setupLogoutHandler();
 });
+
+// Initialize sidebar with user info
+function initializeSidebarUser() {
+    const user = JSON.parse(localStorage.getItem('gh_user') || '{}');
+    if (user.login) {
+        const userNameEl = document.getElementById('userName');
+        const userLoginEl = document.getElementById('userLogin');
+        const userAvatarEl = document.getElementById('userAvatar');
+
+        if (userNameEl) userNameEl.textContent = user.login;
+        if (userLoginEl) userLoginEl.textContent = '@' + user.login;
+        if (userAvatarEl) userAvatarEl.src = user.avatar_url || '';
+    }
+}
+
+// Setup unified logout handler
+function setupLogoutHandler() {
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('gh_token');
+            localStorage.removeItem('gh_user');
+            window.location.href = '/';
+        });
+    }
+}
 
 // State
 let currentRepo = null;
@@ -1360,7 +1388,7 @@ window.fetchRepoPRs = async function (owner, repo) {
 
     try {
         const res = await fetch(`/api/repos/${owner}/${repo}/prs`, {
-            headers: { 'github-token': getToken() }
+            headers: { 'Github-Token': getToken() }
         });
 
         if (res.status === 401) {
@@ -1371,7 +1399,7 @@ window.fetchRepoPRs = async function (owner, repo) {
         const prs = await res.json();
 
         if (!Array.isArray(prs) || prs.length === 0) {
-            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-dim);">NO_OPEN_PRS_FOUND.</div>';
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-dim);">NO PULL REQUESTS FOUND IN THIS REPOSITORY</div>';
             return;
         }
 
@@ -1404,6 +1432,21 @@ window.fetchPRDetails = async function (owner, repo, prNumber) {
     const title = document.getElementById('prDetailTitle');
     const fileList = document.getElementById('fileListContainer');
 
+    // New IDE layout elements
+    const prRepoInfo = document.getElementById('prRepoInfo');
+    const prTitle = document.getElementById('prTitle');
+
+    // Show terminal loader for analysis
+    showTerminalLoader();
+
+    // Update IDE header immediately if present
+    if (prRepoInfo) {
+        prRepoInfo.textContent = `${owner}/${repo} // PR #${prNumber}`;
+    }
+    if (prTitle) {
+        prTitle.textContent = 'LOADING...';
+    }
+
     if (title) title.textContent = `LOADING #${prNumber}...`;
     if (fileList) fileList.innerHTML = '<div style="padding: 1rem; color: var(--text-dim);">LOADING_FILES...</div>';
 
@@ -1422,6 +1465,14 @@ window.fetchPRDetails = async function (owner, repo, prNumber) {
         // Update Global State
         currentPR = data.pr;
         currentRepo = { owner: owner, name: repo }; // Simplified repo object
+
+        // Update IDE layout header
+        if (prTitle && data.pr) {
+            prTitle.textContent = data.pr.title;
+        }
+        if (prRepoInfo && data.pr) {
+            prRepoInfo.textContent = `${owner}/${repo} // ${data.pr.head.ref} // PR #${prNumber}`;
+        }
 
         // Update Title
         if (title) {
@@ -1450,13 +1501,124 @@ window.fetchPRDetails = async function (owner, repo, prNumber) {
         cachedAnalysis = data.analysis;
 
         // Analysis is cached, will be displayed when user clicks "SHOW ANALYSIS" button
+        // Show success in terminal and hide loader
+        updateTerminalSuccess();
 
     } catch (err) {
         console.error('Failed to fetch PR details', err);
         if (title) title.textContent = 'ERROR_LOADING_PR';
+        if (prTitle) prTitle.textContent = 'ERROR LOADING PR';
         if (fileList) fileList.innerHTML = '<div style="padding: 1rem; color: var(--danger-color);">FAILED_TO_LOAD_FILES</div>';
+        hideTerminalLoader();
     }
 };
+
+// Terminal Loader Functions
+function showTerminalLoader() {
+    const loader = document.getElementById('terminalLoader');
+    const body = document.getElementById('terminalBody');
+    if (!loader || !body) return;
+
+    body.innerHTML = '';
+
+    const messages = [
+        { text: '$ Initializing AI Code Review System...', type: 'info' },
+        { text: '[INFO] Loading PR files and metadata', type: 'info' },
+        { text: '>> Starting Multi-Agent Analysis Pipeline', type: '' },
+        { text: '[AGENT-1] Security Analyzer: Running...', type: 'info' },
+        { text: '[AGENT-2] Performance Analyzer: Running...', type: 'info' },
+        { text: '[AGENT-3] Code Quality Checker: Running...', type: 'info' },
+        { text: '[LINTER] Running static analysis...', type: 'warning' },
+        { text: '[SYNTHESIS] Aggregating findings...', type: 'info' },
+        { text: ' Waiting for analysis to complete...', type: '', hasCursor: true }
+    ];
+
+    let messageIndex = 0;
+
+    function typeNextMessage() {
+        if (messageIndex >= messages.length) return;
+
+        const msg = messages[messageIndex];
+        const line = document.createElement('div');
+        line.className = `terminal-line ${msg.type}`;
+        body.appendChild(line);
+
+        let charIndex = 0;
+        const typingSpeed = 30;
+
+        function typeChar() {
+            if (charIndex < msg.text.length) {
+                line.textContent += msg.text[charIndex];
+                charIndex++;
+                body.scrollTop = body.scrollHeight;
+                setTimeout(typeChar, typingSpeed);
+            } else {
+                if (msg.hasCursor) {
+                    const cursor = document.createElement('span');
+                    cursor.className = 'terminal-cursor';
+                    line.appendChild(cursor);
+                }
+                messageIndex++;
+                setTimeout(typeNextMessage, 200);
+            }
+        }
+
+        typeChar();
+    }
+
+    typeNextMessage();
+
+    loader.classList.add('active');
+}
+
+function hideTerminalLoader() {
+    const loader = document.getElementById('terminalLoader');
+    if (loader) loader.classList.remove('active');
+}
+
+function updateTerminalSuccess() {
+    const body = document.getElementById('terminalBody');
+    if (!body) return;
+
+    const successMessages = [
+        { text: '[SUCCESS] Multi-agent analysis completed', type: 'success' },
+        { text: '$ All agents finished successfully', type: 'success' },
+        { text: '$ Loading results...', type: 'info' }
+    ];
+
+    let msgIndex = 0;
+
+    function typeSuccessMessage() {
+        if (msgIndex >= successMessages.length) {
+            // All messages typed, hide after delay
+            setTimeout(() => hideTerminalLoader(), 1200);
+            return;
+        }
+
+        const msg = successMessages[msgIndex];
+        const line = document.createElement('div');
+        line.className = `terminal-line ${msg.type}`;
+        body.appendChild(line);
+
+        let charIndex = 0;
+
+        function typeChar() {
+            if (charIndex < msg.text.length) {
+                line.textContent += msg.text[charIndex];
+                charIndex++;
+                body.scrollTop = body.scrollHeight;
+                setTimeout(typeChar, 25);
+            } else {
+                msgIndex++;
+                setTimeout(typeSuccessMessage, 150);
+            }
+        }
+
+        typeChar();
+    }
+
+    typeSuccessMessage();
+}
 
 // Initialization Logic (Router)
 document.addEventListener('DOMContentLoaded', () => {
@@ -1546,12 +1708,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const pr = params.get('pr');
 
         if (owner && repo && pr) {
-            // Completely hide sidebar for PR details to maximize editor width
-            if (sidebar && dashboardContainer) {
-                sidebar.classList.add('hidden');
-                dashboardContainer.classList.add('sidebar-hidden');
-            }
-
             fetchPRDetails(owner, repo, pr);
         } else {
             alert("MISSING_PR_PARAMETERS");
@@ -1944,3 +2100,120 @@ window.runMultiAgentAnalysis = async function () {
         if (analysisSpinner) analysisSpinner.classList.add('hidden');
     }
 };
+
+// =========================================
+// IDE Layout Functions
+// =========================================
+
+function toggleChatPanel() {
+    const panel = document.getElementById('chatPanel');
+    if (panel) {
+        panel.classList.toggle('visible');
+    }
+}
+
+function switchIDEView(viewName) {
+    const icon = document.getElementById(`tab-icon-${viewName}`);
+    const sidebar = document.getElementById('ideSidebar');
+    const filesView = document.getElementById('view-files');
+    const reportView = document.getElementById('view-report');
+
+    // VS Code behavior: clicking active icon toggles sidebar
+    if (icon && icon.classList.contains('active') && viewName === 'files') {
+        // Toggle sidebar visibility
+        if (sidebar) {
+            sidebar.classList.toggle('collapsed');
+            // Resize editor after transition
+            setTimeout(() => {
+                if (window.monacoEditor && typeof window.monacoEditor.layout === 'function') {
+                    window.monacoEditor.layout();
+                }
+            }, 200);
+        }
+        return;
+    }
+
+    // Update activity bar icons
+    document.querySelectorAll('.activity-icon').forEach(el => el.classList.remove('active'));
+    if (icon) icon.classList.add('active');
+
+    // Show/hide views
+    if (viewName === 'files') {
+        if (filesView) filesView.style.display = 'flex';
+        if (reportView) reportView.classList.remove('active');
+        // Ensure sidebar is visible when switching to files view
+        if (sidebar) sidebar.classList.remove('collapsed');
+    } else if (viewName === 'report') {
+        if (filesView) filesView.style.display = 'none';
+        if (reportView) reportView.classList.add('active');
+        // Hide sidebar when viewing report
+        if (sidebar) sidebar.classList.add('collapsed');
+    }
+
+    // Resize editor if visible
+    if (viewName === 'files' && window.monacoEditor && typeof window.monacoEditor.layout === 'function') {
+        setTimeout(() => window.monacoEditor.layout(), 50);
+    }
+}
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('ideSidebar');
+    if (sidebar) {
+        sidebar.classList.toggle('collapsed');
+        // Resize editor after transition
+        setTimeout(() => {
+            if (window.monacoEditor && typeof window.monacoEditor.layout === 'function') {
+                window.monacoEditor.layout();
+            }
+        }, 200);
+    }
+}
+
+// Resizable Sidebar
+let isResizing = false;
+let sidebarWidth = 250;
+
+function initSidebarResize() {
+    const sidebar = document.getElementById('ideSidebar');
+    if (!sidebar) return;
+
+    // Create resize handle
+    const resizeHandle = document.createElement('div');
+    resizeHandle.className = 'sidebar-resize-handle';
+    sidebar.appendChild(resizeHandle);
+
+    resizeHandle.addEventListener('mousedown', function (e) {
+        isResizing = true;
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+    });
+
+    document.addEventListener('mousemove', function (e) {
+        if (!isResizing) return;
+
+        const newWidth = e.clientX - 50; // 50px for activity bar
+        if (newWidth >= 150 && newWidth <= 600) {
+            sidebar.style.width = newWidth + 'px';
+            sidebarWidth = newWidth;
+        }
+    });
+
+    document.addEventListener('mouseup', function () {
+        if (isResizing) {
+            isResizing = false;
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+            // Resize editor
+            if (window.monacoEditor && typeof window.monacoEditor.layout === 'function') {
+                window.monacoEditor.layout();
+            }
+        }
+    });
+}
+
+// Initialize resize on page load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSidebarResize);
+} else {
+    initSidebarResize();
+}

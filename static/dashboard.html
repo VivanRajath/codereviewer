@@ -2,20 +2,16 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
+    <meta char set="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - PR Analyzer</title>
+    <title>Dashboard</title>
     <link rel="stylesheet" href="/static/style.css">
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 </head>
 
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <!-- <div class="sidebar-header">
-                <button class="btn-icon toggle-sidebar-btn" id="sidebarToggle" title="Toggle Sidebar">☰</button>
-            </div> -->
+        <aside class="sidebar">
             <div class="user-profile">
                 <img src="" alt="Avatar" class="avatar" id="userAvatar">
                 <div class="user-info">
@@ -25,10 +21,9 @@
             </div>
 
             <ul class="nav-links">
-                <li><a href="/dashboard" class="active">› ACTIVITY_LOG</a></li>
-                <li><a href="/static/repositories.html">› REPOSITORIES</a></li>
-
-                <li><a href="/static/manual.html">› MANUAL_OVERRIDE</a></li>
+                <li><a href="/dashboard" class="active">ACTIVITY LOG</a></li>
+                <li><a href="/static/repositories.html">REPOSITORIES</a></li>
+                <li><a href="/static/manual.html">MANUAL OVERRIDE</a></li>
             </ul>
 
             <div style="margin-top: auto;">
@@ -36,20 +31,18 @@
             </div>
         </aside>
 
-        <!-- Main Content -->
         <main class="main-content">
-            <!-- Activity Section -->
             <section id="activitySection">
                 <div class="section-header">
-                    <h2>RECENT_ACTIVITY</h2>
+                    <h2>RECENT ACTIVITY</h2>
                     <button class="btn" onclick="fetchActivityLogs(true)">REFRESH</button>
                 </div>
 
                 <!-- Tab Navigation -->
                 <div class="tab-nav" style="margin-bottom: 1.5rem;">
-                    <button class="tab-btn active" onclick="switchActivityTab('commits')">LATEST_COMMITS</button>
-                    <button class="tab-btn" onclick="switchActivityTab('fileChanges')">FILE_CHANGES</button>
-                    <button class="tab-btn" onclick="switchActivityTab('analyses')">PR_ANALYSES</button>
+                    <button class="tab-btn active" onclick="switchActivityTab('commits')">LATEST COMMITS</button>
+                    <button class="tab-btn" onclick="switchActivityTab('fileChanges')">FILE CHANGES</button>
+                    <button class="tab-btn" onclick="switchActivityTab('analyses')">PR ANALYSES</button>
                 </div>
 
                 <!-- Tab Content -->
@@ -74,22 +67,7 @@
         </main>
     </div>
 
-    <!-- Analysis Modal -->
-    <!-- <div id="modalOverlay" class="modal-overlay" onclick="closeModal()"></div>
-    <div id="analysisModal" class="modal">
-        <div class="modal-header">
-            <h3 id="modalTitle">ANALYSIS_DETAILS</h3>
-            <button class="btn-icon" onclick="closeModal()">×</button>
-        </div>
-        <div class="modal-body" id="modalContent">
-            Content injected here -->
-    <!-- </div>
-    <div class="modal-footer">
-        <button class="btn" onclick="closeModal()">CLOSE</button>
-    </div>
-    </div> -->
-
-    <script src="/static/app.js?v=2"></script>
+    <script src="/static/app.js?v=3"></script>
 </body>
 
 </html>

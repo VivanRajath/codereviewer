@@ -1,192 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
-<style>
-    .dashboard-container {
-        display: block !important;
-        grid-template-columns: 260px 1fr;
-        height: 100vh;
-        transition: grid-template-columns 0.1s steps(1);
-    }
-</style>
-
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PR Details - PR Analyzer</title>
+    <title>PR Editor</title>
     <link rel="stylesheet" href="/static/style.css">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 </head>
 
 <body>
-    <div class="dashboard-container">
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <button class="btn-icon toggle-sidebar-btn" id="sidebarToggle" title="Toggle Sidebar">☰</button>
-            </div>
-            <div class="user-profile">
-                <img src="" alt="Avatar" class="avatar" id="userAvatar">
-                <div class="user-info">
-                    <div class="username" id="userName">INITIALIZING...</div>
-                    <div style="font-size: 0.8rem; color: var(--text-dim);" id="userLogin">@...</div>
+    <div class="ide-container">
+        <!-- Top Header -->
+        <header class="ide-header">
+            <div class="left-controls">
+                <button class="btn-sm" onclick="window.history.back()">
+                    BACK
+                </button>
+                <div class="pr-info">
+                    <span id="prRepoInfo" style="color: var(--text-dim); font-size: 0.85rem;"></span>
+                    <span id="prTitle"
+                        style="font-weight: bold; color: var(--primary-color); margin-left: 0.5rem;">LOADING...</span>
                 </div>
             </div>
-            <ul class="nav-links">
-                <li><a href="/dashboard">› ACTIVITY_LOG</a></li>
-                <li><a href="/static/repositories.html" class="active">› REPOSITORIES</a></li>
-                <li><a href="/static/reports.html">› REPORTS</a></li>
-                <li><a href="/static/manual.html">› MANUAL_OVERRIDE</a></li>
-            </ul>
-            <div style="margin-top: auto;">
-                <button class="btn logout-btn" id="logoutBtn">LOGOUT</button>
+            <div class="right-controls">
+                <button class="btn-sm" id="commitPushBtn" onclick="commitAndPush()">
+                    <span id="commitBtnText">COMMIT & PUSH</span>
+                    <span id="commitSpinner" class="hidden">...</span>
+                </button>
             </div>
-        </aside>
+        </header>
 
-        <main class="main-content">
-            <section class="content-section">
-                <div class="pr-details-header">
-                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-                        <button class="btn-sm" onclick="window.history.back()"
-                            style="display: flex; align-items: center; gap: 0.5rem;">
-                            <span>←</span>
-                            <span>BACK</span>
-                        </button>
+        <div class="ide-workspace">
+            <!-- Activity Bar -->
+            <aside class="activity-bar">
+                <div class="activity-icon active" id="tab-icon-files" title="Explorer" onclick="switchIDEView('files')">
+                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path
+                            d="M14.5 3H7.71l-.85-.85L6.51 2h-5l-.5.5v11l.5.5h13l.5-.5v-10L14.5 3zm-.51 8.49V13h-12V7h4.49l.35-.15.86-.86H14v1.5z" />
+                    </svg>
+                </div>
+                <div class="activity-icon" id="tab-icon-report" title="Analysis Report"
+                    onclick="switchIDEView('report')">
+                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path
+                            d="M1.5 1h13l.5.5v13l-.5.5h-13l-.5-.5v-13l.5-.5zM2 2v12h12V2H2zm2 7h3v4H4V9zm4-4h3v8H8V5zm4 2h3v6h-3V7z" />
+                    </svg>
+                </div>
+            </aside>
+
+            <!-- File Explorer Sidebar -->
+            <aside class="ide-sidebar" id="ideSidebar">
+                <div class="ide-sidebar-header">
+                    <span>EXPLORER</span>
+                </div>
+                <div id="fileListContainer" class="ide-file-list">
+                    <!-- Files injected here -->
+                    <div style="padding: 1rem; color: var(--text-dim); text-align: center;">LOADING FILES...</div>
+                </div>
+            </aside>
+
+            <!-- Main Editor Area -->
+            <main class="ide-main" id="view-files">
+                <!-- Editor Tabs -->
+                <div class="editor-tabs">
+                    <div class="editor-tab active">
+                        <span id="editorFileName">SELECT FILE</span>
                     </div>
-                    <h2 id="prTitle">LOADING PR DETAILS...</h2>
-                    <div class="pr-meta">
-                        <span id="prNumber">#--</span>
-                        <span id="prAuthor">AUTHOR: --</span>
-                        <span id="prCreated">CREATED: --</span>
+                    <div style="margin-left: auto; display: flex; align-items: center; padding-right: 0.5rem;">
+                        <button class="btn-sm" onclick="autoFixFile()"
+                            style="font-size: 0.7rem; padding: 2px 6px;">AUTO-FIX</button>
                     </div>
                 </div>
 
-                <!-- Tab Navigation -->
-                <div class="tab-navigation">
-                    <button class="tab-btn active" onclick="switchPRTab('files')">FILES</button>
-                    <button class="tab-btn" onclick="switchPRTab('report')">REPORT</button>
+                <!-- Monaco Editor -->
+                <div id="monacoEditor"></div>
+            </main>
+
+            <!-- Report View (Hidden by default) -->
+            <main class="ide-main ide-report-view" id="view-report">
+                <div class="report-header">
+                    <h3>MULTI-AGENT ANALYSIS REPORT</h3>
+                    <button class="btn-sm" id="showAnalysisBtn" onclick="displayCachedAnalysis()">
+                        RUN ANALYSIS
+                    </button>
                 </div>
 
-                <!-- Tab Content -->
-                <div class="tab-container">
-                    <!-- FILES TAB: 3-Pane Editor -->
-                    <div id="tab-files" class="tab-content active">
-                        <div class="pr-split-view" id="prSplitView">
-                            <!-- Left: File List -->
-                            <div class="file-list-panel">
-                                <div class="panel-header">FILES</div>
-                                <div id="fileListContainer" class="file-list">
-                                    <!-- Files injected here -->
-                                </div>
-                            </div>
+                <div id="reportContent" class="report-content">
+                    <div style="color: var(--text-dim); text-align: center; padding: 2rem;">
+                        CLICK "RUN ANALYSIS" TO VIEW RESULTS...
+                    </div>
+                </div>
 
-                            <!-- Middle: Editor -->
-                            <div class="editor-panel">
-                                <div class="editor-header">
-                                    <span id="editorFileName">SELECT A FILE</span>
-                                    <div class="editor-actions">
-                                        <button class="btn-sm" id="commitPushBtn" onclick="commitAndPush()">
-                                            <span id="commitBtnText">COMMIT & PUSH</span>
-                                            <span id="commitSpinner" class="hidden">⟳</span>
-                                        </button>
-                                        <button class="btn-sm" onclick="autoFixFile()">AUTO-FIX</button>
-                                    </div>
-                                </div>
-                                <div id="monacoEditor"></div>
-                            </div>
-
-                            <!-- Right: AI Chat -->
-                            <div class="chat-panel" id="chatPanel">
-                                <div class="panel-header">
-                                    <span>AI ASSISTANT</span>
-                                    <button class="btn-icon" onclick="toggleChat()" title="Toggle Chat">_</button>
-                                </div>
-                                <div class="chat-container">
-                                    <div id="chatMessages" class="chat-messages">
-                                        <div style="color: var(--text-dim); text-align: center; margin-top: 1rem;">
-                                            SELECT A FILE TO START ANALYSIS...
-                                        </div>
-                                    </div>
-                                    <div class="chat-input-area">
-                                        <input type="text" id="chatInput" placeholder="Ask about this code..."
-                                            onkeypress="handleChatInput(event)">
-                                        <button class="btn" onclick="sendChatMessage()">SEND</button>
-                                    </div>
-                                </div>
-                            </div>
+                <div class="report-sections">
+                    <div class="report-section">
+                        <h4>SECURITY ANALYSIS</h4>
+                        <div id="securityResults" class="report-section-content">
+                            <p style="color: var(--text-dim);">No security analysis available.</p>
                         </div>
                     </div>
 
-                    <!-- REPORT TAB -->
-                    <div id="tab-report" class="tab-content">
-                        <div class="report-container">
-                            <div class="report-header">
-                                <h3>MULTI-AGENT ANALYSIS REPORT</h3>
-                                <button class="btn-sm" id="showAnalysisBtn" onclick="displayCachedAnalysis()">
-                                    RUN ANALYSIS
-                                </button>
-                            </div>
+                    <div class="report-section">
+                        <h4>PERFORMANCE</h4>
+                        <div id="performanceResults" class="report-section-content">
+                            <p style="color: var(--text-dim);">No performance analysis available.</p>
+                        </div>
+                    </div>
+                    <div class="report-section">
+                        <h4>CODE QUALITY</h4>
+                        <div id="codeQualityResults" class="report-section-content">
+                            <p style="color: var(--text-dim);">No analysis results available.</p>
+                        </div>
+                    </div>
 
-                            <div id="reportContent" class="report-content">
-                                <div style="color: var(--text-dim); text-align: center; padding: 2rem;">
-                                    CLICK "RUN ANALYSIS" TO VIEW RESULTS...
-                                </div>
-                            </div>
-
-                            <div class="report-sections">
-
-
-
-
-                                <div class="report-section">
-                                    <h4> SECURITY ANALYSIS</h4>
-                                    <div id="securityResults" class="report-section-content">
-                                        <p style="color: var(--text-dim);">No security analysis available.</p>
-                                    </div>
-                                </div>
-
-                                <div class="report-section">
-                                    <h4> PERFORMANCE</h4>
-                                    <div id="performanceResults" class="report-section-content">
-                                        <p style="color: var(--text-dim);">No performance analysis available.</p>
-                                    </div>
-                                </div>
-                                <div class="report-section">
-                                    <h4> CODE QUALITY</h4>
-                                    <div id="codeQualityResults" class="report-section-content">
-                                        <p style="color: var(--text-dim);">No analysis results available.</p>
-                                    </div>
-                                </div>
-
-                                <div class="report-section">
-                                    <h4> LINTER RESULTS</h4>
-                                    <div id="linterResults" class="report-section-content">
-                                        <p style="color: var(--text-dim);">No linter results available.</p>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="report-section">
+                        <h4>LINTER RESULTS</h4>
+                        <div id="linterResults" class="report-section-content">
+                            <p style="color: var(--text-dim);">No linter results available.</p>
                         </div>
                     </div>
                 </div>
-            </section>
-        </main>
+            </main>
+
+            <!-- Slide-out Chat Panel -->
+            <aside class="ide-chat-panel" id="chatPanel">
+                <div class="panel-header">
+                    <span>AI ASSISTANT</span>
+                    <button class="btn-icon" onclick="toggleChatPanel()" title="Close">X</button>
+                </div>
+                <div class="chat-container">
+                    <div id="chatMessages" class="chat-messages">
+                        <div style="color: var(--text-dim); text-align: center; margin-top: 2rem;">
+                            AI Code Assistant Ready.<br>
+                            Select a file to start analysis.
+                        </div>
+                    </div>
+                    <div class="chat-input-area" style="padding: 1rem; border-top: 1px solid var(--primary-color);">
+                        <input type="text" id="chatInput" placeholder="Ask about this code..."
+                            onkeypress="handleChatInput(event)">
+                        <button class="btn" onclick="sendChatMessage()">SEND</button>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Floating Chat Button -->
+        <button class="floating-chat-btn" id="floatingChatBtn" onclick="toggleChatPanel()" title="Toggle AI Chat">
+            <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
+                <path
+                    d="M2.5 2h11l.5.5v8l-.5.5H8l-2.5 3v-3h-3l-.5-.5v-8l.5-.5zM3 3v7h3.5l.5.5v1.5l1.5-2 .5-.5h5V3H3z" />
+            </svg>
+        </button>
     </div>
 
-    <!-- Commit Message Modal -->
+    <!-- Terminal Loader -->
+    <div class="terminal-loader" id="terminalLoader">
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="terminal-dots">
+                    <div class="terminal-dot"></div>
+                    <div class="terminal-dot"></div>
+                    <div class="terminal-dot"></div>
+                </div>
+                <div class="terminal-title">AI Multi-Agent Analysis</div>
+            </div>
+            <div class="terminal-body" id="terminalBody">
+                <!-- Terminal output will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Commit Modal -->
     <div id="commitModal" class="modal">
         <div class="modal-content" style="max-width: 500px;">
             <div class="modal-header">
                 <h3 style="margin: 0; color: var(--primary-color);">COMMIT MESSAGE</h3>
-                <button class="btn-icon" onclick="closeCommitModal()" style="font-size: 1.5rem;">×</button>
+                <button class="btn-icon" onclick="closeCommitModal()" style="font-size: 1.5rem;">X</button>
             </div>
             <div class="modal-body">
                 <input type="text" id="commitMessageInput" placeholder="Enter commit message..."
                     style="width: 100%; padding: 0.75rem; background: var(--surface-color); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; color: var(--text-color); font-size: 0.95rem;"
                     onkeypress="handleCommitInputKeypress(event)">
-                <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-dim);">
-                    Press Enter to commit or Esc to cancel
-                </div>
             </div>
             <div class="modal-footer" style="display: flex; gap: 0.5rem; justify-content: flex-end;">
                 <button class="btn-sm" onclick="closeCommitModal()">CANCEL</button>

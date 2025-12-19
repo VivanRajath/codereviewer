@@ -1,4 +1,4 @@
-document.getElementById('analyzeForm').addEventListener('submit', async function(e) {
+document.getElementById('analyzeForm').addEventListener('submit', async function (e) {
     e.preventDefault();
 
     const submitBtn = document.getElementById('submitBtn');

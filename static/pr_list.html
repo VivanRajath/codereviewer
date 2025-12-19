@@ -4,11 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PR List - PR Analyzer</title>
+    <title>Pull Requests </title>
     <link rel="stylesheet" href="/static/style.css">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -18,18 +16,18 @@
                 <img src="" alt="Avatar" class="avatar" id="userAvatar">
                 <div class="user-info">
                     <div class="username" id="userName">INITIALIZING...</div>
-                    <div style="font-size: 0.8rem; color: var(--text-dim);" id="userLogin">@...</div>
+                    <div id="userLogin" style="font-size: 0.8rem; color: var(--text-dim);">@...</div>
                 </div>
             </div>
-            <ul class="nav-links">
-                <li><a href="/dashboard">› ACTIVITY_LOG</a></li>
-                <li><a href="/static/repositories.html" class="active">› REPOSITORIES</a></li>
 
-                <li><a href="/static/manual.html">› MANUAL_OVERRIDE</a></li>
+            <ul class="nav-links">
+                <li><a href="/dashboard">ACTIVITY LOG</a></li>
+                <li><a href="/static/repositories.html" class="active">REPOSITORIES</a></li>
+                <li><a href="/static/manual.html">MANUAL OVERRIDE</a></li>
             </ul>
+
             <div style="margin-top: auto;">
-                <button class="btn logout-btn" id="logoutBtn"
-                    style="width: 100%; border-color: var(--danger-color); color: var(--danger-color);">LOGOUT</button>
+                <button class="btn logout-btn" id="logoutBtn">LOGOUT</button>
             </div>
         </aside>
 
@@ -37,13 +35,14 @@
             <section id="prListSection">
                 <div class="section-header">
                     <h2 id="repoTitle">LOADING...</h2>
-                    <button class="btn"
-                        onclick="window.location.href='/static/repositories.html'">BACK_TO_REPOS</button>
+                    <button class="btn" onclick="window.location.href='/static/repositories.html'">BACK TO
+                        REPOS</button>
                 </div>
                 <div id="prListGrid" class="card-grid"></div>
             </section>
         </main>
     </div>
+
     <script src="/static/app.js"></script>
 </body>
 
